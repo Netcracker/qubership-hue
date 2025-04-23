@@ -6,7 +6,7 @@ apiVersion: v1
 data:
   POSTGRES_PASSWORD: {{ default "postgres" (include "postgres.hue.password" .) | b64enc }}
   POSTGRES_ADMIN_USER: {{ default "postgres" (include "postgres.adminUser" .) | b64enc }}
-  POSTGRES_ADMIN_PASSWORD: {{ default "postgres" (include "postgres.adminPassword") | b64enc }}
+  POSTGRES_ADMIN_PASSWORD: {{ default "postgres" (include "postgres.adminPassword" .) | b64enc }}
 kind: Secret
 metadata:
   name: huepreinstallhooksecret
