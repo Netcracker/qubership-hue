@@ -1,0 +1,331 @@
+env: ~
+#  - name: REQUESTS_CA_BUNDLE
+#    value: /home/hue/trustcerts/ca.crt
+#  - name: SSL_CERT_FILE
+#    value: /home/hue/trustcerts/ca.crt
+#  - name: PGSSLROOTCERT
+#    value: /home/hue/trustcerts/ca.crt
+#  - name: POSTGRES_SSLMODE
+#    value: "verify-ca"
+
+image:
+   registry: "ghcr.io/netcracker/qubership-hue"
+   tag: "main"
+   pullPolicy: "IfNotPresent"
+
+cloudIntegrationEnabled: true
+
+api:
+  enabled: false
+  domain: "api."
+
+hue:
+  priorityClassName: ~
+  replicas: 1
+  resources:
+    limits:
+      cpu: "300m"
+      memory: "500Mi"
+    requests:
+      cpu: "200m"
+      memory: "300Mi"
+  service:
+    annotations: { }
+  database:
+    create: true
+    initJobAnnotations:
+      # This is what defines this resource as a hook. Without this line, the
+      # job is considered part of the release.
+      "helm.sh/hook": pre-install
+      "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
+      "helm.sh/hook-weight": "-4"
+    engine: "postgresql_psycopg2"
+    host: "pg-patroni.postgres.svc"
+    port: 5432
+    user: "user"
+    password: "password"
+    #password_script=echo ${DATABASE_PASSWORD}
+    name: "database name"
+    adminUser: "admin user name"
+    adminPassword: "admin password"
+  imagePullPolicy: Always
+  podSecurityContext:
+    runAsUser: 1001
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+    runAsUser: 1001
+  hostAliases: []
+
+  interpreters: |
+    [[[postgresql]]]
+    name = PostgreSql
+    interface=sqlalchemy
+    options='{"url": "postgresql+psycopg2://{{ include "postgres.hue.user" . }}:{{ include "postgres.hue.password" . }}@{{ include "postgres.host" . }}:{{ include "postgres.port" . }}/{{ .Values.hue.database.name }}"}'
+#    [[[hive]]]
+#    # The name of the snippet.
+#    name=Hive
+#    # The backend connection to use to communicate with the server.
+#    interface=hiveserver2
+#    [[[trino]]]
+#    name = Trino
+#    interface= sqlalchemy
+#    options='{"url": "trino://trino:8080/cassandra"}'
+#    [[[trino1]]]
+#    name = Redis-1
+#    interface= sqlalchemy
+#    options='{"url": "trino://trino:8080/redis"}'
+#    [beeswax]
+#    hive_conf_dir=/etc/hadoop/conf
+#    hive_server_host=<hive server host url>
+#    security_enabled=true
+#    mechanism=GSSAPI
+
+  ini: |
+    [desktop]
+    app_blacklist=filebrowser,search,hbase,security,jobbrowser,oozie
+    enable_xff_for_hive_impala=false
+    django_debug_mode=false
+    gunicorn_work_class=sync
+    enable_prometheus=false
+    # [[auth]]
+    # backend=desktop.auth.backend.LdapBackend
+    # [[ldap]]
+    # ldap_url=ldaps://ldapurl
+    # search_bind_authentication=true
+    # create_users_on_login=true
+    # base_dn="user base_dn"
+    # bind_dn="bind_dn"
+    # bind_password_script=sh /var/lib/hue/hue_passwords.sh
+    # [[[users]]]
+    # user_filter="objectclass=user"
+    # user_name_attr="sAMAccountName"
+    # [[[groups]]]
+    # group_filter="objectclass=group"
+    # group_name_attr="cn"
+    # group_member_attr="member"
+    [[database]]
+    host={{ include "postgres.host" . }}
+    engine=postgresql_psycopg2
+    user={{ include "postgres.hue.user" . }}
+    password={{ include "postgres.hue.password" . }}
+    name={{ .Values.hue.database.name }}
+    # [[kerberos]]
+    # Path to Hue's Kerberos keytab file
+    # hue_keytab=/etc/hue/keytabs/service.keytab
+
+    # Kerberos principal name for Hue
+    # hue_principal=mapr/<hostname>@<realm>
+    # Substitute your hostname and realm in the example below
+    # hue_principal=userr@LDAP.REALM.LOCAL
+
+    # Path to keep Kerberos credentials cached
+    
+    # ccache_path=/tmp/krb5cc_1001
+    # Frequency in seconds with which Hue will renew its keytab
+    # keytab_reinit_frequency=86400
+
+    # Path to kinit
+    # Note that the actual path depends on which Linux OS you are using
+    # kinit_path=/usr/bin/kinit
+
+createDBJob:
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 300m
+      memory: 300Mi
+
+ingress:
+  create: true
+  type: "nginx"
+  domain: ""
+  tls:
+    enabled: false
+    # secretName: hue-tls-cm
+  annotations: {}
+#    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+#    nginx.ingress.kubernetes.io/proxy-ssl-verify: 'on'
+#    nginx.ingress.kubernetes.io/proxy-ssl-name: 'hue.<hue_namespace>'
+#    nginx.ingress.kubernetes.io/proxy-ssl-secret: '<hue_namespace>/<hue_service_secret_name>'
+
+  # extraHosts:
+  # - "demo.hue.com"
+  # annotations: {}
+  # loadBalancerIp: "127.0.0.1"
+
+hive:
+  site: |
+    <!--
+
+    -->
+
+ssl:
+  enabled: false
+  cacerts: |
+    ""
+
+kerberos:
+  enabled: false
+  keytab: |
+    ""
+  config: |
+    ""
+
+ldap:
+  enabled: false
+  bind_password_script: |
+    ""
+
+databasescommon:
+  enabled: false
+  configs:
+    mongodb.properties: |
+      connector.name=mongodb
+      mongodb.connection-url=mongodb://root:root@mongos.mongo.svc/
+    cassandra.properties: |
+      connector.name=cassandra
+      cassandra.contact-points=cassandra.cassandra
+      cassandra.native-protocol-port=9042
+      cassandra.security=PASSWORD
+      cassandra.username=cassandra user
+      cassandra.password=cassandra user password
+      cassandra.load-policy.dc-aware.local-dc=dc1
+      cassandra.load-policy.use-dc-aware=true
+    redis.properties: |
+      connector.name=redis
+      redis.table-names: redis
+      redis.nodes: redis.redis
+      redis.default-schema: default
+      redis.password: redis password
+      redis.database-index: 1
+      redis.table-description-dir: /dbadditionalconfigs/test.json
+    tpch.properties: |
+      connector.name=tpch
+
+#additionalConfigs:
+#  test.json: |
+#    {
+#      "tableName": "redis",
+#      "schemaName": "redis",
+#      "key": {
+#        "dataFormat": "raw",
+#        "fields": [
+#          {
+#            "name": "redis_key",
+#            "type": "varchar",
+#            "hidden": "false"
+#          }
+#        ]
+#      },
+#      "value": {
+#        "dataFormat": "raw",
+#        "fields": [
+#          {
+#            "name": "redis_value",
+#            "type": "varchar",
+#            "hidden": "false"
+#          }
+#        ]
+#      }
+#    }
+
+trino:
+  enabled: false
+  image: ghcr.io/netcracker/qubership-trino:main
+  imagePullPolicy: "IfNotPresent"
+  replicas: 1
+  priorityClassName: ~
+  resources:
+    limits:
+      cpu: 150m
+      memory: 800Mi
+    requests:
+      cpu: 100m
+      memory: 600Mi
+  service:
+    annotations: {}
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+  securityRules:
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+  hostAliases: []
+  extraVolumes: []
+#    - name: tls-pg-cert
+#      secret:
+#        secretName: tls-pg-cert
+  extraVolumeMounts: []
+#    - name: tls-pg-cert
+#      mountPath: /home/trino/trustcerts/ca.crt
+#      subPath: cm-ca.crt
+#      readOnly: true
+
+jvmconfig: |
+  -XX:+ExplicitGCInvokesConcurrent
+  -XX:+HeapDumpOnOutOfMemoryError
+  -XX:+UseGCOverheadLimit
+  -XX:+ExitOnOutOfMemoryError
+  -XX:ReservedCodeCacheSize=256M
+  -Djdk.attach.allowAttachSelf=true
+  -Djdk.nio.maxCachedBufferSize=2000000
+  -DHADOOP_USER_NAME=hadoop user name
+
+jvm:
+  maxHeapSize: 1G
+  gcMethod:
+    type: UseG1GC
+    g1:
+      heapRegionSize: 16M
+
+certManagerInegration:
+  enabled: false
+  secretName: hue-tls-cm
+  secretMounts:
+    - mountPath: /home/hue/trustcerts/ca.crt
+      subPath: ca.crt
+  duration: 365
+  subjectAlternativeName:
+    additionalDnsNames: [ ]
+    additionalIpAddresses: [ ]
+  clusterIssuerName: ~
+
+
+## Pod Annotations
+# podAnnotations: {}
+
+## Pod Labels
+# podLabels: {}
+
+extraSecrets: {}
+#  tls-custom-cert:
+#    stringData: |
+#      cm-ca.crt: |
+#       -----BEGIN CERTIFICATE-----
+#       certificate content goes here
+#       -----END CERTIFICATE-----
+#
+
+extraVolumes: []
+#  - name: tls-custom-cert
+#    secret:
+#      secretName: tls-custom-cert
+
+extraVolumeMounts: []
+#  - name: tls-custom-cert
+#    mountPath: /home/hue/trustcerts/ca-custom.crt
+#    subPath: cm-ca.crt
+#    readOnly: true

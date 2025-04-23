@@ -1,0 +1,15 @@
+##########################################################################################################################
+# Qubership custom template. Self-signed cert-manager Issuer for Hue if certificate integration is enabled via Helm values
+##########################################################################################################################
+{{- if .Values.certManagerInegration.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: hue-tls-issuer
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "allObjectsLabels" . | nindent 4 }}
+    {{- include "certManagerLabel" . | nindent 4 }}
+spec:
+  selfSigned: {}
+{{- end }}

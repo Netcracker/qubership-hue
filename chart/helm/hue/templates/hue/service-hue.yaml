@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hue
+  # Qubership custom change: custom namespace for Qubership release support
+  namespace: {{ .Release.Namespace }}
+  # Qubership custom change: custom annotations for Qubership release support
+  {{- if .Values.hue.service.annotations }}
+  annotations:
+    {{- toYaml .Values.hue.service.annotations | nindent 4 }}
+  {{- end }}
+  labels:
+    # Qubership custom change: custom lables for Qubership release support
+    {{- include "hue.deploymentAndServiceOnlyLabels" . | nindent 4 }}
+    {{- include "allObjectsLabels" . | nindent 4 }}
+
+spec:
+  ports:
+  - name: hue
+    port: 8888
+    targetPort: 8888
+  selector:
+    # Qubership custom change: custom lables for Qubership release support
+    {{- include "hue.selectorLabels" . | nindent 4 }}

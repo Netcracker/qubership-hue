@@ -1,0 +1,114 @@
+#################################################################################################################
+# Qubership custom template. Trino as a Kubernetes Deployment with optional database and certManager integrations
+#################################################################################################################
+{{- if .Values.trino.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-trino
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "trino.deploymentOnlyLabels" . | nindent 4 }}
+    {{- include "trino.deploymentAndServiceOnlyLabels" . | nindent 4 }}
+    {{- include "allObjectsLabels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.trino.replicas }}
+  selector:
+    matchLabels:
+      {{- include "trino.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "allObjectsLabels" . | nindent 8 }}
+        {{- include "trino.deploymentOnlyLabels" . | nindent 8 }}
+        {{- include "trino.deploymentAndServiceOnlyLabels" . | nindent 8 }}
+      annotations:
+        checksum/databases-config: {{ include (print $.Template.BasePath "/trino/trino-databases-secret.yaml") . | sha256sum }}
+        checksum/databases-additional-configs: {{ include (print $.Template.BasePath "/trino/trino-databases-additional-configs.yaml") . | sha256sum }}
+        checksum/jvm-config: {{ include (print $.Template.BasePath "/trino/trino-jvm-configmap.yaml") . | sha256sum }}
+        {{- if .Values.trino.annotations }}
+        {{- toYaml .Values.trino.annotations | nindent 4 }}
+        {{- end }}
+    spec:
+      {{- if .Values.trino.priorityClassName }}
+      priorityClassName: {{ .Values.trino.priorityClassName }}
+      {{- end }}
+      {{- if .Values.trino.hostAliases }}
+      hostAliases:
+         {{- toYaml .Values.trino.hostAliases | nindent 8 }}
+      {{- end }}
+      restartPolicy: Always
+      {{- if .Values.trino.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.trino.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.trino.affinity }}
+      affinity:
+        {{- toYaml .Values.trino.affinity | nindent 8 }}
+      {{- end }}
+      {{- if .Values.trino.tolerations }}
+      tolerations:
+        {{- toYaml .Values.trino.tolerations | nindent 8 }}
+      {{- end }}
+      {{- with .Values.trino.securityContext }}
+      securityContext:
+        runAsUser: {{ .runAsUser }}
+        runAsGroup: {{ .runAsGroup }}
+      {{- end }}
+      containers:
+      - name: {{ .Chart.Name }}-trino
+        image: {{ template "trinodb.image" . }}
+        imagePullPolicy: {{ .Values.trino.imagePullPolicy }}
+        {{- if .Values.trino.securityRules }}
+        securityContext:
+          {{- toYaml .Values.trino.securityRules  | nindent 12 }}
+        {{- end }}
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+          {{- if .Values.certManagerInegration.enabled }}
+          - name: {{ .Values.certManagerInegration.secretName}}-volume
+            mountPath: /home/trino/trustcerts/ca.crt
+            subPath: ca.crt
+          {{- end}}
+          {{- if .Values.trino.extraVolumeMounts }}
+            {{- tpl (toYaml .Values.trino.extraVolumeMounts) . | nindent 10 }}
+          {{- end }}
+          {{- if .Values.databasescommon.enabled }}
+          - name: config-database
+            mountPath: /etc/trino/catalog/
+          {{- end }}
+          - name: jvm-config
+            mountPath: /etc/trino/jvm.config
+            subPath: jvm.config
+            {{- if and .Values.databasescommon.enabled .Values.databasescommon.additionalConfigs }}
+          - name: databases-additional-configs
+            mountPath: /dbadditionalconfigs
+            {{- end }}
+        resources:
+          {{- toYaml .Values.trino.resources | nindent 12 }}
+      volumes:
+        {{- if .Values.certManagerInegration.enabled }}
+        - name: {{.Values.certManagerInegration.secretName }}-volume
+          secret:
+            secretName: {{.Values.certManagerInegration.secretName }}
+        {{- end}}
+        {{- if .Values.trino.extraVolumes }}
+          {{- tpl (toYaml .Values.trino.extraVolumes) . | nindent 8 }}
+        {{- end }}
+        - name: jvm-config
+          configMap:
+            name: {{ .Chart.Name }}-jvm-config
+        {{- if .Values.databasescommon.enabled }}
+        - name: config-database
+          secret:
+            secretName: {{ .Chart.Name }}-databases
+        {{- end }}
+        {{- if and .Values.databasescommon.enabled .Values.databasescommon.additionalConfigs }}
+        - name: databases-additional-configs
+          configMap:
+            name: {{ .Chart.Name }}-databases-additional-configs
+        {{- end }}
+      restartPolicy: Always
+      serviceAccountName: ""
+{{- end }}

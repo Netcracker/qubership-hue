@@ -1,0 +1,15 @@
+#################################################################################
+# Qubership custom tmeplate. ConfigMap with additional database configs for trino.
+#################################################################################
+{{- if and .Values.databasescommon.enabled .Values.databasescommon.additionalConfigs }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-databases-additional-configs
+  labels:
+    {{- include "allObjectsLabels" . | nindent 4 }}
+data:
+{{- with .Values.databasescommon.additionalConfigs }}
+{{ toYaml . | indent 2 }}
+{{- end }}
+{{- end }}

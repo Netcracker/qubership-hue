@@ -1,0 +1,24 @@
+#########################################################
+# Qubership custom template. Kubernetes Service for Trino
+#########################################################
+{{- if .Values.trino.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: trino
+  namespace: {{ .Release.Namespace }}
+  {{- if .Values.trino.service.annotations }}
+  annotations:
+    {{- toYaml .Values.trino.service.annotations | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "allObjectsLabels" . | nindent 4 }}
+    {{- include "trino.deploymentAndServiceOnlyLabels" . | nindent 4 }}
+spec:
+  ports:
+  - name: "8080"
+    port: 8080
+    targetPort: 8080
+  selector:
+    {{- include "trino.selectorLabels" . | nindent 4 }}
+{{- end }}

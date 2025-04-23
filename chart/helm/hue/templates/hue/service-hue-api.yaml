@@ -1,0 +1,29 @@
+{{- if .Values.api.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: hue-api
+  # Qubership custom change: Qubership release support
+  {{- if .Values.hue.service.annotations }}
+  annotations:
+    {{- toYaml .Values.hue.service.annotations | nindent 4 }}
+  {{- end }}
+  labels:
+    pod: hue-api
+    # Qubership custom change: Qubership release support
+    app: {{ .Chart.Name }}
+    component: hue
+    release: {{ .Release.Name }}
+
+spec:
+  ports:
+  - name: hue-api
+    port: 8005
+    targetPort: 8005
+  selector:
+    pod: hue-api
+    # Qubership custom change: Qubership release support
+    app: {{ .Chart.Name }}
+    component: hue
+    release: {{ .Release.Name }}
+{{- end -}}
