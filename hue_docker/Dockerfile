@@ -9,15 +9,15 @@ RUN mkdir /etc/hadoop \
     && mkdir --parents /home/hue \
     && chmod 777 -R /home/hue
 
-COPY requrements.txt /bin/requrements.txt
+COPY hue_docker/requrements.txt /bin/requrements.txt
 
 RUN ./build/env/bin/pip install --no-cache-dir -r /bin/requrements.txt
 
 RUN apt-get --allow-unauthenticated update \
     && apt-get --no-install-recommends install -y openssl nodejs libssl1.1  krb5-user
 
-COPY createdb.py /bin/createdb.py
-COPY get_hive_conf.sh /bin/get_hive_conf.sh
+COPY hue_/docker/createdb.py /bin/createdb.py
+COPY hue_docker/get_hive_conf.sh /bin/get_hive_conf.sh
 
 RUN chmod 777 /bin/get_hive_conf.sh
 
