@@ -16,7 +16,7 @@ RUN ./build/env/bin/pip install --no-cache-dir -r /bin/requrements.txt
 RUN apt-get --allow-unauthenticated update \
     && apt-get --no-install-recommends install -y openssl nodejs libssl1.1  krb5-user
 
-COPY hue_/docker/createdb.py /bin/createdb.py
+COPY hue_docker/createdb.py /bin/createdb.py
 COPY hue_docker/get_hive_conf.sh /bin/get_hive_conf.sh
 
 RUN chmod 777 /bin/get_hive_conf.sh
