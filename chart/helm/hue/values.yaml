@@ -45,7 +45,7 @@ hue:
     user: "user"
     password: "password"
     #password_script=echo ${DATABASE_PASSWORD}
-    name: "database name"
+    name: "postgres"
     adminUser: "admin user name"
     adminPassword: "admin password"
   imagePullPolicy: Always
