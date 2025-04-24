@@ -27,7 +27,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install psycopg2-binary
+          pip install psycopg2-binary pylint
 
       - name: Run Super-Linter
         uses: github/super-linter@v6
