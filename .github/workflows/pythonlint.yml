@@ -35,6 +35,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ENV_FILE: .github/workflows/super-linter.env
           FLAKE8_CONFIG_FILE: .github/linters/.flake8
+          PYLINT_RCFILE: .github/linters/.pylintrc 
           VALIDATE_ALL_CODEBASE: false
           FILTER_REGEX_INCLUDE: 'hue_docker/createdb\.py'
           RUN_LOCAL: false
