@@ -6,9 +6,6 @@ on:
       - '**'
     paths:
       - hue_docker/createdb.py
-  pull_request:
-    paths:
-      - hue_docker/createdb.py
 
 jobs:
   lint:
