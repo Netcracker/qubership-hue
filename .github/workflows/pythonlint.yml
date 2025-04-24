@@ -5,6 +5,8 @@ on:
     paths:
       - hue_docker/createdb.py
   pull_request:
+    branches:
+      - '**'
     paths:
       - hue_docker/createdb.py
 
