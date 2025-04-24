@@ -60,7 +60,7 @@ app.kubernetes.io/instance: {{ cat .Release.Name "-" .Release.Namespace | nospac
 {{- end }}
 
 {{/*
-Hue deployment only labels for cloud release
+Hue deployment only labels for Qubership release
 */}}
 {{- define "hue.deploymentOnlyLabels" -}}
 app.kubernetes.io/instance: {{ cat .Release.Name "-" .Release.Namespace | nospace | trunc 63 | trimSuffix "-" }}
@@ -71,7 +71,7 @@ app.kubernetes.io/technology: python
 
 
 {{/*
-Hue deployment and service only labels for cloud release
+Hue deployment and service only labels for Qubership release
 */}}
 {{- define "hue.deploymentAndServiceOnlyLabels" -}}
 name:  {{ include "hue.name" . }}
@@ -87,7 +87,7 @@ app.kubernetes.io/instance: {{ cat .Release.Name "-" .Release.Namespace | nospac
 {{- end }}
 
 {{/*
-Trino deployment only labels for cloud release
+Trino deployment only labels for Qubership release
 */}}
 {{- define "trino.deploymentOnlyLabels" -}}
 app.kubernetes.io/instance: {{ cat .Release.Name "-" .Release.Namespace | nospace | trunc 63 | trimSuffix "-" }}
@@ -98,7 +98,7 @@ app.kubernetes.io/technology: java
 
 
 {{/*
-Trino deployment and service only labels for cloud release
+Trino deployment and service only labels for Qubership release
 */}}
 {{- define "trino.deploymentAndServiceOnlyLabels" -}}
 name:  trino-hue
@@ -106,28 +106,28 @@ app.kubernetes.io/name: trino-hue
 {{- end }}
 
 {{/*
-All object labels for cloud release
+All object labels for Qubership release
 */}}
 {{- define "allObjectsLabels" -}}
 app.kubernetes.io/part-of: hue
 {{- end }}
 
 {{/*
-Processed by grafana operator label for cloud release
+Processed by grafana operator label for Qubership release
 */}}
 {{- define "grafanaOperatorLabel" -}}
 app.kubernetes.io/processed-by-operator: grafana-operator
 {{- end }}
 
 {{/*
-Processed by prometheus operator label for cloud release
+Processed by prometheus operator label for Qubership release
 */}}
 {{- define "prometheusOperatorLabel" -}}
 app.kubernetes.io/processed-by-operator: prometheus-operator
 {{- end }}
 
 {{/*
-Processed by cert-manager label for cloud release
+Processed by cert-manager label for Qubership release
 */}}
 {{- define "certManagerLabel" -}}
 app.kubernetes.io/processed-by-operator: cert-manager

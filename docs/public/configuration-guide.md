@@ -1,6 +1,6 @@
 This section provides the information about the Hue and Trino connectors for connecting to databases.
 
-You can initiate the Helm charts using Deployer tools through a Jenkins job or manually.
+You can initiate the Helm charts manually.
 
 * [Hue Hadoop Side Steps](#hue-hadoop-side-steps)
   * [Сonfiguration Hive](#сonfiguration-hive)

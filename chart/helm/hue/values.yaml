@@ -13,7 +13,6 @@ image:
    tag: "main"
    pullPolicy: "IfNotPresent"
 
-cloudIntegrationEnabled: true
 
 api:
   enabled: false
