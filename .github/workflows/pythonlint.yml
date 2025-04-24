@@ -1,0 +1,23 @@
+name: Lint Python File
+
+on:
+  push:
+    paths:
+      - hue_docker/Dockerfile/createdb.py
+  pull_request:
+    paths:
+      - hue_docker/Dockerfile/createdb.py
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Super-Linter
+        uses: github/super-linter@v6
+        env:
+          VALIDATE_ALL_CODEBASE: false
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ENV_FILE: .github/workflows/super-linter.env
