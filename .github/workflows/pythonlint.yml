@@ -37,7 +37,7 @@ jobs:
           FLAKE8_CONFIG_FILE: .github/linters/.flake8
           VALIDATE_ALL_CODEBASE: false
           FILTER_REGEX_INCLUDE: 'hue_docker/createdb\.py'
-          RUN_LOCAL: true
+          RUN_LOCAL: false
           DEFAULT_BRANCH: main
           VALIDATE_PYTHON: true
           VALIDATE_BASH: false
