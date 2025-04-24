@@ -2,11 +2,11 @@ name: Lint Python File
 
 on:
   push:
+    branches:
+      - '**'
     paths:
       - hue_docker/createdb.py
   pull_request:
-    branches:
-      - '**'
     paths:
       - hue_docker/createdb.py
 
