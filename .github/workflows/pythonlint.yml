@@ -32,7 +32,7 @@ jobs:
 
       - name: Run black
         run: |
-          black --check hue_docker/createdb.py  # --check is used to only check, not auto-format
+          black --check hue_docker/createdb.py
 
       - name: Run flake8
         run: |
@@ -44,4 +44,4 @@ jobs:
 
       - name: Run pylint
         run: |
-          pylint --disable=import-error hue_docker/createdb.py
+          pylint hue_docker/createdb.py
