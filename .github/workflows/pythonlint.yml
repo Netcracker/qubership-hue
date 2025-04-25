@@ -30,18 +30,18 @@ jobs:
         run: |
           pip install psycopg2-binary pylint black flake8 mypy types-psycopg2
 
-      - name: Run black on createdb.py
+      - name: Run black
         run: |
           black --check hue_docker/createdb.py  # --check is used to only check, not auto-format
 
-      - name: Run flake8 on createdb.py
+      - name: Run flake8
         run: |
           flake8 --config .github/linters/.flake8 hue_docker/createdb.py
 
-      - name: Run mypy on createdb.py
+      - name: Run mypy
         run: |
           mypy hue_docker/createdb.py
 
-      - name: Run pylint on createdb.py
+      - name: Run pylint
         run: |
           pylint --disable=import-error hue_docker/createdb.py
