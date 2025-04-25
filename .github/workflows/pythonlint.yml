@@ -38,10 +38,11 @@ jobs:
           PYLINT_RCFILE: .github/linters/.pylintrc 
           VALIDATE_ALL_CODEBASE: false
           FILTER_REGEX_INCLUDE: 'hue_docker/createdb\.py'
-          SUPPRESS_PYLINT_ERROR_CODES: "E0401"
           RUN_LOCAL: false
           DEFAULT_BRANCH: main
           VALIDATE_PYTHON: true
+          VALIDATE_PYTHON_PYLINT: true
+          SUPPRESS_PYLINT_ERROR_CODES: E0401
           VALIDATE_BASH: false
           VALIDATE_DOCKERFILE: false
           VALIDATE_ENV: false
