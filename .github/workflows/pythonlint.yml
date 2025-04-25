@@ -28,7 +28,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install psycopg2-binary pylint black flake8 mypy
+          pip install psycopg2-binary pylint black flake8 mypy types-psycopg2
 
       - name: Run black on createdb.py
         run: |
