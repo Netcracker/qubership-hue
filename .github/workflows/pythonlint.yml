@@ -44,7 +44,11 @@ jobs:
           FILTER_REGEX_INCLUDE: 'hue_docker/createdb\.py'
           RUN_LOCAL: false
           DEFAULT_BRANCH: main
-          VALIDATE_PYTHON: true
+          VALIDATE_PYTHON_BLACK: true
+          VALIDATE_PYTHON_FLAKE8: true
+          VALIDATE_PYTHON_MYPY: true
+          VALIDATE_PYTHON_PYINK: true
+          VALIDATE_PYTHON_PYLINT: false
           SUPPRESS_PYLINT_ERROR_CODES: E0401
           VALIDATE_BASH: false
           VALIDATE_DOCKERFILE: false
