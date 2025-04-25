@@ -36,7 +36,7 @@ jobs:
 
       - name: Run flake8 on createdb.py
         run: |
-          flake8 hue_docker/createdb.py
+          flake8 --config .github/linters/.flake8 hue_docker/createdb.py
 
       - name: Run mypy on createdb.py
         run: |
