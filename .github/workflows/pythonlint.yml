@@ -41,7 +41,6 @@ jobs:
           RUN_LOCAL: false
           DEFAULT_BRANCH: main
           VALIDATE_PYTHON: true
-          VALIDATE_PYTHON_PYLINT: true
           SUPPRESS_PYLINT_ERROR_CODES: E0401
           VALIDATE_BASH: false
           VALIDATE_DOCKERFILE: false
