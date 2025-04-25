@@ -13,14 +13,14 @@ postgres_admin_user = os.getenv("POSTGRES_ADMIN_USER")
 postgres_admin_password = os.getenv("POSTGRES_ADMIN_PASSWORD")
 sslmode = os.getenv("POSTGRES_SSLMODE")
 
-check_if_db_exists = (
+CHECK_IF_DB_EXISTS = (
     f"SELECT 1 FROM pg_catalog.pg_database WHERE datname = '{db_name}';"
 )
-create_db = f"CREATE DATABASE {db_name};"
-check_if_user_exists = f"SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = '{db_user}';"
-create_user = f"CREATE USER {db_user} PASSWORD '{db_password}';"
-grant_permissions = f"GRANT ALL PRIVILEGES ON DATABASE {db_name} TO {db_user};"
-grant_ownership = f"ALTER DATABASE {db_name} OWNER TO {db_user};"
+CREATE_DB = f"CREATE DATABASE {db_name};"
+CHECK_IF_USER_EXISTS = f"SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = '{db_user}';"
+CREATE_USER = f"CREATE USER {db_user} PASSWORD '{db_password}';"
+GRANT_PERMISSIONS = f"GRANT ALL PRIVILEGES ON DATABASE {db_name} TO {db_user};"
+GRANT_OWNERSHIP = f"ALTER DATABASE {db_name} OWNER TO {db_user};"
 
 conn = psycopg2.connect(
     database="postgres",
@@ -35,22 +35,22 @@ conn.autocommit = True
 cursor = conn.cursor()
 
 
-cursor.execute(check_if_db_exists)
+cursor.execute(CHECK_IF_DB_EXISTS)
 exists = cursor.fetchone()
 if not exists:
     print("db doesn't exist, creating ...")
-    cursor.execute(create_db)
+    cursor.execute(CREATE_DB)
     print("db created ...")
 
-cursor.execute(check_if_user_exists)
+cursor.execute(CHECK_IF_USER_EXISTS)
 exists = cursor.fetchone()
 if not exists:
     print("user doesn't exist, creating ...")
-    cursor.execute(create_user)
+    cursor.execute(CREATE_USER)
     print("user created ...")
 
-cursor.execute(grant_permissions)
-cursor.execute(grant_ownership)
+cursor.execute(GRANT_PERMISSIONS)
+cursor.execute(GRANT_OWNERSHIP)
 print("permissions were configured")
 
 cursor.close()
