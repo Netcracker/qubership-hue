@@ -28,6 +28,10 @@ jobs:
       - name: Install dependencies
         run: |
           pip install psycopg2-binary pylint
+          
+      - name: Run pylint on createdb.py
+        run: |
+          pylint --disable=import-error hue_docker/createdb.py
 
       - name: Run Super-Linter
         uses: github/super-linter@v6
