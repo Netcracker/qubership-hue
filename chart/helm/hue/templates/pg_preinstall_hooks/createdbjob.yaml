@@ -26,13 +26,13 @@ spec:
         - name: {{ .Chart.Name }}-create-postgres-db
           env:
             - name: POSTGRES_HOST
-              value: {{ include "postgres.host" . }}
+              value: "{{ include "postgres.host" . }}"
             - name: POSTGRES_PORT
               value: "{{ include "postgres.port" . }}"
             - name: DB_NAME
-              value: {{ .Values.hue.database.name }}
+              value: "{{ .Values.hue.database.name }}"
             - name: DB_USER
-              value: {{ include "postgres.hue.user" . }}
+              value: "{{ include "postgres.hue.user" . }}"
             {{- if .Values.env }}
                {{- toYaml .Values.env | nindent 12 }}
             {{- end }}
