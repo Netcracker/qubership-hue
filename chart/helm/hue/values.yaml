@@ -65,7 +65,7 @@ hue:
     [[[postgresql]]]
     name = PostgreSql
     interface=sqlalchemy
-    options='{"url": "postgresql+psycopg2://{{`{{ include "postgres.hue.user" . }}`}}:{{`{{ include "postgres.hue.password" . }}`}}@{{`{{ include "postgres.host" . }}`}}:{{`{{ include "postgres.port" . }}`}}/{{`{{ .Values.hue.database.name }}`}}"}'
+    options='{"url": "postgresql+psycopg2://{{ include "postgres.hue.user" . }}:{{ include "postgres.hue.password" . }}@{{ include "postgres.host" . }}:{{ include "postgres.port" . }}/{{ .Values.hue.database.name }}"}'
 #    [[[hive]]]
 #    # The name of the snippet.
 #    name=Hive
