@@ -7,12 +7,12 @@ The following topics are covered in this chapter:
 * [Best Practices and Recommendations](#best-practices-and-recommendations)
   * [HWE](#hwe)
     * [Small](#small)
-    * [Meduim](#medium)
+    * [Medium](#medium)
     * [Large](#large)
 * [Parameters](#parameters)
-  * [Qubership-hue deployment schema](#qubership-hue-deployment-schema)
-  * [Configuration Hue](#configuration-hue)
-    * [Database Hue](#database-hue)
+  * [Qubership-hue Deployment Schema](#qubership-hue-deployment-schema)
+  * [Hue Configuration](#hue-configuration)
+    * [Hue Database](#hue-database)
     * [Hue Configuration File](#hue-configuration-file)
     * [Enable HTTPS/TLS](#enable-httpstls)
       * [Prepare TLS/SSL Certificate](#prepare-tlsssl-certificate)
@@ -66,9 +66,9 @@ The hardware requirements for the installation are specified below.
 
 # Parameters
 
-The parameters are specified in the below seb-sections.
+The parameters are specified in the below sub-sections.
 
-## Qubership-hue deployment schema
+## Qubership-hue Deployment Schema
 
 Qubership-hue helm charts contain several Hue and Trino components for working with databases.
 
@@ -108,26 +108,26 @@ The chart for Hue deployment mostly follows community chart from https://github.
 | `databasescommon.configs`                 | list ob objects | true      | -                                                           | Configuration options for database access                                                                                                                                                                                                                                                                                                               |
 | `trino.enabled`                           | string          | false     | `true`                                                      | Parameter enabling Trino                                                                                                                                                                                                                                                                                                                                |
 | `trino.image`                             | string          | false     | `"ghcr.io/netcracker/qubership-trino:main"`    | The image repository.                                                                                                                                                                                                                                                                                                                                   |
-| `trino.imagePullPolicy`                   | string          | false     | `IfNotPresent`                                              | The image pull policy.                                                                                                                                                                                                                                                                                                                                  |
-| `trino.securityContext.runAsUser`         | string          | false     | `1000`                                                      | All processes' containers that run with the specified user.                                                                                                                                                                                                                                                                                             |
-| `trino.securityContext.runAsGroup`        | string          | false     | `1000`                                                      | All processes' containers that run with the specified user group.                                                                                                                                                                                                                                                                                       |
-| `trino.priorityClassName`                 | string          | false     | `~`                                                         | Priority class name for trino pods.                                                                                                                                                                                                                                                                                                                     |
-| `trino.affinity`                          | map             | false     | `~`                                                         | Affinity for trino pods.                                                                                                                                                                                                                                                                                                                                |
-| `certManagerInegration.enabled`           | string          | false     | `false`                                                     | The parameter to integrate cert-manager.                                                                                                                                                                                                                                                                                                                |
-| `certManagerInegration.secretName`        | string          | false     | `hue-tls`                                                   | The name of the certificate for a TLS operation.                                                                                                                                                                                                                                                                                                        |
-| `certManagerInegration.secretMounts`      | array           | false     | `- mountPath: /home/hue/trustcerts/ca.crt subPath: ca.crt`  | Cer manager generated certificates mount details - mountPath and subPath.                                                                                                                                                                                                                                                                               |
+| `trino.imagePullPolicy`                   | string          | false     | `IfNotPresent`                                              | The image pull policy                                                                                                                                                                                                                                                                                                                                  |
+| `trino.securityContext.runAsUser`         | string          | false     | `1000`                                                      | All processes' containers that run with the specified user                                                                                                                                                                                                                                                                                             |
+| `trino.securityContext.runAsGroup`        | string          | false     | `1000`                                                      | All processes' containers that run with the specified user group                                                                                                                                                                                                                                                                                       |
+| `trino.priorityClassName`                 | string          | false     | `~`                                                         | Priority class name for trino pods                                                                                                                                                                                                                                                                                                                     |
+| `trino.affinity`                          | map             | false     | `~`                                                         | Affinity for trino pods                                                                                                                                                                                                                                                                                                                                |
+| `certManagerInegration.enabled`           | string          | false     | `false`                                                     | The parameter to integrate cert-manager                                                                                                                                                                                                                                                                                                                |
+| `certManagerInegration.secretName`        | string          | false     | `hue-tls`                                                   | The name of the certificate for a TLS operation                                                                                                                                                                                                                                                                                                        |
+| `certManagerInegration.secretMounts`      | array           | false     | `- mountPath: /home/hue/trustcerts/ca.crt subPath: ca.crt`  | Cer manager generated certificates mount details - mountPath and subPath                                                                                                                                                                                                                                                                               |
 | `certManagerInegration.clusterIssuerName` | string          | false     | `common-cluster-issuer`                                     | The name of the issuer to create a certificate for a TLS operation                                                                                                                                                                                                                                                                                      |
 | `extraSecrets`                            | map             | false     | `{}`                                                        | Allows to create custom secrets to pass them to pods during the deployments. The format for secret data is "key/value" where key (can be templated) is the name of the secret that will be created, value - an object with the standard 'data' or 'stringData' key (or both). The value associated with those keys must be a string (can be templated). |
-| `extraVolumes`                            | array           | false     | `[]`                                                        | One or more additional volume mounts to add to Hue, Trino and DB init job pods.                                                                                                                                                                                                                                                                         |
-| `extraVolumeMounts`                       | array           | false     | `[]`                                                        | One or more additional volume mounts to add to Hue, Trino and DB init job pods.                                                                                                                                                                                                                                                                         |
-| `env`                                     | array           | false     | `[]`                                                        | Additional env parameters for Hue Service and DB init job.                                                                                                                                                                                                                                                                                              |
+| `extraVolumes`                            | array           | false     | `[]`                                                        | One or more additional volume mounts to add to Hue, Trino and DB init job pods                                                                                                                                                                                                                                                                         |
+| `extraVolumeMounts`                       | array           | false     | `[]`                                                        | One or more additional volume mounts to add to Hue, Trino and DB init job pods                                                                                                                                                                                                                                                                         |
+| `env`                                     | array           | false     | `[]`                                                        | Additional env parameters for Hue Service and DB init job                                                                                                                                                                                                                                                                                             |
 
 
-## Configuration Hue
+## Hue Configuration
 
-The configuration information is provided in the below sections.
+The configuration information is provided in the below sub-sections.
 
-### Database Hue
+### Hue Database
 
 Hue demands database for backend activities and it can be any SQL database. Cloud DB Tool uses PostgreSQL database.
 It is possible to specify parameters for the database creation. When the parameters are specified, the Kubernetes job runs before the Hue deployment and creates a database. An example of the parameters for the database creation is as follows:
@@ -148,7 +148,7 @@ hue:
 
 ```
 
-Alternatively, you can manually create the database, user, and grants in PostgresSQL beforehand.
+Alternatively, you can manually create the database, user, and, grants in PostgresSQL beforehand.
 
 In any patroni pod, execute the following.
 
@@ -198,7 +198,7 @@ ingress:
 
 ```
 
-The main configuration point of Hue - HUE configuration is included in all the data sources that you need and their settings. For more information, refer to the official documentation at [https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini](https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini).
+The main configuration point of Hue - HUE configuration is included in all the data sources that you need and their settings. For more information, refer to the _Official Documentation_ at [https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini](https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini).
 
 ```yaml
 hue:
@@ -219,7 +219,7 @@ The information on enabling HTTPS/TLS is provided below.
 
 #### Prepare TLS/SSL Certificate
 
-You can use two options to get TLS/SSL certificates.
+You can use the below two options to get the TLS/SSL certificates.
 
 1. Using manual certificate for Hue.
 
@@ -343,8 +343,9 @@ How to get a secret with certificates for `tls.secretName` is described in the [
 
 You can enable TLS on Hue service as follows:
 
-1. Prepare and mount certificates as described in [Prepare TLS/SSL Certificate](#prepare-tlsssl-certificate).
+1. Prepare and mount certificates as described in the [Prepare TLS/SSL Certificate](#prepare-tlsssl-certificate) section.
 2. Set the mounted certificates for `ssl_certificate` and `ssl_private_key` properties in `hue -> ini -> [desktop]` to enable TLS on Hue as a backend.
+
 ```yaml
 hue:
   ini: >
@@ -362,9 +363,8 @@ hue:
 It is possible to enable TLS on Hue web user interface directly inside kubernetes. For this, Hue needs TLS key and certificate. 
 TLS key and certificate can be requested from cert-manager using `certManagerInegration.enabled` parameter. By default, it will create secret `hue-tls-cm` with TLS certificate, TLS key and CA certificate. 
 Alternatively, TLS key and certificate can be specified and mounted into the pod using `extraSecrets`, `extraVolumes`, `extraVolumeMounts` parameters.
-Then the mounted certificates should be set for `ssl_certificate` and `ssl_private_key` properties in `hue -> ini -> [desktop]` to enable TLS on Hue as a backend.
-If using kubernetes with NGINX ingress controller, it is possible to pass annotations for ingress controller to work with TLS backend. Configuration examples are given below.
-
+Then, the mounted certificates should be set for `ssl_certificate` and `ssl_private_key` properties in `hue -> ini -> [desktop]` to enable TLS on Hue as a backend.
+If using kubernetes with NGINX ingress controller, it is possible to pass the annotations for ingress controller to work with TLS backend. Configuration examples are given below.
 
 ```yaml
 ingress:
@@ -427,16 +427,18 @@ If no NGINX Ingress Controller is installed on Openshift, the following steps sh
    ```
 
 **Note**: If you cannot access the webserver host after Route creation because of "too many redirects" error, then one of the possible root
-causes is there is HTTP traffic between balancers and the cluster. To resolve that issue it is necessary to add the Route name to
-the exception list at the balancers
+causes, there is HTTP traffic between balancers and the cluster. To resolve this issue, it is necessary to add the Route name to
+the exception list at the balancers.
 
 **Note** It might be possible to create the route in openshift automatically using annotations like `route.openshift.io/destination-ca-certificate-secret` and `route.openshift.io/termination: "reencrypt"` but this approach was not tested.
 
 ### Secure Connections from Hue
 
-In order to secure connections from Hive Metastore using TLS/SSL, there are three options for adding certificates:
+In order to secure the connections from Hive Metastore using TLS/SSL, there are three options for adding certificates:
 
 #### Adding a Certificate
+
+The procedure for adding a certificate is specified below.
 
 1. An appropriate CA certificate needs to be mounted to `/home/hue/trustcerts/ca.crt`.
 Cert manager can be configured to generate certificates:
@@ -495,6 +497,8 @@ extraVolumeMounts:
 
 #### Configure Connections to Use SSL/TLS
 
+To configure the connections to use SSL/TLS:
+
 1. Add the following env variables:
 ```yaml
 env:
@@ -508,7 +512,7 @@ env:
     value: "verify-ca"
 ```
 2. Update PG host and port to use the secured address.
-3.  Add `options='{"sslmode": "verify-ca"}'` to `ini` > `[desktop]` > `[[database]]`.
+3. Add `options='{"sslmode": "verify-ca"}'` to `ini` > `[desktop]` > `[[database]]`.
 ```yaml
 ini: >
     [desktop]
@@ -570,7 +574,8 @@ For services connecting via Trino, add `"connect_args":"{\"protocol\": \"https\"
 
 ##### Disable Certificate Validation
 
-To disable the certificate validation, the following should be configured:
+To disable the certificate validation, configure the following:
+
 ```yaml
   env:
     - name: POSTGRES_SSLMODE
@@ -630,9 +635,9 @@ To disable the certificate validation, the following should be configured:
 
 ### Kerberized Data Source
 
-If you have kerberized data source, at least one of them, for example, HIVE.
+If you have the kerberized data source, at least one of them, for example, HIVE.
 
-To make Hue use principal to connect to data sources, you need to specify the `[[kerberos]]` tag after `[desktop]` as given below.
+To make Hue use the principal to connect to data sources, you need to specify the `[[kerberos]]` tag after `[desktop]` as given below.
 
 ```yaml
 hue:
@@ -699,7 +704,8 @@ Where, `keytab` is the base64 encoded keytab that is generated on any Hadoop nod
 
 **Note**: Do not forget to insert the main data source part, for example, for HIVE, it was described in [Connection to Hive](#hive).
 
-**Note**: With configured kerberos, postgresql pscycopg client will try to enable the GSSAPI connection mode to PG by default (see https://jdbc.postgresql.org/documentation/publicapi/org/postgresql/jdbc/GSSEncMode.html ). This can cause unwanted failed login attempts at KDC server. To avoid this, it is possible to disable the `gssencmode` pg connection option, for example 
+**Note**: With configured kerberos, postgresql pscycopg client tries to enable the GSSAPI connection mode to PG by default (see https://jdbc.postgresql.org/documentation/publicapi/org/postgresql/jdbc/GSSEncMode.html). This can cause unwanted failed login attempts at KDC server. To avoid this, it is possible to disable the `gssencmode` pg connection option, for example:
+
 ```yaml
 [[database]]
 ...
@@ -757,23 +763,23 @@ Successfully authenticated users can be crated in Hue database.
    * Client authentication should be On.
    * Authentication flow: Standard flow, Direct access grants.
    ![Client](./images/keycloak_client.png)
-2. Open the client created at step 1 and go to `Client scopes` tab.  
+2. Open the client created at step 1 and navigate to the `Client scopes` tab.  
    ![Mapper](./images/keycloak_client_scopes.png)
-   Go to `<client_name>-dedicated` assigned client scope and app a mapper with a user attribute that will bw used as username in Hue.
+   Go to `<client_name>-dedicated` assigned client scope and app a mapper with a user attribute that will be used as username in Hue.
    For example:
    * Add a mapper by configuration.
-   * Choose `User Property` mapper type.
-   * Set `email` to `Property`. Email will bw used as a username in Hue.
+   * Select the `User Property` mapper type.
+   * Set `email` to `Property`. Email will be used as a username in Hue.
    * `Add to ID token`, `Add to access token`, `Add to userinfo` should be `On`.
    ![Mapper](./images/keycloak_mapper.png)
 3. To make users admins after login:
     * Open the client created at step 1 and go to `Client scopes` tab.
     * On `Client scopes` tab go to `<client_name>-dedicated`. 
     * Add a mapper by configuration.
-    * Choose `Group Membership` mapper type.
+    * Select the `Group Membership` mapper type.
     * Set `group_membership` to `Token Claim Name`.
     * `Add to ID token`, `Add to access token`, `Add to userinfo` should be `On`.
-    * Add the user to admin group, for example `hue_superusers`, and set the name of that group as `superuser_group=hue_superusers` in Hue configuration(described below).
+    * Add the user to admin group, for example, `hue_superusers`, and set the name of that group as `superuser_group=hue_superusers` in the Hue configuration (described below).
     ![Mapper](./images/keycloak_group_mapper.png)
    
 *Hue Configuration*  
@@ -952,7 +958,7 @@ Refer to example connectors for external Trino [here](https://github.com/Netcrac
 <!-- #GFCFilterMarkerEnd# -->
 
 1. Certificates mount and connections security should be configured for external Trino as well.  
-   Refer to external Trino documentation's `Secure Connections from Trino` section of `Installation` guide.
+   Refer to the external Trino documentation's `Secure Connections from Trino` section of `Installation` guide.
 
 2. Secure connections to services should be configured in external Trino's deployment parameters:
 ```yaml
@@ -1011,6 +1017,8 @@ Refer to the releases page to find the release tag.
    ```
 
 # On-Prem
+
+The on-premises deployment information is described below.
 
 ## Non-HA Scheme
 
