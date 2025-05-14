@@ -3,7 +3,7 @@ This section provides the information about the Hue and Trino connectors for con
 You can initiate the Helm charts manually.
 
 * [Hue Hadoop Side Steps](#hue-hadoop-side-steps)
-  * [Сonfiguration Hive](#сonfiguration-hive)
+  * [Hive Сonfiguration](#hive-сonfiguration)
     * [Downloading Hive Configurations as a Prestart Script](#downloading-hive-configurations-as-a-prestart-script) 
     * [Manually Specifying Hive Configurations](#manually-specifying-hive-configurations)
     * [Hive with SSL](#hive-with-ssl)
