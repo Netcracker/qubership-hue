@@ -427,7 +427,7 @@ If no NGINX Ingress Controller is installed on Openshift, the following steps sh
    ```
 
 **Note**: If you cannot access the webserver host after Route creation because of "too many redirects" error, then one of the possible root
-causes, there is HTTP traffic between balancers and the cluster. To resolve this issue, it is necessary to add the Route name to
+causes is, there is HTTP traffic between balancers and the cluster. To resolve this issue, it is necessary to add the Route name to
 the exception list at the balancers.
 
 **Note** It might be possible to create the route in openshift automatically using annotations like `route.openshift.io/destination-ca-certificate-secret` and `route.openshift.io/termination: "reencrypt"` but this approach was not tested.
