@@ -50,7 +50,7 @@ In the user interface, the **Run as end user instead of Hive user** checkbox is 
 
 3. Add the `hive` user in Ranger <cluster>_yarn policy in "all - queue".
 
-### Сonfiguration Hive
+### Hive Сonfiguration
 
 Specify the default Hue configuration as given below.
 
