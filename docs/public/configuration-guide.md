@@ -46,7 +46,7 @@ inv_configuration:
         value: "true"
 ````
 
-In the UI, it is the **Run as end user instead of Hive user** checkbox in the `hive-interactive-site` configuration on HIVE.
+In the user interface, the **Run as end user instead of Hive user** checkbox is provided in the `hive-interactive-site` configuration on HIVE.
 
 3. Add the `hive` user in Ranger <cluster>_yarn policy in "all - queue".
 
@@ -104,7 +104,7 @@ hue:
 
 #### Manually Specifying Hive Configurations
 
-Instead of downloading hive configurations, it is possible to specify them in the deploy parameters. In this case, you need to copy hive.xml from any Hadoop node where hive is located or download it from the Ambari UI.
+Instead of downloading hive configurations, it is possible to specify them in the deploy parameters. In this case, you need to copy hive.xml from any Hadoop node where hive is located or download it from the Ambari user inetrface.
 
 You need to specify it in Values.
 
@@ -158,8 +158,7 @@ ssl:
     certificate content
 ```
 
-Where `cacerts` is the base64 encoded file from Certificate Center with the .pem extension. 
-
+Where, `cacerts` is the base64 encoded file from Certificate Center with the .pem extension. 
 
 ### Connecting to Trino Supported Databases
 
@@ -227,7 +226,7 @@ trino:
 
 For connection properties, refer to [https://trino.io/docs/471/connector/cassandra.html](https://trino.io/docs/471/connector/cassandra.html).
 
-In the Hue configuration, you should specify the section for the connection to Cassandra through Trino, for example:
+In the Hue configuration, specify the section for the connection to Cassandra through Trino, for example:
 
 ````yaml
 hue:
@@ -255,7 +254,7 @@ databasescommon:
 
 For connection properties, refer to [https://trino.io/docs/471/connector/mongodb.html](https://trino.io/docs/471/connector/mongodb.html).
 
-In the Hue configuration, you should specify the section for the connection to MongoDB through Trino:
+In the Hue configuration, specify the section for the connection to MongoDB through Trino:
 
 ```yaml
 hue:
@@ -313,7 +312,7 @@ databasescommon:
 ...
 ```
 
-In the Hue configuration, you should specify the section for the connection to Redis through Trino:
+In the Hue configuration, specify the section for the connection to Redis through Trino:
 
 ```yaml
 hue:
@@ -344,8 +343,8 @@ hue:
 
 ### Hue with PostgreSQL
 
-Hue supports connection to PostgreSQL out of the box.
-Add the following to the Hue configuration.
+Hue supports the connection to PostgreSQL out of the box.
+Add the following to the Hue configuration:
 
 ```yaml
 hue:
@@ -358,8 +357,8 @@ hue:
 
 ### Hue with Greenplum
 
-Hue supports connection to Greenplum out of the box.
-Add the following to the Hue configuration.
+Hue supports the connection to Greenplum out of the box.
+Add the following to the Hue configuration:
 
 ```yaml
 hue:
