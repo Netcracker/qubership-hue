@@ -1,4 +1,4 @@
-This guide provides information about the main security parameters and its configuration in the Qubership-hue service.
+This section provides information about the main security parameters and its configuration in the Qubership-hue service.
 
 ## Exposed Ports
 
@@ -16,7 +16,7 @@ It is possible to enable TLS in Qubership-hue deployment schema. This process is
 
 ## User Management
 
-There are no predefined local users and roles, but it is possible to manage users according to the external Hue documentation: _[Hue Users](https://docs.gethue.com/administrator/administration/user-management/#users)_.
+There are no predefined local users and roles, but it is possible to manage users according to the _External Hue Documentation_ at [https://docs.gethue.com/administrator/administration/user-management/#users](https://docs.gethue.com/administrator/administration/user-management/#users).
 
 There are no roles entities, but there is a user property: Is admin. Authorization matrix can be configured via groups and permissions. There is one predefined group: default.
 Detailed information about available permissions is provided in the external Hue Users guide.
@@ -27,18 +27,18 @@ To block the local user account, it is required to perform the steps below.
 * Find the user account to be blocked.
 * Set the user's status to "Inactive" (or delete the account if temporary blocking is not required).
 
-There is a possibility to integrate Hue with LDAP and Keycloak, see details in the respective [Installation Guide](/docs/public/installation.md#hue-with-ldap-integrated-ui) guide.
-Hue allows to sync users and groups with LDAP, see details in external Hue documentation: "Hue with Ldap Integrated UI" in [Hue Service Installation Procedure](https://docs.gethue.com/administrator/administration/user-management/#syncing-users-and-groups).
+It is possible to integrate Hue with LDAP and Keycloak, refer to the details in the "Hue with Ldap Integrated User Interface" section of the _[Hue Service Installation Procedure](/docs/public/installation.md#hue-with-ldap-integrated-ui)_ guide.
+Hue allows to sync users and groups with LDAP, see details in _External Hue Documentation_ at [[Hue Service Installation Procedure](https://docs.gethue.com/administrator/administration/user-management/#syncing-users-and-groups)](https://docs.gethue.com/administrator/administration/user-management/#syncing-users-and-groups).
 
 ## Changing Credentials
 
-A password resetting process for local users is described in the respective [USERS](https://docs.gethue.com/administrator/administration/user-management/#reset-a-password) guide.
+A password resetting process for local users is described in the following documentation: [https://docs.gethue.com/administrator/administration/user-management/#reset-a-password)](https://docs.gethue.com/administrator/administration/user-management/#reset-a-password).
 
-Credentials for underlying services are managed in the underlying services. You can configure them in the Qubership-hue deployment schemaparameters. For more details refer to:
+Credentials for underlying services are managed in the underlying services. You can configure them in the Qubership-hue deployment schema parameters. For more details refer to:
 * "Configuration Trino" in [Hue Service Installation Procedure](https://github.com/Netcracker/qubership-hue/blob/main/docs/public/installation.md#configuration-trino)
 * "Hue Service Configuration" in [Hue Service Installation Procedure](/docs/public/configuration-guide.md)
 
-Password policies for local users are not supported in Qubership-hue deployment schema. Hue uses Django framework for password management, find details in the respective [Password Management in Django](https://docs.djangoproject.com/en/5.1/topics/auth/passwords/) guide.
+Password policies for local users are not supported in the Qubership-hue deployment schema. Hue uses Django framework for password management, find details in the respective _Official Django Documentation_ at [https://docs.djangoproject.com/en/5.1/topics/auth/passwords/](https://docs.djangoproject.com/en/5.1/topics/auth/passwords/).
 
 ## Security Events
 
