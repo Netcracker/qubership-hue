@@ -1,0 +1,23 @@
+##################################################################################################################################
+# Qubership custom template. ConfigMap for JVM configuration with customizable heap size and garbage collection settings for Trino
+##################################################################################################################################
+{{- if .Values.trino.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-jvm-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "allObjectsLabels" . | nindent 4 }}
+data:
+  {{- if .Values.jvmconfig }}
+  jvm.config: |
+    -server
+    -Xmx{{ .Values.jvm.maxHeapSize }}
+    -XX:+{{ .Values.jvm.gcMethod.type }}
+    -XX:G1HeapRegionSize={{ .Values.jvm.gcMethod.g1.heapRegionSize }}
+    -XX:+UnlockDiagnosticVMOptions
+    -XX:G1NumCollectionsKeepPinned=10000000
+    {{- .Values.jvmconfig | nindent 4 }}
+  {{- end }}
+{{- end }}

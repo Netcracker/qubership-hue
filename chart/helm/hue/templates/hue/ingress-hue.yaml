@@ -1,0 +1,53 @@
+##########################################################################################################
+# Qubership custom template. Ingress for Hue and API, with TLS and custom annotations based on Helm values
+##########################################################################################################
+{{- if .Values.ingress.create }}
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: hue-ingress
+  labels:
+    {{- include "allObjectsLabels" . | nindent 4 }}
+  annotations:
+    {{- if .Values.ingress.annotations }}
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.ingress.tls.enabled }}
+  tls:
+  - hosts:
+    - {{ .Values.ingress.domain }}
+    {{- range .Values.ingress.extraHosts }}
+    - {{ . | quote }}
+    {{- end }}
+    {{- if .Values.api.enabled }}
+    - {{ .Values.api.domain }}
+    {{- end }}
+    {{- if .Values.ingress.tls.secretName }}
+    secretName: {{ .Values.ingress.tls.secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.ingress.domain }}
+      http:
+        paths:
+          - path: /
+            pathType: "ImplementationSpecific"
+            backend:
+              service:
+                name: hue
+                port:
+                  number: 8888
+    {{- if .Values.api.enabled }}
+    - host: {{ .Values.api.domain }}
+      http:
+        paths:
+        - backend:
+            service:
+              name: hue-api
+              port:
+                number: 8005
+          pathType: ImplementationSpecific
+          path: /(.*)
+    {{- end }}
+{{- end }}

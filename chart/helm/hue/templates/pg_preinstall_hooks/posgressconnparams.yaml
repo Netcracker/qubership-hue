@@ -1,0 +1,22 @@
+##########################################################################################################################
+# Qubership custom template. A pre-install Helm hook Secret with PostgreSQL credentials for the Hue DB initialization Job
+##########################################################################################################################
+{{ if .Values.hue.database.create }}
+apiVersion: v1
+data:
+  POSTGRES_PASSWORD: {{ default "postgres" (include "postgres.hue.password" .) | b64enc }}
+  POSTGRES_ADMIN_USER: {{ default "postgres" (include "postgres.adminUser" .) | b64enc }}
+  POSTGRES_ADMIN_PASSWORD: {{ default "postgres" (include "postgres.adminPassword" .) | b64enc }}
+kind: Secret
+metadata:
+  name: huepreinstallhooksecret
+  labels:
+    {{- include "allObjectsLabels" . | nindent 4 }}
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
+    "helm.sh/hook-weight": "-5"
+type: Opaque
+{{ end }}

@@ -1,0 +1,206 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # Qubership custom change: custom name and namespce for Qubership release support
+  name: {{ .Chart.Name }}-hue
+  namespace: {{ .Release.Namespace }}
+  labels:
+    # Qubership custom change: custom labels for Qubership release support
+    {{- include "hue.deploymentOnlyLabels" . | nindent 4 }}
+    {{- include "hue.deploymentAndServiceOnlyLabels" . | nindent 4 }}
+    {{- include "allObjectsLabels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.hue.replicas }}
+  selector:
+    matchLabels:
+      # Qubership custom change: custom labels for Qubership release support
+      {{- include "hue.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+      # Qubership custom change: custom labels for Qubership release support
+        {{- include "allObjectsLabels" . | nindent 8 }}
+        {{- include "hue.deploymentOnlyLabels" . | nindent 8 }}
+        {{- include "hue.deploymentAndServiceOnlyLabels" . | nindent 8 }}
+{{- with .Values.podLabels }}
+{{ toYaml . | indent 8 }}
+{{- end }}
+      annotations:
+        # Qubership custom change: Using secret instead of configmap for security
+        checksum/config: {{ include (print $.Template.BasePath "/hue/secrets-hue.yaml") . | sha256sum }}
+        checksum/config-extra: {{ include (print $.Template.BasePath "/hue/secrets-hue.yaml") . | sha256sum }}
+        checksum/config-hive: {{ include (print $.Template.BasePath "/hue/secret-hive.yaml") . | sha256sum }}
+        checksum/hue-secret: {{ include (print $.Template.BasePath "/hue/secrets-hue.yaml") . | sha256sum }}
+        # Qubership custom change: Using kerberos for authentication
+        checksum/kerberos-config: {{ include (print $.Template.BasePath "/hue/kerberos-hue.yaml") . | sha256sum }}
+{{- with .Values.podAnnotations }}
+{{ toYaml . | indent 8 }}
+{{- end }}
+    spec:
+{{ if eq .Values.hue.database.engine "postgresql_psycopg2" }}
+      initContainers:
+        - name: hue-init
+        # Qubership custom change: custom image for init container, and custom connection paramters
+          image: {{ template "hue.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - /bin/sh
+            - -c
+            - >
+              set -x;
+              while [ $(curl -s --connect-timeout 1 {{ include "postgres.host" . }}:{{ include "postgres.port" . }} || echo $?) -ne 52 ]; do
+                sleep 1;
+              done
+{{ end }}
+# Qubership custom change: Qubership Custom pod-level settings for Hue: security, scheduling, host aliases, and restart policy from Helm values
+          {{- if .Values.hue.securityContext }}
+          securityContext:
+            {{- toYaml .Values.hue.securityContext | nindent 12 }}
+          {{- end }}
+      {{- if .Values.hue.priorityClassName }}
+      priorityClassName: {{ .Values.hue.priorityClassName }}
+      {{- end }}
+      {{- if .Values.hue.hostAliases }}
+      hostAliases:
+         {{- toYaml .Values.hue.hostAliases | nindent 8 }}
+      {{- end }}
+      restartPolicy: Always
+      {{- if .Values.hue.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.hue.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.hue.affinity }}
+      affinity:
+        {{- toYaml .Values.hue.affinity | nindent 8 }}
+      {{- end }}
+      {{- if .Values.hue.tolerations }}
+      tolerations:
+        {{- toYaml .Values.hue.tolerations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.hue.podSecurityContext }}
+      securityContext:
+        {{- toYaml .Values.hue.podSecurityContext | nindent 8 }}
+      {{- end }}
+      containers:
+      # Qubership custom change: Qubership Custom container config for Hue with dynamic image, security, args, and env based on Helm values
+      - name: {{ .Chart.Name }}-hue
+        image: {{ include "hue.image" . }}
+        imagePullPolicy: {{ .Values.hue.imagePullPolicy }}
+        {{- if .Values.hue.securityContext }}
+        securityContext:
+          {{- toYaml .Values.hue.securityContext | nindent 10 }}
+        {{- end }}
+        {{- if .Values.hue.args }}
+        args: {{ tpl (toYaml .Values.hue.args) . | nindent 12 }}
+          {{- end }}
+        {{- if .Values.env }}
+        env:
+          {{- toYaml .Values.env | nindent 12}}
+        {{- end }}
+        ports:
+          - containerPort: 8888
+        volumeMounts:
+        # Qubership custom change: Qubership Custom volume mounts for Hue from cert-manager secrets and extra user-defined mounts via Helm values
+          {{- if .Values.certManagerInegration.enabled }}
+          {{- range .Values.certManagerInegration.secretMounts }}
+          - name: {{ $.Values.certManagerInegration.secretName }}-volume
+            mountPath: {{ .mountPath }}
+            {{- if .subPath }}
+            subPath: {{ .subPath }}
+            {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.extraVolumeMounts }}
+            {{- tpl (toYaml .Values.extraVolumeMounts) . | nindent 10 }}
+          {{- end }}
+          - name: config-volume
+            mountPath: /usr/share/hue/desktop/conf/z-hue.ini
+            subPath: z-hue.ini
+          - name: config-volume-extra
+            mountPath: /usr/share/hue/desktop/conf/zz-hue.ini
+            subPath: zz-hue.ini
+          - name: hive-config-volume
+            mountPath: /etc/hive/conf/hive-site.xml
+            subPath: hive-site.xml
+          # Qubership custom change: Qubership Conditional volume mounts for Kerberos, SSL, and LDAP integrations based on enabled Helm values  
+          {{- if .Values.kerberos.enabled }}
+          - name: keytabs
+            mountPath: "/etc/hue/keytabs/"
+            readOnly: true
+          - name: kerberos-config
+            mountPath: /etc/krb5.conf
+            subPath: krb5.conf
+          {{- end }}
+          {{- if .Values.ssl.enabled }}
+          - name: cacerts
+            mountPath: "/etc/hue/"
+            readOnly: true
+          {{- end }}
+          {{- if .Values.ldap.enabled }}
+          - name: scripts
+            mountPath: "/var/lib/hue/hue_passwords.sh"
+            subPath: hue_passwords.sh
+          {{- end }}
+        readinessProbe:
+          httpGet:
+          # Qubership custom change: Qubership support for secure connections
+          {{- if contains "ssl_private_key" .Values.hue.ini  }}
+            scheme: HTTPS
+          {{ else }}
+            scheme: HTTP
+          {{- end }}
+            path: /desktop/debug/is_alive
+            port: 8888
+          initialDelaySeconds: 30
+          timeoutSeconds: 15
+          periodSeconds: 15
+          failureThreshold: 30
+        resources:
+          {{- toYaml .Values.hue.resources | nindent 12 }}
+      volumes:
+      # Qubership custom change: Qubership custom volumes for config files, cert-manager secrets, and conditional integrations (Kerberos, SSL, LDAP) using Helm values
+        {{- if .Values.certManagerInegration.enabled }}
+        - name: {{.Values.certManagerInegration.secretName }}-volume
+          secret:
+            secretName: {{.Values.certManagerInegration.secretName }}
+        {{- end }}
+        {{- if .Values.extraVolumes }}
+          {{- tpl (toYaml .Values.extraVolumes) . | nindent 8 }}
+        {{- end }}
+        - name: config-volume
+          secret:
+            secretName: hue-config
+            items:
+              - key: z-hue.ini
+                path: z-hue.ini
+        - name: config-volume-extra
+          secret:
+            secretName: hue-config-extra
+            items:
+              - key: zz-hue.ini
+                path: zz-hue.ini
+        - name: hive-config-volume
+          secret:
+            secretName: hue-hive-config
+            items:
+              - key: hive-site.xml
+                path: hive-site.xml
+        {{- if .Values.kerberos.enabled }}
+        - name: keytabs
+          secret:
+            secretName: keytabs
+        - name: kerberos-config
+          configMap:
+            name: {{ .Chart.Name }}-kerberos
+        {{- end }}
+        {{- if .Values.ssl.enabled }}
+        - name: cacerts
+          secret:
+            secretName: cacerts
+        {{- end }}
+        {{- if .Values.ldap.enabled }}
+        - name: scripts
+          secret:
+            secretName: scripts
+        {{- end }}
+      serviceAccountName: ""

@@ -1,0 +1,47 @@
+name: Lint Python File
+
+on:
+  push:
+    branches:
+      - '**'
+    paths:
+      - hue_docker/createdb.py
+  pull_request:
+    branches:
+      - '**'
+    paths:
+      - hue_docker/createdb.py
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install psycopg2-binary pylint black flake8 mypy types-psycopg2
+
+      - name: Run black
+        run: |
+          black --check hue_docker/createdb.py
+
+      - name: Run flake8
+        run: |
+          flake8 --config .github/linters/.flake8 hue_docker/createdb.py
+
+      - name: Run mypy
+        run: |
+          mypy hue_docker/createdb.py
+
+      - name: Run pylint
+        run: |
+          pylint hue_docker/createdb.py

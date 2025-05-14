@@ -1,0 +1,38 @@
+{{- if .Values.api.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # Qubership custom change: custom labels for Qubership release support
+  name: {{ .Chart.Name }}-hue-api
+  labels:
+    app: {{ .Chart.Name }}
+    component: hue
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.hue.replicas }}
+  selector:
+    matchLabels:
+      pod: hue-api
+      # Qubership custom change: custom labels for Qubership release support
+      app: {{ .Chart.Name }}
+      component: hue
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        pod: hue-api
+        # Qubership custom change: custom labels for Qubership release support
+        app: {{ .Chart.Name }}
+        component: hue
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: hue
+        image: gethue/compose:latest
+        imagePullPolicy: {{ .Values.hue.imagePullPolicy }}
+        ports:
+          - containerPort: 8005
+        resources:
+          requests:
+            cpu: "25m"
+{{- end -}}
