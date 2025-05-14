@@ -702,7 +702,7 @@ kerberos:
 
 Where, `keytab` is the base64 encoded keytab that is generated on any Hadoop node or on local KRB5, and `config` is the krb5.conf file that can be downloaded from any Hadoop node or from the Ambari UI. 
 
-**Note**: Do not forget to insert the main data source part, for example, for HIVE, it was described in [Connection to Hive](#hive).
+**Note**: Do not forget to insert the main data source part, for example, for HIVE, it was described in [Connection to Hive](configuration-guide.md#hive-сonfiguration) section.
 
 **Note**: With configured kerberos, postgresql pscycopg client tries to enable the GSSAPI connection mode to PG by default (see https://jdbc.postgresql.org/documentation/publicapi/org/postgresql/jdbc/GSSEncMode.html). This can cause unwanted failed login attempts at KDC server. To avoid this, it is possible to disable the `gssencmode` pg connection option, for example:
 
