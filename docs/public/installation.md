@@ -148,7 +148,7 @@ hue:
 
 ```
 
-Alternatively, you can manually create the database, user, and, grants in PostgresSQL beforehand.
+Alternatively, you can manually create the database, user, and grants in PostgresSQL beforehand.
 
 In any patroni pod, execute the following.
 
