@@ -83,14 +83,14 @@ Trino selector labels
 */}}
 {{- define "trino.selectorLabels" -}}
 app.kubernetes.io/name: trino-hue
-app.kubernetes.io/instance: trino-{{ .Release.Namespace | nospace | trunc 63 | trimSuffix "-" }}
+app.kubernetes.io/instance: hue-{{ .Release.Namespace | nospace | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Trino deployment only labels for Qubership release
 */}}
 {{- define "trino.deploymentOnlyLabels" -}}
-app.kubernetes.io/instance: trino-{{ .Release.Namespace | nospace | trunc 63 | trimSuffix "-" }}
+app.kubernetes.io/instance: hue-{{ .Release.Namespace | nospace | trunc 63 | trimSuffix "-" }}
 app.kubernetes.io/component: trino
 app.kubernetes.io/version: {{ splitList ":" ( include "hue.image" . ) | last }}
 app.kubernetes.io/technology: java
