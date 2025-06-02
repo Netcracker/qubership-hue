@@ -56,7 +56,7 @@ Hue selector labels
 */}}
 {{- define "hue.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "hue.name" . }}
-app.kubernetes.io/instance: {{ cat .Release.Name "-" .Release.Namespace | nospace | trunc 63 | trimSuffix "-" }}
+app.kubernetes.io/instance: hue-hue
 {{- end }}
 
 {{/*
@@ -83,7 +83,7 @@ Trino selector labels
 */}}
 {{- define "trino.selectorLabels" -}}
 app.kubernetes.io/name: trino-hue
-app.kubernetes.io/instance: {{ cat .Release.Name "-" .Release.Namespace | nospace | trunc 63 | trimSuffix "-" }}
+app.kubernetes.io/instance: hue-trino
 {{- end }}
 
 {{/*
