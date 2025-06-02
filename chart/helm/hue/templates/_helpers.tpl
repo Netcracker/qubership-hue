@@ -63,7 +63,7 @@ app.kubernetes.io/instance: hue-hue
 Hue deployment only labels for Qubership release
 */}}
 {{- define "hue.deploymentOnlyLabels" -}}
-app.kubernetes.io/instance: {{ cat .Release.Name "-" .Release.Namespace | nospace | trunc 63 | trimSuffix "-" }}
+app.kubernetes.io/instance: hue-hue
 app.kubernetes.io/component: hue
 app.kubernetes.io/version: {{ splitList ":" ( include "hue.image" . ) | last }}
 app.kubernetes.io/technology: python
@@ -90,7 +90,7 @@ app.kubernetes.io/instance: hue-trino
 Trino deployment only labels for Qubership release
 */}}
 {{- define "trino.deploymentOnlyLabels" -}}
-app.kubernetes.io/instance: {{ cat .Release.Name "-" .Release.Namespace | nospace | trunc 63 | trimSuffix "-" }}
+app.kubernetes.io/instance: hue-trino
 app.kubernetes.io/component: trino
 app.kubernetes.io/version: {{ splitList ":" ( include "hue.image" . ) | last }}
 app.kubernetes.io/technology: java
