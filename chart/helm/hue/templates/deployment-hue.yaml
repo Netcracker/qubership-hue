@@ -27,12 +27,12 @@ spec:
 {{- end }}
       annotations:
         # Qubership custom change: Using secret instead of configmap for security
-        checksum/config: {{ include (print $.Template.BasePath "/hue/secrets-hue.yaml") . | sha256sum }}
-        checksum/config-extra: {{ include (print $.Template.BasePath "/hue/secrets-hue.yaml") . | sha256sum }}
-        checksum/config-hive: {{ include (print $.Template.BasePath "/hue/secret-hive.yaml") . | sha256sum }}
-        checksum/hue-secret: {{ include (print $.Template.BasePath "/hue/secrets-hue.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/secrets-hue.yaml") . | sha256sum }}
+        checksum/config-extra: {{ include (print $.Template.BasePath "/secrets-hue.yaml") . | sha256sum }}
+        checksum/config-hive: {{ include (print $.Template.BasePath "/secret-hive.yaml") . | sha256sum }}
+        checksum/hue-secret: {{ include (print $.Template.BasePath "/secrets-hue.yaml") . | sha256sum }}
         # Qubership custom change: Using kerberos for authentication
-        checksum/kerberos-config: {{ include (print $.Template.BasePath "/hue/kerberos-hue.yaml") . | sha256sum }}
+        checksum/kerberos-config: {{ include (print $.Template.BasePath "/kerberos-hue.yaml") . | sha256sum }}
 {{- with .Values.podAnnotations }}
 {{ toYaml . | indent 8 }}
 {{- end }}
