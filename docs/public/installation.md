@@ -213,6 +213,20 @@ hue:
     name=<database>
 ```
 
+### Handling CSRF Errors in Hue
+
+When accessing the Hue web UI, users receive a 403 CSRF error after login or while submitting forms. Becuase Hue enforces CSRF protection. If accessed via a custom domain or behind a proxy, the origin may not be trusted. Add your domain to the trusted_origins list in hue.ini under the [desktop] > [[session]] section. If you are using kubernets you should add the hue ingress url.
+
+```yaml
+hue:
+  ini: |
+    [desktop]
+    app_blacklist=filebrowser,search,hbase,security,jobbrowser,oozie
+    [[session]]
+    trusted_origins=.yourdomain.com
+
+```
+
 ### Enable HTTPS/TLS
 
 The information on enabling HTTPS/TLS is provided below.

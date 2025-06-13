@@ -13,8 +13,11 @@ COPY hue_docker/requrements.txt /bin/requrements.txt
 
 RUN ./build/env/bin/pip install --no-cache-dir -r /bin/requrements.txt
 
-RUN apt-get --allow-unauthenticated update \
-    && apt-get --no-install-recommends install -y openssl nodejs libssl1.1  krb5-user
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install --no-install-recommends -y openssl nodejs libssl1.1 krb5-user \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY hue_docker/createdb.py /bin/createdb.py
 COPY hue_docker/get_hive_conf.sh /bin/get_hive_conf.sh
