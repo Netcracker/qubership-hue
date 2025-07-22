@@ -9,7 +9,7 @@
     
     {
       "name": "qubership-hue",
-      "file": "docker/Dockerfile",
+      "file": "hue_docker/Dockerfile",
       "context": "."
     }
   ],
