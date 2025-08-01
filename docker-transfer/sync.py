@@ -24,11 +24,6 @@ def parse_release_images_yaml(file_path):
     return image_versions
 
 def update_node(node, image_versions):
-    """
-    Recursively updates:
-    - any full image string "name:tag"
-    - any Helm-style image block with registry + tag
-    """
     if isinstance(node, dict):
         # Check if this is a Helm-style image block
         if "registry" in node and "tag" in node:
@@ -73,8 +68,8 @@ def update_values_yaml(values_path, image_versions):
         yaml.dump(updated, f)
 
 if __name__ == "__main__":
-    releases_file = sys.argv[1] if len(sys.argv) > 1 else "releases.yaml"
-    values_file = sys.argv[2] if len(sys.argv) > 2 else "values.yaml"
+    releases_file = sys.argv[1]
+    values_file = sys.argv[2]
 
     image_versions = parse_release_images_yaml(releases_file)
     update_values_yaml(values_file, image_versions)
