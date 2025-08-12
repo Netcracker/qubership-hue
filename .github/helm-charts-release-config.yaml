@@ -1,0 +1,10 @@
+---
+
+charts:
+  - name: qubership-hue
+    chart_file: chart/helm/hue/Chart.yaml
+    values_file: chart/helm/hue/release-images.yaml
+    image:
+      - ghcr.io/netcracker/qubership-hue:${release}
+      - ghcr.io/netcracker/qubership-hue-transfer:${release}
+      - ghcr.io/netcracker/qubership-trino:${trino_release}

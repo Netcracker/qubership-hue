@@ -32,8 +32,9 @@ For troubleshouting it might be useful to carefully check installation parameter
 2) Check python lib versions in [requirements.txt](/hue_docker/requrements.txt) compared to community image. If in community image the versions are higher, remove these libraries from requirements.txt.
 3) Check vulnerabilities. If possible to fix vulnerabilities in python libraries by increasing their patch version, add these libraries with updated versions to requirements.txt.
 4) Update helm charts based on https://github.com/cloudera/hue/tree/master/tools/kubernetes/helm/hue while keeping custom changes
-5) Check that hue can be deployed and can connect to all dependent services.
-6) Update documentation if needed.
+5) Update the chart-version in the pipeline .github/workflows/helm-charts-release.yaml when the chart is upgraded.
+6) Check that hue can be deployed and can connect to all dependent services.
+7) Update documentation if needed.
 
 ## Useful links:
 

@@ -1,0 +1,17 @@
+{
+  "components": [
+    
+    {
+      "name": "qubership-hue-transfer",
+      "file": "docker-transfer/Dockerfile",
+      "context": "."
+    },
+    
+    {
+      "name": "qubership-hue",
+      "file": "hue_docker/Dockerfile",
+      "context": "."
+    }
+  ],
+  "platforms": "linux/amd64,linux/arm64"
+}
