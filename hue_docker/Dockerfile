@@ -13,6 +13,7 @@ COPY hue_docker/requrements.txt /bin/requrements.txt
 RUN ./build/env/bin/pip install --no-cache-dir -r /bin/requrements.txt
 
 RUN apt-get update \
+    && apt-get upgrade -y \
     && apt-get install --no-install-recommends -y \
        openssl \
        nodejs \
