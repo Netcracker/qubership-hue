@@ -1,3 +1,3 @@
 qubershipHueImage: ghcr.io/netcracker/qubership-hue:main
 qubershipHueTransferImage: ghcr.io/netcracker/qubership-hue-transfer:main
-qubershipTrinoImage: ghcr.io/netcracker/qubership-trino:main
+qubershipTrinoImage: ghcr.io/netcracker/qubership-trino:1.0.0
