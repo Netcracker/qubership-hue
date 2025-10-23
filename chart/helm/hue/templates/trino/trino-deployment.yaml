@@ -85,6 +85,23 @@ spec:
           - name: databases-additional-configs
             mountPath: /dbadditionalconfigs
             {{- end }}
+        livenessProbe:
+          httpGet:
+            path: /v1/info
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+          successThreshold: 1
+        readinessProbe:
+          exec:
+            command: [/usr/lib/trino/bin/health-check]
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+          successThreshold: 1
         resources:
           {{- toYaml .Values.trino.resources | nindent 12 }}
       volumes:
