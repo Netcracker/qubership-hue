@@ -89,19 +89,19 @@ spec:
           httpGet:
             path: /v1/info
             port: http
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 6
-          successThreshold: 1
+          initialDelaySeconds: {{ .Values.trino.livenessProbe.initialDelaySeconds | default 30 }}
+          periodSeconds: {{ .Values.trino.livenessProbe.periodSeconds | default 10 }}
+          timeoutSeconds: {{ .Values.trino.livenessProbe.timeoutSeconds | default 5 }}
+          failureThreshold: {{ .Values.trino.livenessProbe.failureThreshold | default 6 }}
+          successThreshold: {{ .Values.trino.livenessProbe.successThreshold | default 1 }}
         readinessProbe:
           exec:
             command: [/usr/lib/trino/bin/health-check]
-          initialDelaySeconds: 10
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 6
-          successThreshold: 1
+          initialDelaySeconds: {{ .Values.trino.readinessProbe.initialDelaySeconds | default 10 }}
+          periodSeconds: {{ .Values.trino.readinessProbe.periodSeconds | default 10 }}
+          timeoutSeconds: {{ .Values.trino.readinessProbe.timeoutSeconds | default 5 }}
+          failureThreshold: {{ .Values.trino.readinessProbe.failureThreshold | default 6 }}
+          successThreshold: {{ .Values.trino.readinessProbe.successThreshold | default 1 }}
         resources:
           {{- toYaml .Values.trino.resources | nindent 12 }}
       volumes:
