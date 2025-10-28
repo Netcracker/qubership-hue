@@ -90,16 +90,16 @@ spec:
             path: /v1/info
             port: http
           initialDelaySeconds: {{ .Values.trino.livenessProbe.initialDelaySeconds | default 30 }}
-          periodSeconds: {{ .Values.trino.livenessProbe.periodSeconds | default 10 }}
-          timeoutSeconds: {{ .Values.trino.livenessProbe.timeoutSeconds | default 5 }}
+          periodSeconds: {{ .Values.trino.livenessProbe.periodSeconds | default 30 }}
+          timeoutSeconds: {{ .Values.trino.livenessProbe.timeoutSeconds | default 15 }}
           failureThreshold: {{ .Values.trino.livenessProbe.failureThreshold | default 6 }}
           successThreshold: {{ .Values.trino.livenessProbe.successThreshold | default 1 }}
         readinessProbe:
           exec:
             command: [/usr/lib/trino/bin/health-check]
           initialDelaySeconds: {{ .Values.trino.readinessProbe.initialDelaySeconds | default 10 }}
-          periodSeconds: {{ .Values.trino.readinessProbe.periodSeconds | default 10 }}
-          timeoutSeconds: {{ .Values.trino.readinessProbe.timeoutSeconds | default 5 }}
+          periodSeconds: {{ .Values.trino.readinessProbe.periodSeconds | default 30 }}
+          timeoutSeconds: {{ .Values.trino.readinessProbe.timeoutSeconds | default 15 }}
           failureThreshold: {{ .Values.trino.readinessProbe.failureThreshold | default 6 }}
           successThreshold: {{ .Values.trino.readinessProbe.successThreshold | default 1 }}
         resources:
