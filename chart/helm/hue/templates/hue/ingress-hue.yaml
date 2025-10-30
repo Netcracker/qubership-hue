@@ -16,7 +16,7 @@ spec:
   {{- if .Values.ingress.tls.enabled }}
   tls:
   - hosts:
-    - {{ .Values.ingress.domain }}
+    - {{ tpl (toYaml .Values.ingress.domain) . }}
     {{- range .Values.ingress.extraHosts }}
     - {{ . | quote }}
     {{- end }}
@@ -28,7 +28,7 @@ spec:
     {{- end }}
   {{- end }}
   rules:
-    - host: {{ .Values.ingress.domain }}
+    - host: {{ tpl (toYaml .Values.ingress.domain) . }}
       http:
         paths:
           - path: /
