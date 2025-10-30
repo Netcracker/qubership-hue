@@ -485,6 +485,20 @@ spec:
           initialDelaySeconds: 30
           timeoutSeconds: 15
           periodSeconds: 15
+        # Qubership custom change: Qubership release support
+        livenessProbe:
+          httpGet:
+            path: /desktop/debug/is_alive
+            port: 8888
+          {{- if contains "ssl_private_key" .Values.hue.ini }}
+            scheme: HTTPS
+          {{ else }}
+            scheme: HTTP
+          {{- end }}
+          initialDelaySeconds: 90
+          timeoutSeconds: 15
+          periodSeconds: 30
+          failureThreshold: 5  
         resources:
           {{- toYaml .Values.hue.resources | nindent 12 }}
     volumes:
