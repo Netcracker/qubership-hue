@@ -85,7 +85,6 @@ spec:
           - name: databases-additional-configs
             mountPath: /dbadditionalconfigs
             {{- end }}
-        # Qubership custom change: Qubership release support    
         livenessProbe:
           httpGet:
             path: /v1/info

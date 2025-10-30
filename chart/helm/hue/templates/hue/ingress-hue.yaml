@@ -16,7 +16,6 @@ spec:
   {{- if .Values.ingress.tls.enabled }}
   tls:
   - hosts:
-   # Qubership custom change: Qubership release support
     - {{ tpl (toYaml .Values.ingress.domain) . }}
     {{- range .Values.ingress.extraHosts }}
     - {{ . | quote }}
@@ -29,7 +28,6 @@ spec:
     {{- end }}
   {{- end }}
   rules:
-   # Qubership custom change: Qubership release support
     - host: {{ tpl (toYaml .Values.ingress.domain) . }}
       http:
         paths:
