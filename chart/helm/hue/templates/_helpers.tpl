@@ -113,6 +113,13 @@ app.kubernetes.io/part-of: hue
 {{- end }}
 
 {{/*
+All template labels for Qubership release
+*/}}
+{{- define "alltemplateLabels" -}}
+app.kubernetes.io/part-of: hue
+{{- end }}
+
+{{/*
 Processed by grafana operator label for Qubership release
 */}}
 {{- define "grafanaOperatorLabel" -}}

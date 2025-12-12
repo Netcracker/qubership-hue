@@ -19,7 +19,7 @@ spec:
     metadata:
       labels:
       # Qubership custom change: custom labels for Qubership release support
-        {{- include "allObjectsLabels" . | nindent 8 }}
+        {{- include "alltemplateLabels" . | nindent 8 }}
         {{- include "hue.deploymentOnlyLabels" . | nindent 8 }}
         {{- include "hue.deploymentAndServiceOnlyLabels" . | nindent 8 }}
 {{- with .Values.podLabels }}
