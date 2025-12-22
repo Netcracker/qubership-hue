@@ -64,8 +64,8 @@ Hue deployment only labels for Qubership release
 */}}
 {{- define "hue.deploymentOnlyLabels" -}}
 app.kubernetes.io/instance: {{ cat .Release.Name "-" .Release.Namespace | nospace | trunc 63 | trimSuffix "-" }}
-app.kubernetes.io/component: {{ default "hue" .Values.hueComponentLabel }}
 app.kubernetes.io/version: {{ splitList ":" ( include "hue.image" . ) | last }}
+{{ include "huecomponentLabel" . }}
 app.kubernetes.io/technology: python
 {{- end }}
 
@@ -138,6 +138,13 @@ Processed by cert-manager label for Qubership release
 */}}
 {{- define "certManagerLabel" -}}
 app.kubernetes.io/processed-by-operator: cert-manager
+{{- end }}
+
+{{/*
+Hue component label
+*/}}
+{{- define "huecomponentLabel" -}}
+app.kubernetes.io/component: {{ default "hue" .Values.hueComponentLabel }}
 {{- end }}
 
 {{/*
