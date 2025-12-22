@@ -159,6 +159,10 @@ ingress:
   # - "demo.hue.com"
   # annotations: {}
   # loadBalancerIp: "127.0.0.1"
+  labels: 
+    deployment.netcracker.com/ingress-type: public-network
+    deployment.netcracker.com/ingress-audience-type: ops-user
+    app.kubernetes.io/component: ingress
 
 hive:
   site: |

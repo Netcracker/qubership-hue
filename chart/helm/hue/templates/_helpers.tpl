@@ -64,8 +64,8 @@ Hue deployment only labels for Qubership release
 */}}
 {{- define "hue.deploymentOnlyLabels" -}}
 app.kubernetes.io/instance: {{ cat .Release.Name "-" .Release.Namespace | nospace | trunc 63 | trimSuffix "-" }}
-app.kubernetes.io/component: {{ default "hue" .Values.hueComponentLabel }}
 app.kubernetes.io/version: {{ splitList ":" ( include "hue.image" . ) | last }}
+app.kubernetes.io/component: {{ default "hue" .Values.hueComponentLabel }}
 app.kubernetes.io/technology: python
 {{- end }}
 
@@ -109,6 +109,13 @@ app.kubernetes.io/name: trino-hue
 All object labels for Qubership release
 */}}
 {{- define "allObjectsLabels" -}}
+app.kubernetes.io/part-of: hue
+{{- end }}
+
+{{/*
+All template labels for Qubership release
+*/}}
+{{- define "alltemplateLabels" -}}
 app.kubernetes.io/part-of: hue
 {{- end }}
 
