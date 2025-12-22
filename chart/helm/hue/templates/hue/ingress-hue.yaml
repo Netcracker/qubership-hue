@@ -9,6 +9,7 @@ metadata:
   labels:
     {{- include "allObjectsLabels" . | nindent 4 }}
     {{- include "huecomponentLabel" . | nindent 4 }}
+    {{- tpl (toYaml .Values.ingress.labels) . | nindent 4 }}
   annotations:
     {{- if .Values.ingress.annotations }}
     {{- toYaml .Values.ingress.annotations | nindent 4 }}
