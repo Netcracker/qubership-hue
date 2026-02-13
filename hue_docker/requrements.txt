@@ -1,2 +1,4 @@
 mozilla_django_oidc==4.0.1
 Django==4.2.28
+cryptography==46.0.5
+pyasn1==0.6.2
