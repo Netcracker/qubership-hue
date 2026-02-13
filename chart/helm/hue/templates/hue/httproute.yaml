@@ -47,7 +47,7 @@ spec:
         - group: ''
           kind: Service
           name: {{ $fullname }}
-          port: {{ .port }}
+          port: {{ (index .backendRefs 0).port | int }}
           {{- if .weight }}
           weight: {{ .weight }}
           {{- else }}
