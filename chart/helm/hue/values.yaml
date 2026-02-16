@@ -334,3 +334,19 @@ extraVolumeMounts: []
 #    mountPath: /home/hue/trustcerts/ca-custom.crt
 #    subPath: cm-ca.crt
 #    readOnly: true
+gateway:
+  enabled: false
+  annotations: {}
+  labels: {}
+  parentRefs: []
+  hostnames: []
+  rules: []
+  redirectRoute:
+    enabled: false
+    parentRefs: []
+  backendTLSPolicy:
+      enabled: false
+      hostname: ''
+      caCertificateRefs: []
+      wellKnownCACertificates: ""
+      subjectAltNames: [] 

@@ -620,7 +620,10 @@ ingress-hue.yaml added to create Ingress for Qubership Hue and API, with TLS and
 
 kerberos-hue.yaml added to create ConfigMap for Kerberos configuration if Kerberos is enabled via Helm values
 
+In httproute.yaml, custom HTTPRoute is for redirecting HTTP traffic to HTTPS, if TLS is enabled on the gateway, the `BackendTLSPolicy` is for TLS communication between the gateway and the Hue.
+
 ---
 ### Trino customizations
 
 trino-databases-additional-configs.yaml, trino-databases-secret.yaml, trino-deployment.yaml, trino-jvm-configmap.yaml, trino-service.yaml are created to support Trino deployment and connections.
+
