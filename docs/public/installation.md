@@ -894,7 +894,7 @@ Following configuration parameters are available:
 |gateway.labels|`object`|`{}`|Custom labels for HTTPRoute|
 |gateway.parentRefs|`array`|`[]`|parentRefs for HTTPRoute|
 |gateway.hostnames|`array`|`[]`|hostnames for HTTPRoute|
-|gateway.rules|`array`|`[]`|rules for HTTPRoute. When `rules[].matches` is not set, it defaults to `path.type=PathPrefix` and `path.value=/`. `backendRefs` in the rule will point to Hue server service, but the weight can be configured if needed.|
+|gateway.rules|`array`|`[]`|Rules for HTTPRoute. When `rules[].matches` is not set, it defaults to `path.type=PathPrefix` and `path.value=/`. `backendRefs` in the rule will point to Hue server service, but the weight can be configured if needed.|
 |gateway.redirectRoute.enabled|`boolean`|`false`|Specifies if redirect HTTPRoute for Hue server is deployed|
 |gateway.redirectRoute.parentRefs|`array`|`[]`|parentRefs for redirect HTTPRoute|
 |gateway.backendTLSPolicy.enabled|`boolean`|`false`|Specifies if the backendTLSPolicy should be deployed|
@@ -903,7 +903,7 @@ Following configuration parameters are available:
 |gateway.backendTLSPolicy.wellKnownCACertificates|`string`|`""`|wellKnownCACertificates for backendTLSPolicy|
 |gateway.backendTLSPolicy.subjectAltNames|`array`|`[]`|subjectAltNames for backendTLSPolicy|
 
-Configuration examples can be found below:
+The configuration examples are given below:
 
 Non tls:
 ```yaml
