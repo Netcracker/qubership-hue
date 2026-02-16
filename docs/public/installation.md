@@ -891,6 +891,7 @@ Following configuration parameters are available:
 |---|---|---|---|
 |gateway.enabled|`boolean`|`false`|Specifies if HTTPRoute for Hue server is deployed|
 |gateway.annotations|`object`|`{}`|Annotations for HTTPRoute and related objects|
+|gateway.labels|`object`|`{}`|Custom labels for HTTPRoute|
 |gateway.parentRefs|`array`|`[]`|parentRefs for HTTPRoute|
 |gateway.hostnames|`array`|`[]`|hostnames for HTTPRoute|
 |gateway.rules|`array`|`[]`|rules for HTTPRoute. When `rules[].matches` is not set, it defaults to `path.type=PathPrefix` and `path.value=/`. `backendRefs` in the rule will point to Hue server service, but the weight can be configured if needed.|
