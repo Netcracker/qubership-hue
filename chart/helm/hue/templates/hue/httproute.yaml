@@ -16,7 +16,9 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     heritage: {{ .Release.Service }}
     {{- include "hue.labels" $Global  | nindent 4 }}
+    {{- if .Values.gateway.labels }}
     {{- tpl (toYaml .Values.gateway.labels) . | nindent 4 }}
+    {{- end }}
     
   {{- with .Values.gateway.annotations }}
   annotations: {{- toYaml . | nindent 4 }}
@@ -117,7 +119,9 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     heritage: {{ .Release.Service }}
     {{- include "hue.labels" $Global  | nindent 4 }}
+    {{- if .Values.gateway.labels }}
     {{- tpl (toYaml .Values.gateway.labels) . | nindent 4 }}
+    {{- end }}
   {{- with .Values.gateway.annotations }}
   annotations: {{- toYaml . | nindent 4 }}
   {{- end }}

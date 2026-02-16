@@ -337,6 +337,7 @@ extraVolumeMounts: []
 gateway:
   enabled: false
   annotations: {}
+  labels: {}
   parentRefs: []
   hostnames: []
   rules: []
