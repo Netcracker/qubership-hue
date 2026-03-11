@@ -8,7 +8,7 @@ The following topics are covered in this chapter:
   * [HWE](#hwe)
     * [Small](#small)
     * [Medium](#medium)
-    * [Large](#large)
+    * [Large](#large)    
 * [Parameters](#parameters)
   * [Qubership-hue Deployment Schema](#qubership-hue-deployment-schema)
   * [Hue Configuration](#hue-configuration)
@@ -28,10 +28,12 @@ The following topics are covered in this chapter:
     * [Hue with Ldap Integrated User Interface](#hue-with-ldap-integrated-user-interface)
     * [Hue Keycloak (OIDC) for SSO Login](#hue-keycloak-oidc-for-sso-login)
       * [Keycloak with TLS](#keycloak-with-tls) 
-    * [HTTPRoute for K8S Gateway API Support](#httproute-for-k8s-gateway-api-support)      
+    * [HTTPRoute for K8S Gateway API Support](#httproute-for-k8s-gateway-api-support) 
+    * [Read Only Root Filesystem for Hue](#read-only-root-filesystem-for-hue)     
   * [Configuration Trino](#configuration-trino)
       * [Internal Trino](#internal-trino)
         * [Secure Connections for Internal Trino](#secure-connections-for-internal-trino)
+        * [Read Only Root Filesystem for Trino](#read-only-root-filesystem-for-trino)     
       * [External Trino](#extrenal-trino)
         * [Secure Connections for External Trino](#secure-connections-for-external-trino)
 * [Installation](#installation) 
@@ -948,6 +950,24 @@ gateway:
     wellKnownCACertificates: ""
     subjectAltNames: []
 ```
+## Read Only Root Filesystem for Hue
+
+To improve the security posture of the application, the deployment is configured with a read-only root filesystem. This prevents the container process from writing to any location on the disk except for specifically designated volumes.
+
+The following settings are applied:
+```
+securityContext:
+  readOnlyRootFilesystem: true
+```  
+Since the root filesystem is locked, we use emptyDir volumes to provide writable space for temporary operations. Automated Volume Mounts so no need to manually configure additional storage. 
+
+The following volumes are already provisioned in the deployment to handle standard application requirements:
+
+ | Volume Name | Mount Path | Purpose | 
+ |:-------------:|:---------:|:------------:|:-------------:|
+ | tmp | /tmp | Provides a writable area for temporary files, logs, and general OS-level buffers. |
+
+
 
 ## Configuration Trino
 
@@ -966,6 +986,26 @@ trino:
 
 You need to add a database connection via Trino.
 Examples of connections can be found in the [Connecting to Trino Supported Databases](/docs/public/configuration-guide.md#connecting-to-trino-supported-databases) section under Hue Service Configuration.
+
+#### Read Only Root Filesystem for Trino
+
+To improve the security posture of the application, the deployment is configured with a read-only root filesystem. This prevents the container process from writing to any location on the disk except for specifically designated volumes.
+
+The following settings are applied:
+```
+securityContext:
+  readOnlyRootFilesystem: true
+```  
+Since the root filesystem is locked, we use emptyDir volumes to provide writable space for temporary operations and for certificates storage. Automated Volume Mounts so no need to manually configure additional storage. 
+
+The following volumes are already provisioned in the deployment to handle standard application requirements:
+
+ | Volume Name | Mount Path | Sub Path | Purpose | 
+ |:-------------:|:---------:|:------------:|:-------------:|
+ | common-space | /tmp | tmp-data | Provides a writable area for temporary files, logs, and general OS-level buffers. |
+ | common-space | /data/trino | trino-var | Stores the PID file (launcher.pid), and internal logs. |
+ | java-cacerts-dir| /java-security | java-security | Used specifically for managing Java truststores and security certificates at runtime. |
+
 
 #### Secure Connections for Internal Trino
 

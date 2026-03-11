@@ -58,6 +58,7 @@ hue:
       type: RuntimeDefault
     allowPrivilegeEscalation: false
     runAsNonRoot: true
+    readOnlyRootFilesystem: true
     runAsUser: 1001
   hostAliases: []
 
@@ -268,6 +269,7 @@ trino:
       type: RuntimeDefault
     allowPrivilegeEscalation: false
     runAsNonRoot: true
+    readOnlyRootFilesystem: true
   hostAliases: []
   extraVolumes: []
 #    - name: tls-pg-cert
