@@ -997,7 +997,7 @@ The following settings are applied:
 securityContext:
   readOnlyRootFilesystem: true
 ```  
-Since the root filesystem is locked, we use emptyDir volumes to provide writable space for temporary operations and for certificates storage. Automated Volume Mounts so no need to manually configure additional storage. 
+Since the root filesystem is locked, we use emptyDir volumes to provide writable space for temporary operations and for certificates storage. Automated Volume Mounts, so no need to manually configure the additional storage. 
 
 The following volumes are already provisioned in the deployment to handle standard application requirements:
 
@@ -1008,7 +1008,9 @@ The following volumes are already provisioned in the deployment to handle standa
  | java-cacerts-dir| /java-security | java-security | Used specifically for managing Java truststores and security certificates at runtime. |
 
  #### Redirection of Internal Filesystem Stored Logs to stdout
- Trino has been configured to redirect all logs, that were previously stored in the internal filesystem (e.g., /data/trino/var/log) directly to stdout. This ensures all logs are captured by the container runtime without writing to the local disk.
+ 
+Trino has been configured to redirect all logs, that were previously stored in the internal filesystem, for example, `/data/trino/var/log`, directly to stdout. This ensures that all logs are captured by the container runtime without writing to the local disk.
+
  |Configuration Key |	Value |	Purpose |
  |:-----------------:|:-------:|:----------:|
  | `TRINO_LAUNCHER_LOG_FILE` | `/dev/stdout` | Redirects startup and process management logs to the console |
@@ -1023,7 +1025,6 @@ The following volumes are already provisioned in the deployment to handle standa
    - name: JAVA_TOOL_OPTIONS
      value: "-Dhttp-server.log.enabled=false -Dhttp-server.log.console.enabled=true"  
  ```
-
 
 #### Secure Connections for Internal Trino
 
