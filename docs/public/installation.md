@@ -1006,6 +1006,23 @@ The following volumes are already provisioned in the deployment to handle standa
  | common-space | /data/trino | trino-var | Stores the PID file (launcher.pid), and internal logs. |
  | java-cacerts-dir| /java-security | java-security | Used specifically for managing Java truststores and security certificates at runtime. |
 
+ #### Redirection of Internal Filesystem Stored Logs to stdout
+ Trino has been updated to redirect all logs, that were previously stored in the internal filesystem (e.g., /data/trino/var/log) directly to stdout. This ensures all logs are captured by the container runtime without writing to the local disk.
+ |Configuration Key |	Value |	Purpose |
+ |:-----------------:|:-------:|:----------:|
+ | `TRINO_LAUNCHER_LOG_FILE` | `/dev/stdout` | Redirects startup and process management logs to the console |
+ | `http-server.log.enabled` | `false` | Disables the creation and rotation of http-request.log files on the internal filesystem. |
+ | `http-server.log.console.enabled` | `true` | Activates the console-based logging stream for all HTTP traffic and query events. |
+
+ The above values are configured as defaults as follows:
+ ```yaml
+ env:
+   - name: TRINO_LAUNCHER_LOG_FILE
+     value: /dev/stdout
+   - name: JAVA_TOOL_OPTIONS
+     value: "-Dhttp-server.log.enabled=false -Dhttp-server.log.console.enabled=true"  
+ ```
+
 
 #### Secure Connections for Internal Trino
 
