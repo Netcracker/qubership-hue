@@ -428,11 +428,17 @@ spec:
         {{- if .Values.hue.args }}
         args: {{ tpl (toYaml .Values.hue.args) . | nindent 12 }}
           {{- end }}
-        {{- if .Values.env }}
         env:
-          {{- toYaml .Values.env | nindent 12}}
+        # Qubership custom change: Qubership Custom environment variables to support ReadOnlyRootFS
+          - name: HUE_RUN_DIR
+            value: "/tmp"
+        {{- if .Values.env }}
+          {{- toYaml .Values.env | nindent 10}}
         {{- end }}
         volumeMounts:
+        # Qubership custom change: Qubership Custom volume mounts to support ReadOnlyRootFS
+          - name: tmp
+            mountPath: /tmp
         # Qubership custom change: Qubership Custom volume mounts for Qubership Hue from cert-manager secrets and extra user-defined mounts via Helm values
           {{- if .Values.certManagerInegration.enabled }}
           {{- range .Values.certManagerInegration.secretMounts }}
@@ -502,6 +508,9 @@ spec:
         resources:
           {{- toYaml .Values.hue.resources | nindent 12 }}
     volumes:
+    # Qubership custom change: Qubership Custom volume mounts to support ReadOnlyRootFS
+        - name: tmp
+          emptyDir: {}
       # Qubership custom change: Qubership custom volumes for config files, cert-manager secrets, and conditional integrations (Kerberos, SSL, LDAP) using Helm values
         {{- if .Values.certManagerInegration.enabled }}
         - name: {{.Values.certManagerInegration.secretName }}-volume

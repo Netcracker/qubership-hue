@@ -65,7 +65,19 @@ spec:
         {{- end }}
         ports:
         - containerPort: 8080
+        env:
+          - name: TRINO_HISTORY_FILE
+            value: "/tmp/.trino_history"
         volumeMounts:
+          - name: common-space
+            mountPath: /tmp
+            subPath: tmp-data
+          - name: common-space
+            mountPath: /data/trino
+            subPath: trino-var
+          - name: java-cacerts-dir
+            mountPath: /java-security
+            subPath: java-security
           {{- if .Values.certManagerInegration.enabled }}
           - name: {{ .Values.certManagerInegration.secretName}}-volume
             mountPath: /home/trino/trustcerts/ca.crt
@@ -105,6 +117,10 @@ spec:
         resources:
           {{- toYaml .Values.trino.resources | nindent 12 }}
       volumes:
+        - name: common-space
+          emptyDir: {}
+        - name: java-cacerts-dir
+          emptyDir: {}
         {{- if .Values.certManagerInegration.enabled }}
         - name: {{.Values.certManagerInegration.secretName }}-volume
           secret:

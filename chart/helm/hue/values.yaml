@@ -58,6 +58,7 @@ hue:
       type: RuntimeDefault
     allowPrivilegeEscalation: false
     runAsNonRoot: true
+    readOnlyRootFilesystem: true
     runAsUser: 1001
   hostAliases: []
 
@@ -149,7 +150,8 @@ ingress:
   tls:
     enabled: false
     # secretName: hue-tls-cm
-  annotations: {}
+  annotations:
+    gateway-api-converter.netcracker.com/ignore: "true"
 #    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
 #    nginx.ingress.kubernetes.io/proxy-ssl-verify: 'on'
 #    nginx.ingress.kubernetes.io/proxy-ssl-name: 'hue.<hue_namespace>'
@@ -268,6 +270,7 @@ trino:
       type: RuntimeDefault
     allowPrivilegeEscalation: false
     runAsNonRoot: true
+    readOnlyRootFilesystem: true
   hostAliases: []
   extraVolumes: []
 #    - name: tls-pg-cert
