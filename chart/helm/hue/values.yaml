@@ -11,7 +11,7 @@ env: ~
 image:
    registry: "ghcr.io/netcracker/qubership-hue"
    tag: "main"
-   pullPolicy: "IfNotPresent"
+   pullPolicy: "Always"
 
 
 api:
@@ -245,7 +245,7 @@ databasescommon:
 trino:
   enabled: false
   image: ghcr.io/netcracker/qubership-trino:main
-  imagePullPolicy: "IfNotPresent"
+  imagePullPolicy: "Always"
   replicas: 1
   priorityClassName: ~
   livenessProbe: {}
