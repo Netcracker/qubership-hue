@@ -33,7 +33,8 @@ The following topics are covered in this chapter:
   * [Configuration Trino](#configuration-trino)
       * [Internal Trino](#internal-trino)
         * [Secure Connections for Internal Trino](#secure-connections-for-internal-trino)
-        * [Read Only Root Filesystem for Trino](#read-only-root-filesystem-for-trino)     
+        * [Read Only Root Filesystem for Trino](#read-only-root-filesystem-for-trino)
+        * [Redirection of Internal Filesystem Stored Logs to stdout](#redirection-of-internal-filesystem-stored-logs-to-stdout)     
       * [External Trino](#extrenal-trino)
         * [Secure Connections for External Trino](#secure-connections-for-external-trino)
 * [Installation](#installation) 
@@ -996,16 +997,34 @@ The following settings are applied:
 securityContext:
   readOnlyRootFilesystem: true
 ```  
-Since the root filesystem is locked, we use emptyDir volumes to provide writable space for temporary operations and for certificates storage. Automated Volume Mounts so no need to manually configure additional storage. 
+Since the root filesystem is locked, we use emptyDir volumes to provide writable space for temporary operations and for certificates storage. Automated Volume Mounts, so no need to manually configure the additional storage. 
 
 The following volumes are already provisioned in the deployment to handle standard application requirements:
 
  | Volume Name | Mount Path | Sub Path | Purpose | 
  |:-------------:|:---------:|:------------:|:-------------:|
- | common-space | /tmp | tmp-data | Provides a writable area for temporary files, logs, and general OS-level buffers. |
- | common-space | /data/trino | trino-var | Stores the PID file (launcher.pid), and internal logs. |
+ | common-space | /tmp | tmp-data | Provides a writable area for temporary files, and general OS-level buffers. |
+ | common-space | /data/trino | trino-var | Stores the PID file (launcher.pid). |
  | java-cacerts-dir| /java-security | java-security | Used specifically for managing Java truststores and security certificates at runtime. |
 
+ #### Redirection of Internal Filesystem Stored Logs to stdout
+ 
+Trino has been configured to redirect all logs, that were previously stored in the internal filesystem, for example, `/data/trino/var/log`, directly to stdout. This ensures that all logs are captured by the container runtime without writing to the local disk.
+
+ |Configuration Key |	Value |	Purpose |
+ |:-----------------:|:-------:|:----------:|
+ | `TRINO_LAUNCHER_LOG_FILE` | `/dev/stdout` | Redirects startup and process management logs to the console |
+ | `http-server.log.enabled` | `false` | Disables the creation and rotation of http-request.log files on the internal filesystem. |
+ | `http-server.log.console.enabled` | `true` | Activates the console-based logging stream for all HTTP traffic and query events. |
+
+ The above values are configured as defaults as follows:
+ ```yaml
+ env:
+   - name: TRINO_LAUNCHER_LOG_FILE
+     value: /dev/stdout
+   - name: JAVA_TOOL_OPTIONS
+     value: "-Dhttp-server.log.enabled=false -Dhttp-server.log.console.enabled=true"  
+ ```
 
 #### Secure Connections for Internal Trino
 

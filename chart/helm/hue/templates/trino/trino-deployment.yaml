@@ -68,6 +68,10 @@ spec:
         env:
           - name: TRINO_HISTORY_FILE
             value: "/tmp/.trino_history"
+          - name: JAVA_TOOL_OPTIONS
+            value: "-Dhttp-server.log.enabled=false -Dhttp-server.log.console.enabled=true"
+          - name: TRINO_LAUNCHER_LOG_FILE
+            value: "/dev/stdout"    
         volumeMounts:
           - name: common-space
             mountPath: /tmp
