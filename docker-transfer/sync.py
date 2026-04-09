@@ -8,8 +8,9 @@ yaml.preserve_quotes = True
 yaml.indent(mapping=2, sequence=4, offset=2)
 
 yaml.representer.add_representer(
-    type(None), lambda self, _: self.represent_scalar('tag:yaml.org,2002:null', '~')
+    type(None), lambda self, _: self.represent_scalar("tag:yaml.org,2002:null", "~")
 )
+
 
 def parse_release_images_yaml(file_path):
     with open(file_path) as f:
@@ -22,6 +23,7 @@ def parse_release_images_yaml(file_path):
             image_name, tag = match.groups()
             image_versions[image_name] = tag
     return image_versions
+
 
 def update_node(node, image_versions):
     if isinstance(node, dict):
@@ -54,6 +56,7 @@ def update_node(node, image_versions):
         return node
     return node
 
+
 def update_values_yaml(values_path, image_versions):
     if not os.path.exists(values_path):
         print(f"File not found: {values_path}")
@@ -66,6 +69,7 @@ def update_values_yaml(values_path, image_versions):
 
     with open(values_path, "w") as f:
         yaml.dump(updated, f)
+
 
 if __name__ == "__main__":
     releases_file = sys.argv[1]
