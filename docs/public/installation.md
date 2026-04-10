@@ -1,4 +1,6 @@
-The following topics are covered in this chapter:
+This topic provides fetailed instructions on Hue installation procedure.
+
+The following topics are covered in this toic:
 
 * [Prerequisites](#prerequisites)
   * [Common](#common)
@@ -30,6 +32,7 @@ The following topics are covered in this chapter:
       * [Keycloak with TLS](#keycloak-with-tls) 
     * [HTTPRoute for K8S Gateway API Support](#httproute-for-k8s-gateway-api-support) 
     * [Read Only Root Filesystem for Hue](#read-only-root-filesystem-for-hue)     
+    * [Replace Secret to ENV Mapping with File Based Secret Mounts](#replace-secret-to-env-mapping-with-file-based-secret-mounts)
   * [Configuration Trino](#configuration-trino)
       * [Internal Trino](#internal-trino)
         * [Secure Connections for Internal Trino](#secure-connections-for-internal-trino)
@@ -43,7 +46,6 @@ The following topics are covered in this chapter:
     * [Non-HA Scheme](#non-ha-scheme)
 * [Upgrade](#upgrade)
 * [Rollback](#rollback)
-
 
 # Prerequisites
 
@@ -968,7 +970,23 @@ The following volumes are already provisioned in the deployment to handle standa
  |:-------------:|:---------:|:------------:|:-------------:|
  | tmp | /tmp | Provides a writable area for temporary files, logs, and general OS-level buffers. |
 
+## Replace Secret to ENV Mapping with File Based Secret Mounts
 
+To improve the application security, it is recommended to replace the secret-to-environment variable mapping with file-based secret mounts for handling sensitive data.
+The sensitive parameters are now read from the mounted secret files using automated secret volume mounts.
+
+The following configurations have been applied:
+
+```yaml
+# The following parameters are added to the secret huepreinstallhooksecret, used by createdbjob
+POSTGRES_PASSWORD: {{ default "postgres" (include "postgres.hue.password" .) | b64enc }}
+POSTGRES_ADMIN_USER: {{ default "postgres" (include "postgres.adminUser" .) | b64enc }}
+POSTGRES_ADMIN_PASSWORD: {{ default "postgres" (include "postgres.adminPassword" .) | b64enc }}
+```
+The following volumes are provisioned in the job to support the above configuration:
+| Volume Name | Mount Path | Purpose|
+ |:------------:|:----------:|:-------|
+ | postgres-secrets | /var/run/secrets/hue | Stores postgres credentials. |
 
 ## Configuration Trino
 
