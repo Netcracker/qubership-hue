@@ -1,4 +1,6 @@
-The following topics are covered in this chapter:
+This topic provides fetailed instructions on Hue installation procedure.
+
+The following topics are covered in this toic:
 
 * [Prerequisites](#prerequisites)
   * [Common](#common)
@@ -44,7 +46,6 @@ The following topics are covered in this chapter:
     * [Non-HA Scheme](#non-ha-scheme)
 * [Upgrade](#upgrade)
 * [Rollback](#rollback)
-
 
 # Prerequisites
 
@@ -970,10 +971,12 @@ The following volumes are already provisioned in the deployment to handle standa
  | tmp | /tmp | Provides a writable area for temporary files, logs, and general OS-level buffers. |
 
 ## Replace Secret to ENV Mapping with File Based Secret Mounts
+
 To improve the application security, it is recommended to replace the secret-to-environment variable mapping with file-based secret mounts for handling sensitive data.
-Sensitive parameters are now read from the mounted secret files using automated secret volume mounts.
+The sensitive parameters are now read from the mounted secret files using automated secret volume mounts.
 
 The following configurations have been applied:
+
 ```yaml
 # The following parameters are added to the secret huepreinstallhooksecret, used by createdbjob
 POSTGRES_PASSWORD: {{ default "postgres" (include "postgres.hue.password" .) | b64enc }}
@@ -984,8 +987,6 @@ The following volumes are provisioned in the job to support the above configurat
 | Volume Name | Mount Path | Purpose|
  |:------------:|:----------:|:-------|
  | postgres-secrets | /var/run/secrets/hue | Stores postgres credentials. |
- 
-
 
 ## Configuration Trino
 
