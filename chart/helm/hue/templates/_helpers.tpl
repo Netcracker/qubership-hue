@@ -222,7 +222,7 @@ runAsGroup: {{ .runAsGroup }}
 {{- end }}
 
 {{/*
-Trino security Rules
+Trino pod security context
 */}}
 {{- define "trino.podSecurityContext" -}}
 {{- if .Values.trino.podSecurityContext -}}
