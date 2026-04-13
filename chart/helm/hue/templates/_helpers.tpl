@@ -224,8 +224,8 @@ runAsGroup: {{ .runAsGroup }}
 {{/*
 Trino security Rules
 */}}
-{{- define "trino.securityRules" -}}
-{{- if .Values.trino.securityRules -}}
-{{- toYaml .Values.trino.securityRules -}}
+{{- define "trino.podSecurityContext" -}}
+{{- if .Values.trino.podSecurityContext -}}
+{{- toYaml .Values.trino.podSecurityContext -}}
 {{- end }}
 {{- end }}

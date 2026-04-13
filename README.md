@@ -241,7 +241,7 @@ trino:
   securityContext:
     runAsUser: 1000
     runAsGroup: 1000
-  securityRules:
+  podSecurityContext:
     capabilities:
       drop:
         - ALL
