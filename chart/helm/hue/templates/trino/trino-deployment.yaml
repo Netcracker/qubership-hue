@@ -58,7 +58,7 @@ spec:
         image: {{ template "trinodb.image" . }}
         imagePullPolicy: {{ .Values.trino.imagePullPolicy }}
         securityContext:
-          {{- include "trino.securityRules" . | nindent 12 }}
+          {{- include "trino.securityRules" . | nindent 10 }}
         ports:
         - containerPort: 8080
         env:
