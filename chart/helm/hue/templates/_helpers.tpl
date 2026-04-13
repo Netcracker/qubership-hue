@@ -193,3 +193,39 @@ Hue PG User Password
 {{- .Values.hue.database.password -}}
 {{- end -}}
 
+{{/*
+Hue SecurityContext values
+*/}}
+{{- define "hue.securityContext" -}}
+{{- if .Values.hue.securityContext -}}
+{{- toYaml .Values.hue.securityContext -}}
+{{- end }}
+{{- end }}
+
+{{/*
+Hue Pod SecurityContext values
+*/}}
+{{- define "hue.podSecurityContext" -}}
+{{- if .Values.hue.podSecurityContext -}}
+{{- toYaml .Values.hue.podSecurityContext -}}
+{{- end }}
+{{- end }}
+
+{{/*
+Trino specific security context fields
+*/}}
+{{- define "trino.securityContext" -}}
+{{- with .Values.trino.securityContext -}}
+runAsUser: {{ .runAsUser }}
+runAsGroup: {{ .runAsGroup }}
+{{- end }}
+{{- end }}
+
+{{/*
+Trino security Rules
+*/}}
+{{- define "trino.securityRules" -}}
+{{- if .Values.trino.securityRules -}}
+{{- toYaml .Values.trino.securityRules -}}
+{{- end }}
+{{- end }}
