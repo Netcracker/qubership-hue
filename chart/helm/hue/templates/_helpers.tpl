@@ -194,11 +194,17 @@ Hue PG User Password
 {{- end -}}
 
 {{/*
-Hue SecurityContext values
+Hue SecurityContext with conditional User/Group logic
 */}}
 {{- define "hue.securityContext" -}}
 {{- if .Values.hue.securityContext -}}
-{{- toYaml .Values.hue.securityContext -}}
+{{- $context := omit .Values.hue.securityContext "runAsUser" -}}
+{{- toYaml $context }}
+{{ if eq (default "KUBERNETES" .Values.PAAS_PLATFORM) "KUBERNETES" -}}
+runAsUser: {{ .Values.hue.securityContext.runAsUser | default 1001 }}
+{{- else }}
+runAsUser: null
+{{- end }}
 {{- end }}
 {{- end }}
 
@@ -207,7 +213,17 @@ Hue Pod SecurityContext values
 */}}
 {{- define "hue.podSecurityContext" -}}
 {{- if .Values.hue.podSecurityContext -}}
-{{- toYaml .Values.hue.podSecurityContext -}}
+  {{- $context := omit .Values.hue.podSecurityContext "runAsUser" "fsGroup" -}}
+  {{- if not (empty $context) -}}
+{{ toYaml $context }}
+  {{- end -}}
+  {{- if eq (default "KUBERNETES" .Values.PAAS_PLATFORM) "KUBERNETES" -}}
+runAsUser: {{ .Values.hue.podSecurityContext.runAsUser | default 1001 }}
+fsGroup: {{ .Values.hue.podSecurityContext.fsGroup | default 1001 }}
+  {{- else -}}
+runAsUser: null
+fsGroup: null
+  {{- end -}}
 {{- end }}
 {{- end }}
 
@@ -215,9 +231,14 @@ Hue Pod SecurityContext values
 Trino specific security context fields
 */}}
 {{- define "trino.securityContext" -}}
+{{- if eq (default "KUBERNETES" .Values.PAAS_PLATFORM) "KUBERNETES" -}}
 {{- with .Values.trino.securityContext -}}
 runAsUser: {{ .runAsUser }}
 runAsGroup: {{ .runAsGroup }}
+{{- end }}
+{{- else }}
+runAsUser: null
+runAsGroup: null
 {{- end }}
 {{- end }}
 
@@ -226,6 +247,14 @@ Trino pod security context
 */}}
 {{- define "trino.podSecurityContext" -}}
 {{- if .Values.trino.podSecurityContext -}}
-{{- toYaml .Values.trino.podSecurityContext -}}
+{{- $context := omit .Values.trino.podSecurityContext "runAsUser" "fsGroup" -}}
+{{- toYaml $context }}
+{{ if eq (default "KUBERNETES" .Values.PAAS_PLATFORM) "KUBERNETES" -}}
+runAsUser: {{ .Values.trino.podSecurityContext.runAsUser | default  1000 }}
+fsGroup: {{ .Values.trino.podSecurityContext.fsGroup | default  1000 }}
+{{- else }}
+runAsUser: null
+fsGroup: null
+{{- end }}
 {{- end }}
 {{- end }}
