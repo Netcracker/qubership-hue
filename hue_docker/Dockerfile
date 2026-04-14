@@ -4,6 +4,8 @@ USER root
 ENV DEBIAN_FRONTEND=noninteractive
 
 ENV GUNICORN_CMD_ARGS="--worker-tmp-dir /dev/shm"
+ENV HUE_GUNICORN_UID="-1"
+ENV HUE_GUNICORN_GID="-1"
 
 RUN mkdir -p /etc/hadoop /home/hue
 
@@ -27,8 +29,6 @@ COPY hue_docker/get_hive_conf.sh /bin/get_hive_conf.sh
 
 RUN chgrp -R 0 /usr/share/hue /etc/hadoop /home/hue /tmp /bin/get_hive_conf.sh && \
     chmod -R g+rwX /usr/share/hue /etc/hadoop /home/hue /tmp && \
-    chmod +x /bin/get_hive_conf.sh
-RUN sed -i 's/gunicorn_uid=.*/gunicorn_uid=-1/g' /usr/share/hue/desktop/conf.dist/hue.ini && \
-    sed -i 's/gunicorn_gid=.*/gunicorn_gid=-1/g' /usr/share/hue/desktop/conf.dist/hue.ini    
+    chmod +x /bin/get_hive_conf.sh   
 
 USER hue
