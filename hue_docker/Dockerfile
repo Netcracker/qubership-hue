@@ -3,10 +3,6 @@ USER root
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-ENV GUNICORN_CMD_ARGS="--worker-tmp-dir /dev/shm"
-ENV HUE_GUNICORN_UID="-1"
-ENV HUE_GUNICORN_GID="-1"
-
 RUN mkdir -p /etc/hadoop /home/hue
 
 COPY hue_docker/requrements.txt /bin/requrements.txt

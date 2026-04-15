@@ -201,7 +201,7 @@ Hue SecurityContext with conditional User/Group logic
 {{- $context := omit .Values.hue.securityContext "runAsUser" -}}
 {{- toYaml $context }}
 {{ if eq (default "KUBERNETES" .Values.PAAS_PLATFORM) "KUBERNETES" -}}
-runAsUser: {{ .Values.hue.securityContext.runAsUser | default 1001 }}
+runAsUser: {{ .Values.hue.securityContext.runAsUser }}
 {{- else }}
 runAsUser: null
 {{- end }}
@@ -218,8 +218,12 @@ Hue Pod SecurityContext values
 {{ toYaml $context }}
   {{- end -}}
   {{- if eq (default "KUBERNETES" .Values.PAAS_PLATFORM) "KUBERNETES" -}}
-runAsUser: {{ .Values.hue.podSecurityContext.runAsUser | default 1001 }}
-fsGroup: {{ .Values.hue.podSecurityContext.fsGroup | default 1001 }}
+    {{- if .Values.hue.podSecurityContext.runAsUser }}
+runAsUser: {{ .Values.hue.podSecurityContext.runAsUser }}
+    {{- end }}
+    {{- if .Values.hue.podSecurityContext.fsGroup }}
+fsGroup: {{ .Values.hue.podSecurityContext.fsGroup }}
+    {{- end }}
   {{- else -}}
 runAsUser: null
 fsGroup: null
@@ -250,8 +254,10 @@ Trino pod security context
 {{- $context := omit .Values.trino.podSecurityContext "runAsUser" "fsGroup" -}}
 {{- toYaml $context }}
 {{ if eq (default "KUBERNETES" .Values.PAAS_PLATFORM) "KUBERNETES" -}}
-runAsUser: {{ .Values.trino.podSecurityContext.runAsUser | default  1000 }}
-fsGroup: {{ .Values.trino.podSecurityContext.fsGroup | default  1000 }}
+{{- if .Values.trino.podSecurityContext.runAsUser }}
+runAsUser: {{ .Values.trino.podSecurityContext.runAsUser }}
+{{- end }}
+fsGroup: {{ .Values.trino.podSecurityContext.fsGroup }}
 {{- else }}
 runAsUser: null
 fsGroup: null
