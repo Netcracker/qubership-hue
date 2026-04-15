@@ -89,8 +89,10 @@ spec:
           {{- end }}
         env:
         # Qubership custom change: Qubership Custom environment variables to support ReadOnlyRootFS
+        {{- if ne (default "KUBERNETES" .Values.PAAS_PLATFORM) "KUBERNETES" }}
           - name: GUNICORN_USE_OS_USER
             value: "true"
+        {{- end }}    
           - name: HUE_RUN_DIR
             value: "/tmp"
         {{- if .Values.env }}

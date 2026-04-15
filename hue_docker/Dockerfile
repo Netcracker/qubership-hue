@@ -3,7 +3,10 @@ USER root
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN mkdir -p /etc/hadoop /home/hue
+RUN mkdir /etc/hadoop \
+    && chmod 777 /etc/hadoop \
+    && mkdir --parents /home/hue \
+    && chmod 777 -R /home/hue
 
 COPY hue_docker/requrements.txt /bin/requrements.txt
 
@@ -23,8 +26,6 @@ RUN apt-get update \
 COPY hue_docker/createdb.py /bin/createdb.py
 COPY hue_docker/get_hive_conf.sh /bin/get_hive_conf.sh
 
-RUN chgrp -R 0 /usr/share/hue /etc/hadoop /home/hue /tmp /bin/get_hive_conf.sh && \
-    chmod -R g+rwX /usr/share/hue /etc/hadoop /home/hue /tmp && \
-    chmod +x /bin/get_hive_conf.sh   
+RUN chmod 777 /bin/get_hive_conf.sh   
 
 USER hue
