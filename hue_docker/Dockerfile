@@ -26,6 +26,6 @@ RUN apt-get update \
 COPY hue_docker/createdb.py /bin/createdb.py
 COPY hue_docker/get_hive_conf.sh /bin/get_hive_conf.sh
 
-RUN chmod 777 /bin/get_hive_conf.sh   
+RUN chmod 777 /bin/get_hive_conf.sh
 
 USER hue

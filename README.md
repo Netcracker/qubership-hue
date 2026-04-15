@@ -424,6 +424,11 @@ spec:
         args: {{ tpl (toYaml .Values.hue.args) . | nindent 12 }}
           {{- end }}
         env:
+        # Qubership custom change: OpenShift deployment support
+        {{- if ne (default "KUBERNETES" .Values.PAAS_PLATFORM) "KUBERNETES" }}
+          - name: GUNICORN_USE_OS_USER
+            value: "true"
+        {{- end }} 
         # Qubership custom change: Qubership Custom environment variables to support ReadOnlyRootFS
           - name: HUE_RUN_DIR
             value: "/tmp"
