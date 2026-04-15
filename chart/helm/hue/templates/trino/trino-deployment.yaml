@@ -50,19 +50,15 @@ spec:
       tolerations:
         {{- toYaml .Values.trino.tolerations | nindent 8 }}
       {{- end }}
-      {{- with .Values.trino.securityContext }}
+      
       securityContext:
-        runAsUser: {{ .runAsUser }}
-        runAsGroup: {{ .runAsGroup }}
-      {{- end }}
+        {{- include "trino.securityContext" . | nindent 8 }}
       containers:
       - name: {{ .Chart.Name }}-trino
         image: {{ template "trinodb.image" . }}
         imagePullPolicy: {{ .Values.trino.imagePullPolicy }}
-        {{- if .Values.trino.securityRules }}
         securityContext:
-          {{- toYaml .Values.trino.securityRules  | nindent 12 }}
-        {{- end }}
+          {{- include "trino.podSecurityContext" . | nindent 10 }}
         ports:
         - containerPort: 8080
         env:

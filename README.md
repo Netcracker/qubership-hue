@@ -241,7 +241,7 @@ trino:
   securityContext:
     runAsUser: 1000
     runAsGroup: 1000
-  securityRules:
+  podSecurityContext:
     capabilities:
       drop:
         - ALL
@@ -388,9 +388,8 @@ spec:
                 sleep 1;
               done
 # Qubership custom change: Qubership Custom pod-level settings for Qubership Hue: security, scheduling, host aliases, and restart policy from Helm values
-          {{- if .Values.hue.securityContext }}
           securityContext:
-            {{- toYaml .Values.hue.securityContext | nindent 12 }}
+            {{- include "hue.securityContext" . | nindent 12 }}
           {{- end }}
       {{- if .Values.hue.priorityClassName }}
       priorityClassName: {{ .Values.hue.priorityClassName }}
@@ -412,23 +411,24 @@ spec:
       tolerations:
         {{- toYaml .Values.hue.tolerations | nindent 8 }}
       {{- end }}
-      {{- if .Values.hue.podSecurityContext }}
       securityContext:
-        {{- toYaml .Values.hue.podSecurityContext | nindent 8 }}
-      {{- end }}
+        {{- include "hue.podSecurityContext" . | nindent 8 }}
       containers:
       # Qubership custom change: Qubership Custom container config for Qubership Hue with dynamic image, security, args, and env based on Helm values
       - name: {{ .Chart.Name }}-hue
         image: {{ include "hue.image" . }}
         imagePullPolicy: {{ .Values.hue.imagePullPolicy }}
-        {{- if .Values.hue.securityContext }}
         securityContext:
-          {{- toYaml .Values.hue.securityContext | nindent 10 }}
-        {{- end }}
+          {{- include "hue.securityContext" . | nindent 10 }}
         {{- if .Values.hue.args }}
         args: {{ tpl (toYaml .Values.hue.args) . | nindent 12 }}
           {{- end }}
         env:
+        # Qubership custom change: OpenShift deployment support
+        {{- if ne (default "KUBERNETES" .Values.PAAS_PLATFORM) "KUBERNETES" }}
+          - name: GUNICORN_USE_OS_USER
+            value: "true"
+        {{- end }} 
         # Qubership custom change: Qubership Custom environment variables to support ReadOnlyRootFS
           - name: HUE_RUN_DIR
             value: "/tmp"
