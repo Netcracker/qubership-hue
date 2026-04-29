@@ -1,4 +1,4 @@
-FROM gethue/hue:20260212-140101
+FROM gethue/hue:20260428-140101
 USER root
 
 ENV DEBIAN_FRONTEND=noninteractive
