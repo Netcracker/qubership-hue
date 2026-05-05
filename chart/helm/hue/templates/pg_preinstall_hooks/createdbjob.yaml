@@ -41,8 +41,10 @@ spec:
                 name: huepreinstallhooksecret
           image: {{ include "hue.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.hue.securityContext }}
           securityContext:
-            {{- include "hue.securityContext" . | nindent 12 }}
+            {{- toYaml .Values.hue.securityContext | nindent 12 }}
+          {{- end }}
           volumeMounts:
             {{ if .Values.hue.database.create }}
             - name: postgres-secrets
@@ -84,6 +86,6 @@ spec:
       restartPolicy: OnFailure
       schedulerName: default-scheduler
       securityContext:
-        {{- include "hue.podSecurityContext" . | nindent 8 }}
+        {{- include "hue.podSecurityContext" . }}
       terminationGracePeriodSeconds: 30
 {{ end }}

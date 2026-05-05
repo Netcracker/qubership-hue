@@ -194,73 +194,25 @@ Hue PG User Password
 {{- end -}}
 
 {{/*
-Hue SecurityContext with conditional User/Group logic
-*/}}
-{{- define "hue.securityContext" -}}
-{{- if .Values.hue.securityContext -}}
-{{- $context := omit .Values.hue.securityContext "runAsUser" -}}
-{{- toYaml $context }}
-{{ if eq (default "KUBERNETES" .Values.PAAS_PLATFORM) "KUBERNETES" -}}
-runAsUser: {{ .Values.hue.securityContext.runAsUser }}
-{{- else }}
-runAsUser: null
-{{- end }}
-{{- end }}
-{{- end }}
-
-{{/*
 Hue Pod SecurityContext values
 */}}
 {{- define "hue.podSecurityContext" -}}
-{{- if .Values.hue.podSecurityContext -}}
-  {{- $context := omit .Values.hue.podSecurityContext "runAsUser" "fsGroup" -}}
-  {{- if not (empty $context) -}}
-{{ toYaml $context }}
-  {{- end -}}
-  {{- if eq (default "KUBERNETES" .Values.PAAS_PLATFORM) "KUBERNETES" -}}
-    {{- if .Values.hue.podSecurityContext.runAsUser }}
-runAsUser: {{ .Values.hue.podSecurityContext.runAsUser }}
-    {{- end }}
-    {{- if .Values.hue.podSecurityContext.fsGroup }}
-fsGroup: {{ .Values.hue.podSecurityContext.fsGroup }}
-    {{- end }}
-  {{- else -}}
-runAsUser: null
-fsGroup: null
-  {{- end -}}
+{{ if eq (default "KUBERNETES" .Values.PAAS_PLATFORM) "OPENSHIFT" -}}
+{{ toYaml (omit .Values.hue.podSecurityContext "runAsUser" "fsGroup" "runAsGroup") | nindent 8 }}
+{{- else -}}
+{{- toYaml .Values.hue.podSecurityContext | nindent 8 }}
 {{- end }}
 {{- end }}
 
-{{/*
-Trino specific security context fields
-*/}}
-{{- define "trino.securityContext" -}}
-{{- if eq (default "KUBERNETES" .Values.PAAS_PLATFORM) "KUBERNETES" -}}
-{{- with .Values.trino.securityContext -}}
-runAsUser: {{ .runAsUser }}
-runAsGroup: {{ .runAsGroup }}
-{{- end }}
-{{- else }}
-runAsUser: null
-runAsGroup: null
-{{- end }}
-{{- end }}
 
 {{/*
 Trino pod security context
 */}}
 {{- define "trino.podSecurityContext" -}}
-{{- if .Values.trino.podSecurityContext -}}
-{{- $context := omit .Values.trino.podSecurityContext "runAsUser" "fsGroup" -}}
-{{- toYaml $context }}
-{{ if eq (default "KUBERNETES" .Values.PAAS_PLATFORM) "KUBERNETES" -}}
-{{- if .Values.trino.podSecurityContext.runAsUser }}
-runAsUser: {{ .Values.trino.podSecurityContext.runAsUser }}
-{{- end }}
-fsGroup: {{ .Values.trino.podSecurityContext.fsGroup }}
+{{ if eq (default "KUBERNETES" .Values.PAAS_PLATFORM) "OPENSHIFT" -}}
+{{ toYaml (omit .Values.trino.podSecurityContext "runAsUser" "fsGroup" "runAsGroup") | nindent 8 }}
 {{- else }}
-runAsUser: null
-fsGroup: null
+{{- toYaml .Values.trino.podSecurityContext | nindent 8 }}
 {{- end }}
 {{- end }}
-{{- end }}
+

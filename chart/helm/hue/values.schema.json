@@ -4,56 +4,6 @@
   "description": "Schema for validating Hue and Trino deployment configurations.",
   "type": "object",
   "definitions": {
-    "kubernetesResource": {
-      "type": "object",
-      "properties": {
-        "cpu": {
-          "type": "string",
-          "pattern": "^([0-9]+m|[0-9]+(\\.[0-9]+)?)$"
-        },
-        "memory": {
-          "type": "string",
-          "pattern": "^[0-9]+(Mi|Gi|Ki|Ti)$"
-        }
-      },
-      "additionalProperties": false
-    },
-    "resourceRequirements": {
-      "type": "object",
-      "properties": {
-        "limits": { "$ref": "#/definitions/kubernetesResource" },
-        "requests": { "$ref": "#/definitions/kubernetesResource" }
-      },
-      "additionalProperties": false
-    },
-    "securityContext": {
-      "type": "object",
-      "properties": {
-        "runAsUser": { "type": ["integer", "string"] },
-        "runAsGroup": { "type": ["integer", "string"] },
-        "readOnlyRootFilesystem": { "type": ["boolean", "string"] },
-        "allowPrivilegeEscalation": { "type": ["boolean", "string"] },
-        "runAsNonRoot": { "type": ["boolean", "string"] },
-        "capabilities": {
-          "type": "object",
-          "properties": {
-            "drop": {
-              "type": "array",
-              "items": { "type": "string" }
-            }
-          },
-          "additionalProperties": false
-        },
-        "seccompProfile": {
-          "type": "object",
-          "properties": {
-            "type": { "type": "string" }
-          },
-          "additionalProperties": false
-        }
-      },
-      "additionalProperties": false
-    },
     "stringMap": {
       "type": "object",
       "additionalProperties": { "type": "string" }
@@ -69,6 +19,7 @@
   "properties": {
     "env": {
       "type": ["array", "null"],
+      "default": null,
       "items": {
         "type": "object",
         "properties": {
@@ -83,9 +34,9 @@
     "image": {
       "type": "object",
       "properties": {
-        "registry": { "type": "string" },
-        "tag": { "type": "string" },
-        "pullPolicy": { "type": "string", "enum": ["Always", "IfNotPresent", "Never"] }
+        "registry": { "type": "string", "default": "ghcr.io/netcracker/qubership-hue" },
+        "tag": { "type": "string", "default": "main" },
+        "pullPolicy": { "type": "string", "enum": ["Always", "IfNotPresent", "Never"], "default": "IfNotPresent" }
       },
       "required": ["registry", "tag"],
       "additionalProperties": false
@@ -93,56 +44,136 @@
     "api": {
       "type": "object",
       "properties": {
-        "enabled": { "type": ["boolean", "string"] },
-        "domain": { "type": "string" }
+        "enabled": { "type": ["boolean", "string"], "default": false },
+        "domain": { "type": "string", "default": "api." }
       },
       "additionalProperties": false
     },
     "hue": {
       "type": "object",
       "properties": {
-        "priorityClassName": { "$ref": "#/definitions/stringOrNull" },
-        "replicas": { "type": ["integer", "string"], "minimum": 1 },
-        "resources": { "$ref": "#/definitions/resourceRequirements" },
+        "priorityClassName": { "$ref": "#/definitions/stringOrNull", "default": null },
+        "replicas": { "type": ["integer", "string"], "minimum": 1, "default": 1 },
+        "resources": {
+          "type": "object",
+          "properties": {
+            "limits": {
+              "type": "object",
+              "properties": {
+                "cpu": {
+                  "type": "string",
+                  "pattern": "^([0-9]+m|[0-9]+(\\.[0-9]+)?)$",
+                  "default": "300m"
+                },
+                "memory": {
+                  "type": "string",
+                  "pattern": "^[0-9]+(Mi|Gi|Ki|Ti)$",
+                  "default": "500Mi"
+                }
+              },
+              "additionalProperties": false
+            },
+            "requests": {
+              "type": "object",
+              "properties": {
+                "cpu": {
+                  "type": "string",
+                  "pattern": "^([0-9]+m|[0-9]+(\\.[0-9]+)?)$",
+                  "default": "200m"
+                },
+                "memory": {
+                  "type": "string",
+                  "pattern": "^[0-9]+(Mi|Gi|Ki|Ti)$",
+                  "default": "300Mi"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
         "service": {
           "type": "object",
           "properties": {
-            "annotations": { "$ref": "#/definitions/stringMap" }
+            "annotations": { "$ref": "#/definitions/stringMap", "default": {} }
           },
           "additionalProperties": false
         },
         "database": {
           "type": "object",
           "properties": {
-            "create": { "type": ["boolean", "string"] },
-            "initJobAnnotations": { "$ref": "#/definitions/stringMap" },
-            "engine": { "type": "string" },
-            "host": { "type": "string" },
-            "port": { "type": ["integer", "string"], "minimum": 1, "maximum": 65535 },
-            "user": { "type": "string" },
-            "password": { "type": "string" },
-            "name": { "type": "string" },
-            "adminUser": { "type": "string" },
-            "adminPassword": { "type": "string" }
+            "create": { "type": ["boolean", "string"], "default": true },
+            "initJobAnnotations": {
+              "type": "object",
+              "properties": {
+                "helm.sh/hook": {
+                  "type": "string",
+                  "default": "pre-install"
+                },
+                "helm.sh/hook-delete-policy": {
+                  "type": "string",
+                  "default": "before-hook-creation,hook-succeeded,hook-failed"
+                },
+                "helm.sh/hook-weight": {
+                  "type": "string",
+                  "default": "-4"
+                }
+            },
+            "additionalProperties": false
+          },
+            "engine": { "type": "string", "default": "postgresql_psycopg2" },
+            "host": { "type": "string", "default": "pg-patroni.postgres.svc" },
+            "port": { "type": ["integer", "string"], "minimum": 1, "maximum": 65535, "default": 5432 },
+            "user": { "type": "string", "default": "user" },
+            "password": { "type": "string", "default": "password" },
+            "name": { "type": "string", "default": "postgres" },
+            "adminUser": { "type": "string", "default": "admin user name" },
+            "adminPassword": { "type": "string", "default": "admin password" }
           },
           "additionalProperties": false
         },
-        "imagePullPolicy": { "type": "string" },
+        "imagePullPolicy": { "type": "string", "default": "Always" },
         "podSecurityContext": {
           "type": "object",
           "properties": {
-            "runAsUser": { "type": ["integer", "string"] },
-            "fsGroup": { "type": ["integer", "string"] }
+            "runAsUser": { "type": ["integer", "string"], "default": 1001 },
+            "fsGroup": { "type": ["integer", "string"], "default": 1001 }
           },
           "additionalProperties": false
         },
-        "securityContext": { "$ref": "#/definitions/securityContext" },
+        "securityContext": {
+          "type": "object",
+          "properties": {
+            "readOnlyRootFilesystem": { "type": ["boolean", "string"], "default": true },
+            "allowPrivilegeEscalation": { "type": ["boolean", "string"], "default": false },
+            "runAsNonRoot": { "type": ["boolean", "string"], "default": true },
+            "capabilities": {
+              "type": "object",
+              "properties": {
+                "drop": {
+                  "type": "array",
+                  "items": { "type": "string", "default": "ALL"}
+                }
+              },
+              "additionalProperties": false
+            },
+            "seccompProfile": {
+              "type": "object",
+              "properties": {
+                "type": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
         "hostAliases": {
           "type": "array",
+          "default": [],
           "items": { "type": "object", "additionalProperties": true }
         },
-        "interpreters": { "type": "string" },
-        "ini": { "type": "string" }
+        "interpreters": {"type": "string"},
+        "ini": { "type": "string"}
       },
       "required": ["database"],
       "additionalProperties": false
@@ -150,26 +181,63 @@
     "createDBJob": {
       "type": "object",
       "properties": {
-        "resources": { "$ref": "#/definitions/resourceRequirements" }
+        "resources": {
+          "type": "object",
+          "properties": {
+            "limits": {
+              "type": "object",
+              "properties": {
+                "cpu": {
+                  "type": "string",
+                  "pattern": "^([0-9]+m|[0-9]+(\\.[0-9]+)?)$",
+                  "default": "500m"
+                },
+                "memory": {
+                  "type": "string",
+                  "pattern": "^[0-9]+(Mi|Gi|Ki|Ti)$",
+                  "default": "512Mi"
+                }
+              },
+              "additionalProperties": false
+            },
+            "requests": {
+              "type": "object",
+              "properties": {
+                "cpu": {
+                  "type": "string",
+                  "pattern": "^([0-9]+m|[0-9]+(\\.[0-9]+)?)$",
+                  "default": "300m"
+                },
+                "memory": {
+                  "type": "string",
+                  "pattern": "^[0-9]+(Mi|Gi|Ki|Ti)$",
+                  "default": "300Mi"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
       },
       "additionalProperties": false
     },
     "ingress": {
       "type": "object",
       "properties": {
-        "create": { "type": ["boolean", "string"] },
-        "type": { "type": "string" },
-        "domain": { "type": "string" },
+        "create": { "type": ["boolean", "string"], "default": true },
+        "type": { "type": "string", "default": "nginx" },
+        "domain": { "type": "string", "default": "" },
         "tls": {
           "type": "object",
           "properties": {
-            "enabled": { "type": ["boolean", "string"] },
+            "enabled": { "type": ["boolean", "string"], "default": false },
             "secretName": { "$ref": "#/definitions/stringOrNull" }
           },
           "additionalProperties": false
         },
-        "annotations": { "$ref": "#/definitions/stringMap" },
-        "labels": { "$ref": "#/definitions/stringMap" }
+        "annotations": { "$ref": "#/definitions/stringMap", "default": {} },
+        "labels": { "$ref": "#/definitions/stringMap", "default": {} }
       },
       "additionalProperties": false
     },
@@ -183,7 +251,7 @@
     "ssl": {
       "type": "object",
       "properties": {
-        "enabled": { "type": ["boolean", "string"] },
+        "enabled": { "type": ["boolean", "string"], "default": false },
         "cacerts": { "type": "string" }
       },
       "additionalProperties": false
@@ -191,7 +259,7 @@
     "kerberos": {
       "type": "object",
       "properties": {
-        "enabled": { "type": ["boolean", "string"] },
+        "enabled": { "type": ["boolean", "string"], "default": false },
         "keytab": { "type": "string" },
         "config": { "type": "string" }
       },
@@ -200,7 +268,7 @@
     "ldap": {
       "type": "object",
       "properties": {
-        "enabled": { "type": ["boolean", "string"] },
+        "enabled": { "type": ["boolean", "string"], "default": false },
         "bind_password_script": { "type": "string" }
       },
       "additionalProperties": false
@@ -208,7 +276,7 @@
     "databasescommon": {
       "type": "object",
       "properties": {
-        "enabled": { "type": ["boolean", "string"] },
+        "enabled": { "type": ["boolean", "string"], "default": false },
         "configs": {
           "type": "object",
           "additionalProperties": { "type": "string" }
@@ -219,33 +287,105 @@
     "trino": {
       "type": "object",
       "properties": {
-        "enabled": { "type": ["boolean", "string"] },
-        "image": { "type": "string" },
-        "imagePullPolicy": { "type": "string" },
-        "replicas": { "type": ["integer", "string"], "minimum": 1 },
+        "enabled": { "type": ["boolean", "string"], "default": false },
+        "image": { "type": "string", "default": "ghcr.io/netcracker/qubership-trino:main" },
+        "imagePullPolicy": { "type": "string", "default": "IfNotPresent" },
+        "replicas": { "type": ["integer", "string"], "minimum": 1, "default": 1 },
         "priorityClassName": { "$ref": "#/definitions/stringOrNull" },
         "livenessProbe": { "type": "object", "additionalProperties": true },
         "readinessProbe": { "type": "object", "additionalProperties": true },
-        "resources": { "$ref": "#/definitions/resourceRequirements" },
-        "service": {
+        "resources": {
           "type": "object",
           "properties": {
-            "annotations": { "$ref": "#/definitions/stringMap" }
+            "limits": {
+              "type": "object",
+              "properties": {
+                "cpu": {
+                  "type": "string",
+                  "pattern": "^([0-9]+m|[0-9]+(\\.[0-9]+)?)$",
+                  "default": "150m"
+                },
+                "memory": {
+                  "type": "string",
+                  "pattern": "^[0-9]+(Mi|Gi|Ki|Ti)$",
+                  "default": "800Mi"
+                }
+              },
+              "additionalProperties": false
+            },
+            "requests": {
+              "type": "object",
+              "properties": {
+                "cpu": {
+                  "type": "string",
+                  "pattern": "^([0-9]+m|[0-9]+(\\.[0-9]+)?)$",
+                  "default": "100m"
+                },
+                "memory": {
+                  "type": "string",
+                  "pattern": "^[0-9]+(Mi|Gi|Ki|Ti)$",
+                  "default": "600Mi"
+                }
+              },
+              "additionalProperties": false
+            }
           },
           "additionalProperties": false
         },
-        "securityContext": { "$ref": "#/definitions/securityContext" },
-        "podSecurityContext": { "$ref": "#/definitions/securityContext" },
+        "service": {
+          "type": "object",
+          "properties": {
+            "annotations": { "$ref": "#/definitions/stringMap", "default": {} }
+          },
+          "additionalProperties": false
+        },
+        "securityContext": {
+          "type": "object",
+          "properties": {
+            "readOnlyRootFilesystem": { "type": ["boolean", "string"], "default": true },
+            "allowPrivilegeEscalation": { "type": ["boolean", "string"], "default": false },
+            "runAsNonRoot": { "type": ["boolean", "string"], "default": true },
+            "capabilities": {
+              "type": "object",
+              "properties": {
+                "drop": {
+                  "type": "array",
+                  "items": { "type": "string", "default": "ALL"}
+                }
+              },
+              "additionalProperties": false
+            },
+            "seccompProfile": {
+              "type": "object",
+              "properties": {
+                "type": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "podSecurityContext": {
+          "type": "object",
+          "properties": {
+            "runAsUser": { "type": ["integer", "string"], "default": 1000 },
+            "runAsGroup": { "type": ["integer", "string"], "default": 1000 }
+          },
+          "additionalProperties": false
+        },
         "hostAliases": {
           "type": "array",
+          "default": [],
           "items": { "type": "object", "additionalProperties": true }
         },
         "extraVolumes": {
           "type": "array",
+          "default": [],
           "items": { "type": "object", "additionalProperties": true }
         },
         "extraVolumeMounts": {
           "type": "array",
+          "default": [],
           "items": { "type": "object", "additionalProperties": true }
         }
       },
@@ -255,15 +395,15 @@
     "jvm": {
       "type": "object",
       "properties": {
-        "maxHeapSize": { "type": "string" },
+        "maxHeapSize": { "type": "string", "default": "1G" },
         "gcMethod": {
           "type": "object",
           "properties": {
-            "type": { "type": "string" },
+            "type": { "type": "string", "default": "UseG1GC" },
             "g1": {
               "type": "object",
               "properties": {
-                "heapRegionSize": { "type": "string" }
+                "heapRegionSize": { "type": "string", "default": "16M" }
               },
               "additionalProperties": false
             }
@@ -276,30 +416,31 @@
     "certManagerInegration": {
       "type": "object",
       "properties": {
-        "enabled": { "type": ["boolean", "string"] },
-        "secretName": { "type": "string" },
+        "enabled": { "type": ["boolean", "string"], "default": false },
+        "secretName": { "type": "string", "default": "hue-tls-cm" },
         "secretMounts": {
           "type": "array",
+          "default": [{ "mountPath": "/home/hue/trustcerts/ca.crt", "subPath": "ca.crt" }],
           "items": {
             "type": "object",
             "properties": {
-              "mountPath": { "type": "string" },
-              "subPath": { "type": "string" }
+              "mountPath": { "type": "string", "default": "/home/hue/trustcerts/ca.crt" },
+              "subPath": { "type": "string", "default": "ca.crt" }
             },
             "required": ["mountPath", "subPath"],
             "additionalProperties": false
           }
         },
-        "duration": { "type": ["integer", "string"] },
+        "duration": { "type": ["integer", "string"], "default": 365 },
         "subjectAlternativeName": {
           "type": "object",
           "properties": {
-            "additionalDnsNames": { "$ref": "#/definitions/stringArray" },
-            "additionalIpAddresses": { "$ref": "#/definitions/stringArray" }
+            "additionalDnsNames": { "$ref": "#/definitions/stringArray", "default": [] },
+            "additionalIpAddresses": { "$ref": "#/definitions/stringArray", "default": [] }
           },
           "additionalProperties": false
         },
-        "clusterIssuerName": { "$ref": "#/definitions/stringOrNull" }
+        "clusterIssuerName": { "$ref": "#/definitions/stringOrNull", "default": null }
       },
       "additionalProperties": false
     },
@@ -309,33 +450,38 @@
     },
     "extraVolumes": {
       "type": "array",
+      "default": [],
       "items": { "type": "object", "additionalProperties": true }
     },
     "extraVolumeMounts": {
       "type": "array",
+      "default": [],
       "items": { "type": "object", "additionalProperties": true }
     },
     "gateway": {
       "type": "object",
       "properties": {
-        "enabled": { "type": ["boolean", "string"] },
-        "annotations": { "$ref": "#/definitions/stringMap" },
-        "labels": { "$ref": "#/definitions/stringMap" },
+        "enabled": { "type": ["boolean", "string"], "default": false },
+        "annotations": { "$ref": "#/definitions/stringMap", "default": {} },
+        "labels": { "$ref": "#/definitions/stringMap", "default": {} },
         "parentRefs": {
           "type": "array",
+          "default": [],
           "items": { "type": "object", "additionalProperties": true }
         },
-        "hostnames": { "$ref": "#/definitions/stringArray" },
+        "hostnames": { "$ref": "#/definitions/stringArray", "default": [] },
         "rules": {
           "type": "array",
+          "default": [],
           "items": { "type": "object", "additionalProperties": true }
         },
         "redirectRoute": {
           "type": "object",
           "properties": {
-            "enabled": { "type": ["boolean", "string"] },
+            "enabled": { "type": ["boolean", "string"], "default": false },
             "parentRefs": {
               "type": "array",
+              "default": [],
               "items": { "type": "object", "additionalProperties": true }
             }
           },
@@ -344,14 +490,15 @@
         "backendTLSPolicy": {
           "type": "object",
           "properties": {
-            "enabled": { "type": ["boolean", "string"] },
-            "hostname": { "type": "string" },
+            "enabled": { "type": ["boolean", "string"], "default": false },
+            "hostname": { "type": "string", "default": "" },
             "caCertificateRefs": {
               "type": "array",
+              "default": [],
               "items": { "type": "object", "additionalProperties": true }
             },
-            "wellKnownCACertificates": { "type": "string" },
-            "subjectAltNames": { "$ref": "#/definitions/stringArray" }
+            "wellKnownCACertificates": { "type": "string", "default": "" },
+            "subjectAltNames": { "$ref": "#/definitions/stringArray", "default": [] }
           },
           "additionalProperties": false
         }
