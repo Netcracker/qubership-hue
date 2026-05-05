@@ -28,7 +28,7 @@
           "valueFrom": { "type": "object", "additionalProperties": true }
         },
         "required": ["name"],
-        "additionalProperties": false
+        "additionalProperties": true
       }
     },
     "image": {
@@ -39,7 +39,7 @@
         "pullPolicy": { "type": "string", "enum": ["Always", "IfNotPresent", "Never"], "default": "IfNotPresent" }
       },
       "required": ["registry", "tag"],
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "api": {
       "type": "object",
@@ -47,7 +47,7 @@
         "enabled": { "type": ["boolean", "string"], "default": false },
         "domain": { "type": "string", "default": "api." }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "hue": {
       "type": "object",
@@ -71,7 +71,7 @@
                   "default": "500Mi"
                 }
               },
-              "additionalProperties": false
+              "additionalProperties": true
             },
             "requests": {
               "type": "object",
@@ -87,17 +87,17 @@
                   "default": "300Mi"
                 }
               },
-              "additionalProperties": false
+              "additionalProperties": true
             }
           },
-          "additionalProperties": false
+          "additionalProperties": true
         },
         "service": {
           "type": "object",
           "properties": {
             "annotations": { "$ref": "#/definitions/stringMap", "default": {} }
           },
-          "additionalProperties": false
+          "additionalProperties": true
         },
         "database": {
           "type": "object",
@@ -119,7 +119,7 @@
                   "default": "-4"
                 }
             },
-            "additionalProperties": false
+            "additionalProperties": true
           },
             "engine": { "type": "string", "default": "postgresql_psycopg2" },
             "host": { "type": "string", "default": "pg-patroni.postgres.svc" },
@@ -130,7 +130,7 @@
             "adminUser": { "type": "string", "default": "admin user name" },
             "adminPassword": { "type": "string", "default": "admin password" }
           },
-          "additionalProperties": false
+          "additionalProperties": true
         },
         "imagePullPolicy": { "type": "string", "default": "Always" },
         "podSecurityContext": {
@@ -139,7 +139,7 @@
             "runAsUser": { "type": ["integer", "string"], "default": 1001 },
             "fsGroup": { "type": ["integer", "string"], "default": 1001 }
           },
-          "additionalProperties": false
+          "additionalProperties": true
         },
         "securityContext": {
           "type": "object",
@@ -155,17 +155,17 @@
                   "items": { "type": "string", "default": "ALL"}
                 }
               },
-              "additionalProperties": false
+              "additionalProperties": true
             },
             "seccompProfile": {
               "type": "object",
               "properties": {
                 "type": { "type": "string" }
               },
-              "additionalProperties": false
+              "additionalProperties": true
             }
           },
-          "additionalProperties": false
+          "additionalProperties": true
         },
         "hostAliases": {
           "type": "array",
@@ -176,7 +176,7 @@
         "ini": { "type": "string"}
       },
       "required": ["database"],
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "createDBJob": {
       "type": "object",
@@ -198,7 +198,7 @@
                   "default": "512Mi"
                 }
               },
-              "additionalProperties": false
+              "additionalProperties": true
             },
             "requests": {
               "type": "object",
@@ -214,13 +214,13 @@
                   "default": "300Mi"
                 }
               },
-              "additionalProperties": false
+              "additionalProperties": true
             }
           },
-          "additionalProperties": false
+          "additionalProperties": true
         }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "ingress": {
       "type": "object",
@@ -234,19 +234,19 @@
             "enabled": { "type": ["boolean", "string"], "default": false },
             "secretName": { "$ref": "#/definitions/stringOrNull" }
           },
-          "additionalProperties": false
+          "additionalProperties": true
         },
         "annotations": { "$ref": "#/definitions/stringMap", "default": {} },
         "labels": { "$ref": "#/definitions/stringMap", "default": {} }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "hive": {
       "type": "object",
       "properties": {
         "site": { "type": "string" }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "ssl": {
       "type": "object",
@@ -254,7 +254,7 @@
         "enabled": { "type": ["boolean", "string"], "default": false },
         "cacerts": { "type": "string" }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "kerberos": {
       "type": "object",
@@ -263,7 +263,7 @@
         "keytab": { "type": "string" },
         "config": { "type": "string" }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "ldap": {
       "type": "object",
@@ -271,7 +271,7 @@
         "enabled": { "type": ["boolean", "string"], "default": false },
         "bind_password_script": { "type": "string" }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "databasescommon": {
       "type": "object",
@@ -282,7 +282,7 @@
           "additionalProperties": { "type": "string" }
         }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "trino": {
       "type": "object",
@@ -311,7 +311,7 @@
                   "default": "800Mi"
                 }
               },
-              "additionalProperties": false
+              "additionalProperties": true
             },
             "requests": {
               "type": "object",
@@ -327,17 +327,17 @@
                   "default": "600Mi"
                 }
               },
-              "additionalProperties": false
+              "additionalProperties": true
             }
           },
-          "additionalProperties": false
+          "additionalProperties": true
         },
         "service": {
           "type": "object",
           "properties": {
             "annotations": { "$ref": "#/definitions/stringMap", "default": {} }
           },
-          "additionalProperties": false
+          "additionalProperties": true
         },
         "securityContext": {
           "type": "object",
@@ -353,17 +353,17 @@
                   "items": { "type": "string", "default": "ALL"}
                 }
               },
-              "additionalProperties": false
+              "additionalProperties": true
             },
             "seccompProfile": {
               "type": "object",
               "properties": {
                 "type": { "type": "string" }
               },
-              "additionalProperties": false
+              "additionalProperties": true
             }
           },
-          "additionalProperties": false
+          "additionalProperties": true
         },
         "podSecurityContext": {
           "type": "object",
@@ -371,7 +371,7 @@
             "runAsUser": { "type": ["integer", "string"], "default": 1000 },
             "runAsGroup": { "type": ["integer", "string"], "default": 1000 }
           },
-          "additionalProperties": false
+          "additionalProperties": true
         },
         "hostAliases": {
           "type": "array",
@@ -389,7 +389,7 @@
           "items": { "type": "object", "additionalProperties": true }
         }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "jvmconfig": { "type": "string" },
     "jvm": {
@@ -405,13 +405,13 @@
               "properties": {
                 "heapRegionSize": { "type": "string", "default": "16M" }
               },
-              "additionalProperties": false
+              "additionalProperties": true
             }
           },
-          "additionalProperties": false
+          "additionalProperties": true
         }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "certManagerInegration": {
       "type": "object",
@@ -428,7 +428,7 @@
               "subPath": { "type": "string", "default": "ca.crt" }
             },
             "required": ["mountPath", "subPath"],
-            "additionalProperties": false
+            "additionalProperties": true
           }
         },
         "duration": { "type": ["integer", "string"], "default": 365 },
@@ -438,11 +438,11 @@
             "additionalDnsNames": { "$ref": "#/definitions/stringArray", "default": [] },
             "additionalIpAddresses": { "$ref": "#/definitions/stringArray", "default": [] }
           },
-          "additionalProperties": false
+          "additionalProperties": true
         },
         "clusterIssuerName": { "$ref": "#/definitions/stringOrNull", "default": null }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "extraSecrets": {
       "type": "object",
@@ -485,7 +485,7 @@
               "items": { "type": "object", "additionalProperties": true }
             }
           },
-          "additionalProperties": false
+          "additionalProperties": true
         },
         "backendTLSPolicy": {
           "type": "object",
@@ -500,11 +500,11 @@
             "wellKnownCACertificates": { "type": "string", "default": "" },
             "subjectAltNames": { "$ref": "#/definitions/stringArray", "default": [] }
           },
-          "additionalProperties": false
+          "additionalProperties": true
         }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     }
   },
-  "additionalProperties": false
+  "additionalProperties": true
 }
