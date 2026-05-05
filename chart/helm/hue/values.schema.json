@@ -420,14 +420,13 @@
         "secretName": { "type": "string", "default": "hue-tls-cm" },
         "secretMounts": {
           "type": "array",
-          "default": [{ "mountPath": "/home/hue/trustcerts/ca.crt", "subPath": "ca.crt" }],
           "items": {
             "type": "object",
             "properties": {
               "mountPath": { "type": "string", "default": "/home/hue/trustcerts/ca.crt" },
               "subPath": { "type": "string", "default": "ca.crt" }
             },
-            "required": ["mountPath", "subPath"],
+            "required": ["mountPath"],
             "additionalProperties": true
           }
         },
