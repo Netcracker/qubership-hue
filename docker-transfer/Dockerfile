@@ -10,7 +10,7 @@ COPY docker-transfer/validation.py /app/validation.py
 
 RUN pip install --no-cache-dir ruamel.yaml pyyaml && \
     python sync.py chart/helm/hue/release-images.yaml chart/helm/hue/values.yaml && \
-    python validation.py --schema chart/helm/hue/values.schema.json --values chart/helm/hue/values.yaml
+    python validation.py chart/helm/hue/values.yaml chart/helm/hue/values.schema.json  
 
 FROM scratch
 
