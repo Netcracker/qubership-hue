@@ -1,595 +1,1052 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Hue Helm Chart Values",
-  "description": "Schema for validating Hue and Trino deployment configurations.",
-  "type": "object",
-  "definitions": {
-  },
-  "properties": {
-    "env": {
-      "description": "Additional env parameters for Hue Service and DB init job",
-      "type": ["array", "null"],
-      "default": null,
-      "items": {
-        "type": "object",
-        "properties": {
-          "name": { "description": "The name of the environment variable.", "type": "string" },
-          "value": { "description": "The value of the environment variable.", "type": "string" },
-          "valueFrom": { "description": "The source of the environment variable value.", "type": "object", "additionalProperties": true }
-        },
-        "required": ["name", "value"],
-        "additionalProperties": true
-      }
-    },
-    "image": {
-      "description": "Hue image configuration.",
-      "type": "object",
-      "properties": {
-        "registry": { 
-          "description": "The image repository",
-          "type": "string", 
-          "default": "ghcr.io/netcracker/qubership-hue"
-         },
-        "tag": { 
-          "description": "This overrides the image tag, which is the hue version by default.",
-          "type": "string", 
-          "default": "main"
-         },
-        "pullPolicy": { 
-          "description": "The image pull policy.",
-          "type": "string",
-          "enum": ["Always", "IfNotPresent", "Never"],
-          "default": "IfNotPresent"
-         }
-      },
-      "required": ["registry", "tag"],
-      "additionalProperties": true
-    },
-    "api": {
-      "description": "api configuration.",
-      "type": "object",
-      "properties": {
-        "enabled": { 
-          "description": "Whether to enable the API.",
-          "type": ["boolean", "string"],
-          "default": false 
-      },
-        "domain": { 
-          "description": "The domain for the API.",
-          "type": "string",
-          "default": "api." 
-        }
-      },
-      "additionalProperties": true
-    },
-    "hue": {
-      "description": "Hue configuration.",
-      "type": "object",
-      "properties": {
-        "priorityClassName": { "description": "Priority class name for hue pods.", "type":["string", "null"], "default": null },
-        "replicas": { "description": "The number of hue to run.", "type": ["integer", "string"], "minimum": 1, "default": 1 },
-        "resources": {
-          "description": "Resource requests and limits for hue pods.",
-          "type": "object",
-          "properties": {
-            "limits": {
-              "description": "Resource limits for hue pods.",
-              "type": "object",
-              "properties": {
-                "cpu": {
-                  "description": "CPU limit for hue pods.",
-                  "type": "string",
-                  "pattern": "^([0-9]+m|[0-9]+(\\.[0-9]+)?)$",
-                  "default": "300m"
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Hue Helm Chart Values",
+    "description": "Schema for validating Hue and Trino deployment configurations.",
+    "type": "object",
+    "definitions": {
+        "io.k8s.apimachinery.pkg.api.resource.Quantity": {
+            "oneOf": [
+                {
+                    "type": "string"
                 },
-                "memory": {
-                  "description": "Memory limit for hue pods.",
-                  "type": "string",
-                  "pattern": "^[0-9]+(Mi|Gi|Ki|Ti)$",
-                  "default": "500Mi"
+                {
+                    "type": "number"
                 }
-              },
-              "additionalProperties": true
+            ]
+        },
+        "io.k8s.api.core.v1.ResourceRequirements": {
+            "description": "ResourceRequirements describes the compute resource requirements.",
+            "properties": {
+                "limits": {
+                    "additionalProperties": {
+                        "$ref": "#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
+                    },
+                    "description": "Limits describes the maximum amount of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+                    "type": "object"
+                },
+                "requests": {
+                    "additionalProperties": {
+                        "$ref": "#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
+                    },
+                    "description": "Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. Requests cannot exceed Limits. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+                    "type": "object"
+                }
             },
-            "requests": {
-              "description": "Resource requests for hue pods.",
-              "type": "object",
-              "properties": {
-                "cpu": {
-                  "description": "CPU request for hue pods.",
-                  "type": "string",
-                  "pattern": "^([0-9]+m|[0-9]+(\\.[0-9]+)?)$",
-                  "default": "200m"
-                },
-                "memory": {
-                  "description": "Memory request for hue pods.",
-                  "type": "string",
-                  "pattern": "^[0-9]+(Mi|Gi|Ki|Ti)$",
-                  "default": "300Mi"
-                }
-              },
-              "additionalProperties": true
-            }
-          },
-          "additionalProperties": true
-        },
-        "service": {
-          "description": "Service configuration for hue.",
-          "type": "object",
-          "properties": {
-            "annotations": { "description": "Annotations for the hue service.", "type": "object", "default": {}, "additionalProperties": { "type": "string" } }
-          },
-          "additionalProperties": true
-        },
-        "database": {
-          "description": "Database configuration for hue.",
-          "type": "object",
-          "properties": {
-            "create": { "description": "The parameter for creating a database for HUE operation.", "type": ["boolean", "string"], "default": true },
-            "initJobAnnotations": {
-              "description": "Annotations for the database initialization job.",
-              "type": "object",
-              "default": {
-                "helm.sh/hook": "pre-install",
-                "helm.sh/hook-delete-policy": "before-hook-creation,hook-succeeded,hook-failed",
-                "helm.sh/hook-weight": "-4"
-              },
-              "additionalProperties": true
-          },
-            "engine": { "description": "The database engine to use.", "type": "string", "default": "postgresql_psycopg2" },
-            "host": { "description": "The host for connecting to the database.", "type": "string", "default": "pg-patroni.postgres.svc" },
-            "port": { "description": "The port for connecting to the database.", "type": ["integer", "string"], "minimum": 1, "maximum": 65535, "default": 5432 },
-            "user": { "description": "The username for working with the table.", "type": "string", "default": "user" },
-            "password": { "description": "The password for working with the table.", "type": "string", "default": "password" },
-            "name": { "description": "The name of the table to work with.", "type": "string", "default": "postgres" },
-            "adminUser": { "description": "The username for connecting to the database.", "type": "string", "default": "admin user name" },
-            "adminPassword": { "description": "The password for connecting to the database.", "type": "string", "default": "admin password" }
-          },
-          "additionalProperties": true
-        },
-        "imagePullPolicy": { "description": "Image pull policy for hue pods.", "type": "string", "default": "Always" },
-        "podSecurityContext": {
-          "description": "Pod-level security context for hue pods.",
-          "type": "object",
-          "properties": {
-            "runAsUser": { "description": "The user ID to run all the containers in the pod.", "type": ["integer", "string"], "default": 1001 },
-            "fsGroup": { "description": "The group ID for the filesystem.", "type": ["integer", "string"], "default": 1001 }
-          },
-          "additionalProperties": true
-        },
-        "securityContext": {
-          "description": "Container-level security context for hue containers.",
-          "type": "object",
-          "properties": {
-            "readOnlyRootFilesystem": { "description": "Whether to make the root filesystem read-only.", "type": ["boolean", "string"], "default": true },
-            "allowPrivilegeEscalation": { "description": "Whether to allow privilege escalation.", "type": ["boolean", "string"], "default": false },
-            "runAsNonRoot": { "description": "Whether to run the container as a non-root user.", "type": ["boolean", "string"], "default": true },
-            "capabilities": {
-              "description": "The capabilities to set for the container.",
-              "type": "object",
-              "properties": {
-                "drop": {
-                  "description": "The capabilities to drop.",
-                  "type": "array",
-                  "items": { "type": "string", "default": "ALL"}
-                }
-              },
-              "additionalProperties": true
-            },
-            "seccompProfile": {
-              "description": "The seccomp profile to use for the container.",
-              "type": "object",
-              "properties": {
-                "type": { "type": "string" }
-              },
-              "additionalProperties": true
-            }
-          },
-          "additionalProperties": true
-        },
-        "hostAliases": {
-          "description": "Host aliases for hue pods.",
-          "type": "array",
-          "default": [],
-          "items": { "type": "object", "additionalProperties": true }
-        },
-        "interpreters": {"description": "Parameters for connecting to databases for hue and others.", "type": "string"},
-        "ini": { "description": "Section is about configuring the Hue server itself.", "type": "string"}
-      },
-      "required": ["database"],
-      "additionalProperties": true
-    },
-    "createDBJob": {
-      "description": "Configuration for the database initialization job.",
-      "type": "object",
-      "properties": {
-        "resources": {
-          "description": "Resource requests and limits for the database initialization job.",
-          "type": "object",
-          "properties": {
-            "limits": {
-              "description": "Resource limits for the database initialization job.",
-              "type": "object",
-              "properties": {
-                "cpu": {
-                  "description": "CPU limit for the database initialization job.",
-                  "type": "string",
-                  "pattern": "^([0-9]+m|[0-9]+(\\.[0-9]+)?)$",
-                  "default": "500m"
-                },
-                "memory": {
-                  "description": "Memory limit for the database initialization job.",
-                  "type": "string",
-                  "pattern": "^[0-9]+(Mi|Gi|Ki|Ti)$",
-                  "default": "512Mi"
-                }
-              },
-              "additionalProperties": true
-            },
-            "requests": {
-              "description": "Resource requests for the database initialization job.",
-              "type": "object",
-              "properties": {
-                "cpu": {
-                  "description": "CPU request for the database initialization job.",
-                  "type": "string",
-                  "pattern": "^([0-9]+m|[0-9]+(\\.[0-9]+)?)$",
-                  "default": "300m"
-                },
-                "memory": {
-                  "description": "Memory request for the database initialization job.",
-                  "type": "string",
-                  "pattern": "^[0-9]+(Mi|Gi|Ki|Ti)$",
-                  "default": "300Mi"
-                }
-              },
-              "additionalProperties": true
-            }
-          },
-          "additionalProperties": true
+            "type": "object",
+            "additionalProperties": false
         }
-      },
-      "additionalProperties": true
     },
-    "ingress": {
-      "description": "Configuration for the Hue ingress controller.",
-      "type": "object",
-      "properties": {
-        "create": { "description": "Whether to create the ingress resource.", "type": ["boolean", "string"], "default": true },
-        "type": { "description": "The type of ingress controller to use.", "type": "string", "default": "nginx" },
-        "domain": { "description": "The address of access to the UI HUE.", "type": "string", "default": "" },
-        "tls": {
-          "description": "TLS configuration for the ingress controller.",
-          "type": "object",
-          "properties": {
-            "enabled": { "description": "Whether to enable TLS for the ingress controller.", "type": ["boolean", "string"], "default": false },
-            "secretName": {"description": "The name of the secret containing the TLS certificate.", "type":["string", "null"], "default": null }
-          },
-          "additionalProperties": true
-        },
-        "annotations": {
-          "description": "Annotations for the ingress controller.",
-          "type":"object", 
-          "default": {
-            "gateway-api-converter.netcracker.com/ignore": "true"
-          },
-          "additionalProperties": { "type": "string" }
-        },
-        "labels": {
-          "description": "Labels for the ingress controller.",
-          "type": "object",
-          "default": {
-            "deployment.netcracker.com/ingress-type": "public-network",
-            "deployment.netcracker.com/ingress-audience-type": "ops-user",
-            "app.kubernetes.io/component": "ingress"
-          },
-          "additionalProperties": { "type": "string" }
-         }
-      },
-      "additionalProperties": true
-    },
-    "hive": {
-      "description": "Hive configuration.",
-      "type": "object",
-      "properties": {
-        "site": { "description": "Configuration file for working with hive.", "type": "string" }
-      },
-      "additionalProperties": true
-    },
-    "ssl": {
-      "description": "SSL configuration for the service.",
-      "type": "object",
-      "properties": {
-        "enabled": { "description": "Whether to enable SSL for the service.", "type": ["boolean", "string"], "default": false },
-        "cacerts": { "description": "The CA certificates for SSL.", "type": "string" }
-      },
-      "additionalProperties": true
-    },
-    "kerberos": {
-      "description": "Kerberos configuration for the service.",
-      "type": "object",
-      "properties": {
-        "enabled": { "description": "Whether to enable Kerberos for the service.", "type": ["boolean", "string"], "default": false },
-        "keytab": { "description": "The Kerberos Keytab file contains mappings between Kerberos Principal names and DES-encrypted keys.", "type": "string" },
-        "config": { "description": "The configuration file for the operation of Kerberos.", "type": "string" }
-      },
-      "additionalProperties": true
-    },
-    "ldap": {
-      "description": "LDAP configuration for the service.",
-      "type": "object",
-      "properties": {
-        "enabled": { "description": "Whether to enable LDAP for the service.", "type": ["boolean", "string"], "default": false },
-        "bind_password_script": { "description": "Password for LDAP operation.", "type": "string" }
-      },
-      "additionalProperties": true
-    },
-    "databasescommon": {
-      "description": "Common database configuration.",
-      "type": "object",
-      "properties": {
-        "enabled": { "description": "A parameter for working with databases in Trino", "type": ["boolean", "string"], "default": false },
-        "configs": {
-          "description": "Configuration options for database access.",
-          "type": "object",
-          "additionalProperties": { "type": "string" }
-        }
-      },
-      "additionalProperties": true
-    },
-    "trino": {
-      "description": "Trino configuration.",
-      "type": "object",
-      "properties": {
-        "enabled": { "description": "Whether to enable Trino.", "type": ["boolean", "string"], "default": false },
-        "image": { "description": "The Docker image for the Trino container.", "type": "string", "default": "ghcr.io/netcracker/qubership-trino:main" },
-        "imagePullPolicy": { "description": "The image pull policy for the Trino container.", "type": "string", "default": "IfNotPresent" },
-        "replicas": { "description": "The number of Trino replicas.", "type": ["integer", "string"], "minimum": 1, "default": 1 },
-        "priorityClassName": { "description": "The priority class name for the Trino pods.", "type":["string", "null"], "default": null },
-        "livenessProbe": { "description": "The liveness probe for the Trino container.", "type": "object", "additionalProperties": true },
-        "readinessProbe": { "description": "The readiness probe for the Trino container.", "type": "object", "additionalProperties": true },
-        "resources": {
-          "description": "Resource requests and limits for the Trino pods.",
-          "type": "object",
-          "properties": {
-            "limits": {
-              "description": "Resource limits for the Trino pods.",
-              "type": "object",
-              "properties": {
-                "cpu": {
-                  "description": "CPU limit for the Trino pods.",
-                  "type": "string",
-                  "pattern": "^([0-9]+m|[0-9]+(\\.[0-9]+)?)$",
-                  "default": "150m"
+    "properties": {
+        "env": {
+            "description": "Additional env parameters for Hue Service and DB init job",
+            "type": [
+                "array",
+                "null"
+            ],
+            "default": null,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "description": "The name of the environment variable.",
+                        "type": "string"
+                    },
+                    "value": {
+                        "description": "The value of the environment variable.",
+                        "type": "string"
+                    },
+                    "valueFrom": {
+                        "description": "The source of the environment variable value.",
+                        "type": "object",
+                        "additionalProperties": true
+                    }
                 },
-                "memory": {
-                  "description": "Memory limit for the Trino pods.",
-                  "type": "string",
-                  "pattern": "^[0-9]+(Mi|Gi|Ki|Ti)$",
-                  "default": "800Mi"
-                }
-              },
-              "additionalProperties": true
-            },
-            "requests": {
-              "description": "Resource requests for the Trino pods.",
-              "type": "object",
-              "properties": {
-                "cpu": {
-                  "description": "CPU request for the Trino pods.",
-                  "type": "string",
-                  "pattern": "^([0-9]+m|[0-9]+(\\.[0-9]+)?)$",
-                  "default": "100m"
-                },
-                "memory": {
-                  "description": "Memory request for the Trino pods.",
-                  "type": "string",
-                  "pattern": "^[0-9]+(Mi|Gi|Ki|Ti)$",
-                  "default": "600Mi"
-                }
-              },
-              "additionalProperties": true
+                "required": [
+                    "name"
+                ],
+                "additionalProperties": true
             }
-          },
-          "additionalProperties": true
         },
-        "service": {
-          "description": "Service configuration for Trino.",
-          "type": "object",
-          "properties": {
-            "annotations": { "description": "Annotations for the Trino service.", "type":"object", "default": {}, "additionalProperties": { "type": "string" } }
-          },
-          "additionalProperties": true
-        },
-        "securityContext": {
-           "description": "Security context for the Trino container.",
-          "type": "object",
-          "properties": {
-            "readOnlyRootFilesystem": { "description": "Whether to mount the root filesystem as read-only.", "type": ["boolean", "string"], "default": true },
-            "allowPrivilegeEscalation": { "description": "Whether to allow privilege escalation.", "type": ["boolean", "string"], "default": false },
-            "runAsNonRoot": { "description": "Whether to run the container as a non-root user.", "type": ["boolean", "string"], "default": true },
-            "capabilities": {
-              "description": "The capabilities to set for the container.",
-              "type": "object",
-              "properties": {
-                "drop": {
-                  "description": "The capabilities to drop.",
-                  "type": "array",
-                  "items": { "type": "string", "default": "ALL"}
-                }
-              },
-              "additionalProperties": true
-            },
-            "seccompProfile": {
-              "description": "The seccomp profile to use for the container.",
-              "type": "object",
-              "properties": {
-                "type": { "description": "The type of the seccomp profile.", "type": "string" }
-              },
-              "additionalProperties": true
-            }
-          },
-          "additionalProperties": true
-        },
-        "podSecurityContext": {
-          "description": "Pod-level security context for the Trino pods.",
-          "type": "object",
-          "properties": {
-            "runAsUser": { "description": "The user ID to run the pod as.", "type": ["integer", "string"], "default": 1000 },
-            "runAsGroup": { "description": "The group ID to run the pod as.", "type": ["integer", "string"], "default": 1000 }
-          },
-          "additionalProperties": true
-        },
-        "hostAliases": {
-          "description": "Host aliases for the Trino pods.",
-          "type": "array",
-          "default": [],
-          "items": { "type": "object", "additionalProperties": true }
-        },
-        "extraVolumes": {
-          "description": "Additional volumes for the Trino pods.",
-          "type": "array",
-          "default": [],
-          "items": { "type": "object", "additionalProperties": true }
-        },
-        "extraVolumeMounts": {
-          "description": "Additional volume mounts for the Trino pods.",
-          "type": "array",
-          "default": [],
-          "items": { "type": "object", "additionalProperties": true }
-        }
-      },
-      "additionalProperties": true
-    },
-    "jvmconfig": { "description": "JVM configuration for Trino.", "type": "string" },
-    "jvm": {
-      "description": "JVM configuration for the Trino container.",
-      "type": "object",
-      "properties": {
-        "maxHeapSize": { "description": "The maximum heap size for the JVM.", "type": "string", "default": "1G" },
-        "gcMethod": {
-          "description": "Garbage collection method for the JVM.",
-          "type": "object",
-          "properties": {
-            "type": { "description": "The garbage collection method to use.", "type": "string", "default": "UseG1GC" },
-            "g1": {
-              "description": "Configuration for the G1 garbage collector.",
-              "type": "object",
-              "properties": {
-                "heapRegionSize": { "description": "The size of each heap region.", "type": "string", "default": "16M" }
-              },
-              "additionalProperties": true
-            }
-          },
-          "additionalProperties": true
-        }
-      },
-      "additionalProperties": true
-    },
-    "certManagerInegration": {
-      "description": "Configuration for cert-manager integration.",
-      "type": "object",
-      "properties": {
-        "enabled": { "description": "Whether cert-manager integration is enabled.", "type": ["boolean", "string"], "default": false },
-        "secretName": { "description": "The name of the secret to store the TLS certificate.", "type": "string", "default": "hue-tls-cm" },
-        "secretMounts": {
-          "description": "Secret mounts for the TLS certificate.",
-          "type": "array",
-          "items": {
+        "image": {
+            "description": "Hue image configuration.",
             "type": "object",
             "properties": {
-              "mountPath": { "description": "The path where the secret will be mounted.", "type": "string", "default": "/home/hue/trustcerts/ca.crt" },
-              "subPath": { "description": "The path within the secret to mount.", "type": "string", "default": "ca.crt" }
+                "registry": {
+                    "description": "The image repository",
+                    "type": "string",
+                    "default": "ghcr.io/netcracker/qubership-hue"
+                },
+                "tag": {
+                    "description": "This overrides the image tag, which is the hue version by default.",
+                    "type": "string",
+                    "default": "main"
+                },
+                "pullPolicy": {
+                    "description": "The image pull policy.",
+                    "type": "string",
+                    "enum": [
+                        "Always",
+                        "IfNotPresent",
+                        "Never"
+                    ],
+                    "default": "IfNotPresent"
+                }
             },
-            "required": ["mountPath"],
+            "required": [
+                "registry",
+                "tag"
+            ],
             "additionalProperties": true
-          }
         },
-        "duration": { "description": "The duration for which the TLS certificate will be valid.", "type": ["integer", "string"], "default": 365 },
-        "subjectAlternativeName": {
-          "description": "Subject alternative name configuration for the TLS certificate.",
-          "type": "object",
-          "properties": {
-            "additionalDnsNames": { "description": "Additional DNS names for the TLS certificate.", "type":"array", "default": [], "items": { "type": "string" } },
-            "additionalIpAddresses": { "description": "Additional IP addresses for the TLS certificate.", "type":"array", "default": [], "items": { "type": "string" } }
-          },
-          "additionalProperties": true
-        },
-        "clusterIssuerName": { "description": "The name of the cluster issuer to use for the TLS certificate.", "type": ["string", "null"], "default": null }
-      },
-      "additionalProperties": true
-    },
-    "extraSecrets": {
-      "description": "Additional secrets for the Hue pods.",
-      "type": "object",
-      "additionalProperties": true
-    },
-    "extraVolumes": {
-      "description": "Additional volumes for the Hue pods.",
-      "type": "array",
-      "default": [],
-      "items": { "type": "object", "additionalProperties": true }
-    },
-    "extraVolumeMounts": {
-      "description": "Additional volume mounts for the Hue pods.",
-      "type": "array",
-      "default": [],
-      "items": { "type": "object", "additionalProperties": true }
-    },
-    "gateway": {
-      "description": "Configuration for the gateway.",
-      "type": "object",
-      "properties": {
-        "enabled": { "description": "Whether the gateway is enabled.", "type": ["boolean", "string"], "default": false },
-        "annotations": { "description": "Annotations for the gateway.", "type":"object", "default": {}, "additionalProperties": { "type": "string" } },
-        "labels": { "description": "Labels for the gateway.", "type":"object", "default": {}, "additionalProperties": { "type": "string" } },
-        "parentRefs": {
-          "description": "References to parent resources.",
-          "type": "array",
-          "default": [],
-          "items": { "type": "object", "additionalProperties": true }
-        },
-        "hostnames": { "description": "Hostnames for the gateway.", "type":"array", "default": [], "items": { "type": "string" } },
-        "rules": {
-          "description": "Rules for the gateway.",
-          "type": "array",
-          "default": [],
-          "items": { "type": "object", "additionalProperties": true }
-        },
-        "redirectRoute": {
-          "description": "Configuration for the redirect route.",
-          "type": "object",
-          "properties": {
-            "enabled": { "description": "Whether the redirect route is enabled.", "type": ["boolean", "string"], "default": false },
-            "parentRefs": {
-              "description": "References to parent resources for the redirect route.",
-              "type": "array",
-              "default": [],
-              "items": { "type": "object", "additionalProperties": true }
-            }
-          },
-          "additionalProperties": true
-        },
-        "backendTLSPolicy": {
-          "description": "TLS policy for the backend.",
-          "type": "object",
-          "properties": {
-            "enabled": { "description": "Whether the backend TLS policy is enabled.", "type": ["boolean", "string"], "default": false },
-            "hostname": { "description": "The hostname for the backend.", "type": "string", "default": "" },
-            "caCertificateRefs": {
-              "description": "References to CA certificates for the backend.",
-              "type": "array",
-              "default": [],
-              "items": { "type": "object", "additionalProperties": true }
+        "api": {
+            "description": "api configuration.",
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "description": "Whether to enable the API.",
+                    "type": [
+                        "boolean",
+                        "string"
+                    ],
+                    "default": false
+                },
+                "domain": {
+                    "description": "The domain for the API.",
+                    "type": "string",
+                    "default": "api."
+                }
             },
-            "wellKnownCACertificates": { "description": "Well-known CA certificates for the backend.", "type": "string", "default": "" },
-            "subjectAltNames": { "description": "Subject Alternative Names for the backend.", "type":"array", "default": [], "items": { "type": "string" } }
-          },
-          "additionalProperties": true
+            "additionalProperties": true
+        },
+        "hue": {
+            "description": "Hue configuration.",
+            "type": "object",
+            "properties": {
+                "priorityClassName": {
+                    "description": "Priority class name for hue pods.",
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "default": null
+                },
+                "replicas": {
+                    "description": "The number of hue to run.",
+                    "type": [
+                        "integer",
+                        "string"
+                    ],
+                    "minimum": 1,
+                    "default": 1
+                },
+                "resources": {
+                    "$ref": "#/definitions/io.k8s.api.core.v1.ResourceRequirements",
+                    "description": "Compute Resources required by this container. Cannot be updated. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/"
+                },
+                "service": {
+                    "description": "Service configuration for hue.",
+                    "type": "object",
+                    "properties": {
+                        "annotations": {
+                            "description": "Annotations for the hue service.",
+                            "type": "object",
+                            "default": {},
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "database": {
+                    "description": "Database configuration for hue.",
+                    "type": "object",
+                    "properties": {
+                        "create": {
+                            "description": "The parameter for creating a database for HUE operation.",
+                            "type": [
+                                "boolean",
+                                "string"
+                            ],
+                            "default": true
+                        },
+                        "initJobAnnotations": {
+                            "description": "Annotations for the database initialization job.",
+                            "type": "object",
+                            "default": {
+                                "helm.sh/hook": "pre-install",
+                                "helm.sh/hook-delete-policy": "before-hook-creation,hook-succeeded,hook-failed",
+                                "helm.sh/hook-weight": "-4"
+                            },
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        },
+                        "engine": {
+                            "description": "The database engine to use.",
+                            "type": "string",
+                            "default": "postgresql_psycopg2"
+                        },
+                        "host": {
+                            "description": "The host for connecting to the database.",
+                            "type": "string",
+                            "default": "pg-patroni.postgres.svc"
+                        },
+                        "port": {
+                            "description": "The port for connecting to the database.",
+                            "type": [
+                                "integer",
+                                "string"
+                            ],
+                            "minimum": 1,
+                            "maximum": 65535,
+                            "default": 5432
+                        },
+                        "user": {
+                            "description": "The username for working with the table.",
+                            "type": "string",
+                            "default": "user"
+                        },
+                        "password": {
+                            "description": "The password for working with the table.",
+                            "type": "string",
+                            "default": "password"
+                        },
+                        "name": {
+                            "description": "The name of the table to work with.",
+                            "type": "string",
+                            "default": "postgres"
+                        },
+                        "adminUser": {
+                            "description": "The username for connecting to the database.",
+                            "type": "string",
+                            "default": "admin user name"
+                        },
+                        "adminPassword": {
+                            "description": "The password for connecting to the database.",
+                            "type": "string",
+                            "default": "admin password"
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "imagePullPolicy": {
+                    "description": "Image pull policy for hue pods.",
+                    "type": "string",
+                    "default": "Always"
+                },
+                "podSecurityContext": {
+                    "description": "Pod-level security context for hue pods.",
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "runAsUser": {
+                            "description": "The user ID to run all the containers in the pod.",
+                            "type": [
+                                "integer",
+                                "string",
+                                "null"
+                            ],
+                            "default": 1001
+                        },
+                        "fsGroup": {
+                            "description": "The group ID for the filesystem.",
+                            "type": [
+                                "integer",
+                                "string",
+                                "null"
+                            ],
+                            "default": 1001
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "securityContext": {
+                    "description": "Container-level security context for hue containers.",
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "readOnlyRootFilesystem": {
+                            "description": "Whether to make the root filesystem read-only.",
+                            "type": [
+                                "boolean",
+                                "string",
+                                "null"
+                            ],
+                            "default": true
+                        },
+                        "allowPrivilegeEscalation": {
+                            "description": "Whether to allow privilege escalation.",
+                            "type": [
+                                "boolean",
+                                "string",
+                                "null"
+                            ],
+                            "default": false
+                        },
+                        "runAsNonRoot": {
+                            "description": "Whether to run the container as a non-root user.",
+                            "type": [
+                                "boolean",
+                                "string",
+                                "null"
+                            ],
+                            "default": true
+                        },
+                        "capabilities": {
+                            "description": "The capabilities to set for the container.",
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "drop": {
+                                    "description": "The capabilities to drop.",
+                                    "type": [
+                                        "array",
+                                        "null"
+                                    ],
+                                    "items": {
+                                        "type": "string",
+                                        "default": "ALL"
+                                    }
+                                }
+                            },
+                            "additionalProperties": true
+                        },
+                        "seccompProfile": {
+                            "description": "The seccomp profile to use for the container.",
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "type": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "default": "RuntimeDefault"
+                                }
+                            },
+                            "additionalProperties": true
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "hostAliases": {
+                    "description": "Host aliases for hue pods.",
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                },
+                "interpreters": {
+                    "description": "Parameters for connecting to databases for hue and others.",
+                    "type": "string"
+                },
+                "ini": {
+                    "description": "Section is about configuring the Hue server itself.",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "database"
+            ],
+            "additionalProperties": true
+        },
+        "createDBJob": {
+            "description": "Configuration for the database initialization job.",
+            "type": "object",
+            "properties": {
+                "resources": {
+                    "$ref": "#/definitions/io.k8s.api.core.v1.ResourceRequirements",
+                    "description": "Compute Resources required by this container. Cannot be updated. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/"
+                }
+            },
+            "additionalProperties": true
+        },
+        "ingress": {
+            "description": "Configuration for the Hue ingress controller.",
+            "type": "object",
+            "properties": {
+                "create": {
+                    "description": "Whether to create the ingress resource.",
+                    "type": [
+                        "boolean",
+                        "string"
+                    ],
+                    "default": true
+                },
+                "type": {
+                    "description": "The type of ingress controller to use.",
+                    "type": "string",
+                    "default": "nginx"
+                },
+                "domain": {
+                    "description": "The address of access to the UI HUE.",
+                    "type": "string",
+                    "default": ""
+                },
+                "tls": {
+                    "description": "TLS configuration for the ingress controller.",
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "description": "Whether to enable TLS for the ingress controller.",
+                            "type": [
+                                "boolean",
+                                "string"
+                            ],
+                            "default": false
+                        },
+                        "secretName": {
+                            "description": "The name of the secret containing the TLS certificate.",
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "default": null
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "annotations": {
+                    "description": "Annotations for the ingress controller.",
+                    "type": "object",
+                    "default": {
+                        "gateway-api-converter.netcracker.com/ignore": "true"
+                    },
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "labels": {
+                    "description": "Labels for the ingress controller.",
+                    "type": "object",
+                    "default": {
+                        "deployment.netcracker.com/ingress-type": "public-network",
+                        "deployment.netcracker.com/ingress-audience-type": "ops-user",
+                        "app.kubernetes.io/component": "ingress"
+                    },
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            },
+            "additionalProperties": true
+        },
+        "hive": {
+            "description": "Hive configuration.",
+            "type": "object",
+            "properties": {
+                "site": {
+                    "description": "Configuration file for working with hive.",
+                    "type": "string"
+                }
+            },
+            "additionalProperties": true
+        },
+        "ssl": {
+            "description": "SSL configuration for the service.",
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "description": "Whether to enable SSL for the service.",
+                    "type": [
+                        "boolean",
+                        "string"
+                    ],
+                    "default": false
+                },
+                "cacerts": {
+                    "description": "The CA certificates for SSL.",
+                    "type": "string"
+                }
+            },
+            "additionalProperties": true
+        },
+        "kerberos": {
+            "description": "Kerberos configuration for the service.",
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "description": "Whether to enable Kerberos for the service.",
+                    "type": [
+                        "boolean",
+                        "string"
+                    ],
+                    "default": false
+                },
+                "keytab": {
+                    "description": "The Kerberos Keytab file contains mappings between Kerberos Principal names and DES-encrypted keys.",
+                    "type": "string"
+                },
+                "config": {
+                    "description": "The configuration file for the operation of Kerberos.",
+                    "type": "string"
+                }
+            },
+            "additionalProperties": true
+        },
+        "ldap": {
+            "description": "LDAP configuration for the service.",
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "description": "Whether to enable LDAP for the service.",
+                    "type": [
+                        "boolean",
+                        "string"
+                    ],
+                    "default": false
+                },
+                "bind_password_script": {
+                    "description": "Password for LDAP operation.",
+                    "type": "string"
+                }
+            },
+            "additionalProperties": true
+        },
+        "databasescommon": {
+            "description": "Common database configuration.",
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "description": "A parameter for working with databases in Trino",
+                    "type": [
+                        "boolean",
+                        "string"
+                    ],
+                    "default": false
+                },
+                "configs": {
+                    "description": "Configuration options for database access.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            },
+            "additionalProperties": true
+        },
+        "trino": {
+            "description": "Trino configuration.",
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "description": "Whether to enable Trino.",
+                    "type": [
+                        "boolean",
+                        "string"
+                    ],
+                    "default": false
+                },
+                "image": {
+                    "description": "The Docker image for the Trino container.",
+                    "type": "string",
+                    "default": "ghcr.io/netcracker/qubership-trino:main"
+                },
+                "imagePullPolicy": {
+                    "description": "The image pull policy for the Trino container.",
+                    "type": "string",
+                    "default": "IfNotPresent"
+                },
+                "replicas": {
+                    "description": "The number of Trino replicas.",
+                    "type": [
+                        "integer",
+                        "string"
+                    ],
+                    "minimum": 1,
+                    "default": 1
+                },
+                "priorityClassName": {
+                    "description": "The priority class name for the Trino pods.",
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "default": null
+                },
+                "livenessProbe": {
+                    "description": "The liveness probe for the Trino container.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "readinessProbe": {
+                    "description": "The readiness probe for the Trino container.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "resources": {
+                    "description": "Resource requests and limits for the Trino pods.",
+                    "type": "object",
+                    "properties": {
+                        "limits": {
+                            "description": "Resource limits for the Trino pods.",
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "description": "CPU limit for the Trino pods.",
+                                    "type": "string",
+                                    "pattern": "^([0-9]+m|[0-9]+(\\.[0-9]+)?)$",
+                                    "default": "150m"
+                                },
+                                "memory": {
+                                    "description": "Memory limit for the Trino pods.",
+                                    "type": "string",
+                                    "pattern": "^[0-9]+(Mi|Gi|Ki|Ti)$",
+                                    "default": "800Mi"
+                                }
+                            },
+                            "additionalProperties": true
+                        },
+                        "requests": {
+                            "description": "Resource requests for the Trino pods.",
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "description": "CPU request for the Trino pods.",
+                                    "type": "string",
+                                    "pattern": "^([0-9]+m|[0-9]+(\\.[0-9]+)?)$",
+                                    "default": "100m"
+                                },
+                                "memory": {
+                                    "description": "Memory request for the Trino pods.",
+                                    "type": "string",
+                                    "pattern": "^[0-9]+(Mi|Gi|Ki|Ti)$",
+                                    "default": "600Mi"
+                                }
+                            },
+                            "additionalProperties": true
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "service": {
+                    "description": "Service configuration for Trino.",
+                    "type": "object",
+                    "properties": {
+                        "annotations": {
+                            "description": "Annotations for the Trino service.",
+                            "type": "object",
+                            "default": {},
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "securityContext": {
+                    "description": "Security context for the Trino container.",
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "readOnlyRootFilesystem": {
+                            "description": "Whether to mount the root filesystem as read-only.",
+                            "type": [
+                                "boolean",
+                                "string",
+                                "null"
+                            ],
+                            "default": true
+                        },
+                        "allowPrivilegeEscalation": {
+                            "description": "Whether to allow privilege escalation.",
+                            "type": [
+                                "boolean",
+                                "string",
+                                "null"
+                            ],
+                            "default": false
+                        },
+                        "runAsNonRoot": {
+                            "description": "Whether to run the container as a non-root user.",
+                            "type": [
+                                "boolean",
+                                "string",
+                                "null"
+                            ],
+                            "default": true
+                        },
+                        "capabilities": {
+                            "description": "The capabilities to set for the container.",
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "drop": {
+                                    "description": "The capabilities to drop.",
+                                    "type": [
+                                        "array",
+                                        "null"
+                                    ],
+                                    "items": {
+                                        "type": "string",
+                                        "default": "ALL"
+                                    }
+                                }
+                            },
+                            "additionalProperties": true
+                        },
+                        "seccompProfile": {
+                            "description": "The seccomp profile to use for the container.",
+                            "type": [
+                                "object",
+                                "null"
+                            ],
+                            "properties": {
+                                "type": {
+                                    "description": "The type of the seccomp profile.",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "default": "RuntimeDefault"
+                                }
+                            },
+                            "additionalProperties": true
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "podSecurityContext": {
+                    "description": "Pod-level security context for the Trino pods.",
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {
+                        "runAsUser": {
+                            "description": "The user ID to run the pod as.",
+                            "type": [
+                                "integer",
+                                "string",
+                                "null"
+                            ],
+                            "default": 1000
+                        },
+                        "runAsGroup": {
+                            "description": "The group ID to run the pod as.",
+                            "type": [
+                                "integer",
+                                "string",
+                                "null"
+                            ],
+                            "default": 1000
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "hostAliases": {
+                    "description": "Host aliases for the Trino pods.",
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                },
+                "extraVolumes": {
+                    "description": "Additional volumes for the Trino pods.",
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                },
+                "extraVolumeMounts": {
+                    "description": "Additional volume mounts for the Trino pods.",
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                }
+            },
+            "additionalProperties": true
+        },
+        "jvmconfig": {
+            "description": "JVM configuration for Trino.",
+            "type": "string"
+        },
+        "jvm": {
+            "description": "JVM configuration for the Trino container.",
+            "type": "object",
+            "properties": {
+                "maxHeapSize": {
+                    "description": "The maximum heap size for the JVM.",
+                    "type": "string",
+                    "default": "1G"
+                },
+                "gcMethod": {
+                    "description": "Garbage collection method for the JVM.",
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "description": "The garbage collection method to use.",
+                            "type": "string",
+                            "default": "UseG1GC"
+                        },
+                        "g1": {
+                            "description": "Configuration for the G1 garbage collector.",
+                            "type": "object",
+                            "properties": {
+                                "heapRegionSize": {
+                                    "description": "The size of each heap region.",
+                                    "type": "string",
+                                    "default": "16M"
+                                }
+                            },
+                            "additionalProperties": true
+                        }
+                    },
+                    "additionalProperties": true
+                }
+            },
+            "additionalProperties": true
+        },
+        "certManagerInegration": {
+            "description": "Configuration for cert-manager integration.",
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "description": "Whether cert-manager integration is enabled.",
+                    "type": [
+                        "boolean",
+                        "string"
+                    ],
+                    "default": false
+                },
+                "secretName": {
+                    "description": "The name of the secret to store the TLS certificate.",
+                    "type": "string",
+                    "default": "hue-tls-cm"
+                },
+                "secretMounts": {
+                    "description": "Secret mounts for the TLS certificate.",
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "mountPath": {
+                                "description": "The path where the secret will be mounted.",
+                                "type": "string",
+                                "default": "/home/hue/trustcerts/ca.crt"
+                            },
+                            "subPath": {
+                                "description": "The path within the secret to mount.",
+                                "type": "string",
+                                "default": "ca.crt"
+                            }
+                        },
+                        "required": [
+                            "mountPath"
+                        ],
+                        "additionalProperties": true
+                    }
+                },
+                "duration": {
+                    "description": "The duration for which the TLS certificate will be valid.",
+                    "type": [
+                        "integer",
+                        "string"
+                    ],
+                    "default": 365
+                },
+                "subjectAlternativeName": {
+                    "description": "Subject alternative name configuration for the TLS certificate.",
+                    "type": "object",
+                    "properties": {
+                        "additionalDnsNames": {
+                            "description": "Additional DNS names for the TLS certificate.",
+                            "type": "array",
+                            "default": [],
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "additionalIpAddresses": {
+                            "description": "Additional IP addresses for the TLS certificate.",
+                            "type": "array",
+                            "default": [],
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "clusterIssuerName": {
+                    "description": "The name of the cluster issuer to use for the TLS certificate.",
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "default": null
+                }
+            },
+            "additionalProperties": true
+        },
+        "extraSecrets": {
+            "description": "Additional secrets for the Hue pods.",
+            "type": "object",
+            "additionalProperties": true
+        },
+        "extraVolumes": {
+            "description": "Additional volumes for the Hue pods.",
+            "type": "array",
+            "default": [],
+            "items": {
+                "type": "object",
+                "additionalProperties": true
+            }
+        },
+        "extraVolumeMounts": {
+            "description": "Additional volume mounts for the Hue pods.",
+            "type": "array",
+            "default": [],
+            "items": {
+                "type": "object",
+                "additionalProperties": true
+            }
+        },
+        "gateway": {
+            "description": "Configuration for the gateway.",
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "description": "Whether the gateway is enabled.",
+                    "type": [
+                        "boolean",
+                        "string"
+                    ],
+                    "default": false
+                },
+                "annotations": {
+                    "description": "Annotations for the gateway.",
+                    "type": "object",
+                    "default": {},
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "labels": {
+                    "description": "Labels for the gateway.",
+                    "type": "object",
+                    "default": {},
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "parentRefs": {
+                    "description": "References to parent resources.",
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                },
+                "hostnames": {
+                    "description": "Hostnames for the gateway.",
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "rules": {
+                    "description": "Rules for the gateway.",
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                },
+                "redirectRoute": {
+                    "description": "Configuration for the redirect route.",
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "description": "Whether the redirect route is enabled.",
+                            "type": [
+                                "boolean",
+                                "string"
+                            ],
+                            "default": false
+                        },
+                        "parentRefs": {
+                            "description": "References to parent resources for the redirect route.",
+                            "type": "array",
+                            "default": [],
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "backendTLSPolicy": {
+                    "description": "TLS policy for the backend.",
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "description": "Whether the backend TLS policy is enabled.",
+                            "type": [
+                                "boolean",
+                                "string"
+                            ],
+                            "default": false
+                        },
+                        "hostname": {
+                            "description": "The hostname for the backend.",
+                            "type": "string",
+                            "default": ""
+                        },
+                        "caCertificateRefs": {
+                            "description": "References to CA certificates for the backend.",
+                            "type": "array",
+                            "default": [],
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        },
+                        "wellKnownCACertificates": {
+                            "description": "Well-known CA certificates for the backend.",
+                            "type": "string",
+                            "default": ""
+                        },
+                        "subjectAltNames": {
+                            "description": "Subject Alternative Names for the backend.",
+                            "type": "array",
+                            "default": [],
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "additionalProperties": true
+                }
+            },
+            "additionalProperties": true
         }
-      },
-      "additionalProperties": true
-    }
-  },
-  "additionalProperties": true
+    },
+    "additionalProperties": true
 }
