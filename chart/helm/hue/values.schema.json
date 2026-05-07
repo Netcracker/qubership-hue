@@ -104,9 +104,7 @@
             "properties": {
                 "enabled": {
                     "description": "Whether to enable the API.",
-                    "type": [
-                        "boolean"
-                    ],
+                    "type": "boolean",
                     "default": false
                 },
                 "domain": {
@@ -131,9 +129,7 @@
                 },
                 "replicas": {
                     "description": "The number of hue to run.",
-                    "type": [
-                        "integer"
-                    ],
+                    "type": "integer",
                     "default": 1
                 },
                 "resources": {
@@ -161,9 +157,7 @@
                     "properties": {
                         "create": {
                             "description": "The parameter for creating a database for HUE operation.",
-                            "type": [
-                                "boolean"
-                            ],
+                            "type": "boolean",
                             "default": true
                         },
                         "initJobAnnotations": {
@@ -190,9 +184,7 @@
                         },
                         "port": {
                             "description": "The port for connecting to the database.",
-                            "type": [
-                                "integer"
-                            ],
+                            "type": "integer",
                             "default": 5432
                         },
                         "user": {
@@ -230,9 +222,7 @@
                 },
                 "podSecurityContext": {
                     "description": "Pod-level security context for hue pods.",
-                    "type": [
-                        "object"
-                    ],
+                    "type": "object",
                     "properties": {
                         "runAsUser": {
                             "description": "The user ID to run all the containers in the pod.",
@@ -251,9 +241,7 @@
                 },
                 "securityContext": {
                     "description": "Container-level security context for hue containers.",
-                    "type": [ 
-                        "object"
-                    ],
+                    "type": "object",
                     "properties": {
                         "readOnlyRootFilesystem": {
                             "description": "Whether to make the root filesystem read-only.",
@@ -287,14 +275,10 @@
                         },
                         "seccompProfile": {
                             "description": "The seccomp profile to use for the container.",
-                            "type": [
-                                "object"
-                            ],
+                            "type": "object",
                             "properties": {
                                 "type": {
-                                    "type": [
-                                        "string"
-                                    ],
+                                    "type": "string",
                                     "default": "RuntimeDefault"
                                 }
                             },
@@ -344,9 +328,7 @@
             "properties": {
                 "create": {
                     "description": "Whether to create the ingress resource.",
-                    "type": [
-                        "boolean"
-                    ],
+                    "type": "boolean",
                     "default": true
                 },
                 "type": {
@@ -365,16 +347,12 @@
                     "properties": {
                         "enabled": {
                             "description": "Whether to enable TLS for the ingress controller.",
-                            "type": [
-                                "boolean"
-                            ],
+                            "type": "boolean",
                             "default": false
                         },
                         "secretName": {
                             "description": "The name of the secret containing the TLS certificate.",
-                            "type": [
-                                "string"
-                            ],
+                            "type": "string",
                             "default": null
                         }
                     },
@@ -422,9 +400,7 @@
             "properties": {
                 "enabled": {
                     "description": "Whether to enable SSL for the service.",
-                    "type": [
-                        "boolean"
-                    ],
+                    "type": "boolean",
                     "default": false
                 },
                 "cacerts": {
@@ -440,9 +416,7 @@
             "properties": {
                 "enabled": {
                     "description": "Whether to enable Kerberos for the service.",
-                    "type": [
-                        "boolean"
-                    ],
+                    "type": "boolean",
                     "default": false
                 },
                 "keytab": {
@@ -462,9 +436,7 @@
             "properties": {
                 "enabled": {
                     "description": "Whether to enable LDAP for the service.",
-                    "type": [
-                        "boolean"
-                    ],
+                    "type": "boolean",
                     "default": false
                 },
                 "bind_password_script": {
@@ -480,9 +452,7 @@
             "properties": {
                 "enabled": {
                     "description": "A parameter for working with databases in Trino",
-                    "type": [
-                        "boolean"
-                    ],
+                    "type": "boolean",
                     "default": false
                 },
                 "configs": {
@@ -501,9 +471,7 @@
             "properties": {
                 "enabled": {
                     "description": "Whether to enable Trino.",
-                    "type": [
-                        "boolean"
-                    ],
+                    "type": "boolean",
                     "default": false
                 },
                 "image": {
@@ -518,9 +486,7 @@
                 },
                 "replicas": {
                     "description": "The number of Trino replicas.",
-                    "type": [
-                        "integer"
-                    ],
+                    "type": "integer",
                     "default": 1
                 },
                 "priorityClassName": {
@@ -562,29 +528,21 @@
                 },
                 "securityContext": {
                     "description": "Security context for the Trino container.",
-                    "type": [
-                        "object"
-                    ],
+                    "type": "object",
                     "properties": {
                         "readOnlyRootFilesystem": {
                             "description": "Whether to mount the root filesystem as read-only.",
-                            "type": [
-                                "boolean"
-                            ],
+                            "type": "boolean",
                             "default": true
                         },
                         "allowPrivilegeEscalation": {
                             "description": "Whether to allow privilege escalation.",
-                            "type": [
-                                "boolean"                               
-                            ],
+                            "type": "boolean",
                             "default": false
                         },
                         "runAsNonRoot": {
                             "description": "Whether to run the container as a non-root user.",
-                            "type": [
-                                "boolean"
-                            ],
+                            "type": "boolean",
                             "default": true
                         },
                         "capabilities": {
@@ -604,14 +562,10 @@
                         },
                         "seccompProfile": {
                             "description": "The seccomp profile to use for the container.",
-                            "type": [
-                                "object"
-                            ],
+                            "type": "object",
                             "properties": {
                                 "type": {
-                                    "type": [
-                                        "string"
-                                    ],
+                                    "type": "string",
                                     "default": "RuntimeDefault"
                                 }
                             },
@@ -623,9 +577,7 @@
                 },
                 "podSecurityContext": {
                     "description": "Pod-level security context for the Trino pods.",
-                    "type": [
-                        "object"
-                    ],
+                    "type": "object",
                     "properties": {
                         "runAsUser": {
                             "description": "The user ID to run the pod as.",
@@ -718,9 +670,7 @@
             "properties": {
                 "enabled": {
                     "description": "Whether cert-manager integration is enabled.",
-                    "type": [
-                        "boolean"
-                    ],
+                    "type": "boolean",
                     "default": false
                 },
                 "secretName": {
@@ -753,9 +703,7 @@
                 },
                 "duration": {
                     "description": "The duration for which the TLS certificate will be valid.",
-                    "type": [
-                        "integer"
-                    ],
+                    "type": "integer",
                     "default": 365
                 },
                 "subjectAlternativeName": {
@@ -821,9 +769,7 @@
             "properties": {
                 "enabled": {
                     "description": "Whether the gateway is enabled.",
-                    "type": [
-                        "boolean"
-                    ],
+                    "type": "boolean",
                     "default": false
                 },
                 "annotations": {
@@ -874,9 +820,7 @@
                     "properties": {
                         "enabled": {
                             "description": "Whether the redirect route is enabled.",
-                            "type": [
-                                "boolean"
-                            ],
+                            "type": "boolean",
                             "default": false
                         },
                         "parentRefs": {
@@ -897,9 +841,7 @@
                     "properties": {
                         "enabled": {
                             "description": "Whether the backend TLS policy is enabled.",
-                            "type": [
-                                "boolean"
-                            ],
+                            "type": "boolean",
                             "default": false
                         },
                         "hostname": {
