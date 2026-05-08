@@ -821,14 +821,6 @@ ini: >
   # Hue session timeout not session in Keycloak 
   idle_session_timeout=30
 
-  # Depending on your OpenID Connect provider (OP) you might need to change the default signing algorithm from HS256 to RS256 oidc_rp_sign_algo=RS256
-  
-  # For RS256 and ES256 algorithms to work, you need to set the OP signing key in PEM or DER format.
-  # Key can be found at https://<keycloak_address>/auth/admin/master/console/#/<realm>/realm-settings/keys
-  oidc_rp_idp_sign_key="""-----BEGIN PUBLIC KEY-----
-  <key content>
-  -----END PUBLIC KEY-----"""
-
   [[oidc]]
   
   # Keycloak client name
@@ -839,10 +831,23 @@ ini: >
   
   # Keycloak endpoints. Use https://<keycloak_address>/auth/realms/<realm>/.well-known/openid-configuration to get the endpoints.
   oidc_op_authorization_endpoint=https://<keycloak_address>/auth/realms/<realm>/protocol/openid-connect/auth
+
   oidc_op_token_endpoint=https://<keycloak_address>/auth/realms/<realm>/protocol/openid-connect/token
+
   oidc_op_user_endpoint=https://<keycloak_address>/auth/realms/<realm>/protocol/openid-connect/userinfo
+
   oidc_op_jwks_endpoint=https://<keycloak_address>/auth/realms/<realm>/protocol/openid-connect/certs
+
   logout_redirect_url=https://<keycloak_address>/auth/realms/<realm>/protocol/openid-connect/logout
+
+  # Depending on your OpenID Connect provider (OP) you might need to change the default signing algorithm from HS256 to RS256 oidc_rp_sign_algo=RS256
+  
+  # For RS256 and ES256 algorithms to work, you need to set the OP signing key in PEM or DER format.
+  # Key can be found at https://<keycloak_address>/auth/admin/master/console/#/<realm>/realm-settings/keys
+  oidc_rp_idp_sign_key="""-----BEGIN PUBLIC KEY-----
+  <key content>
+  -----END PUBLIC KEY-----"""
+
   
   # Enables Keycloak TLS certificate validation
   oidc_verify_ssl=true
