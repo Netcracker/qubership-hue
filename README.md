@@ -631,7 +631,7 @@ kerberos-hue.yaml added to create ConfigMap for Kerberos configuration if Kerber
 
 In httproute.yaml, custom HTTPRoute is for redirecting HTTP traffic to HTTPS, if TLS is enabled on the gateway, the `BackendTLSPolicy` is for TLS communication between the gateway and the Hue.
 
-values.schema.json, custom schema that defines the structure, types, and allowed fields for values.yaml, ensuring configurations are valid and consistent. It enables Helm to validate inputs during linting and templating, preventing misconfigurations at deployment time.
+Added values.schema.json, custom schema that defines the structure, types, and allowed fields for values.yaml, ensuring configurations are valid and consistent. It enables Helm to validate inputs during linting and templating, preventing misconfigurations at deployment time.
 
 ---
 ### Trino customizations

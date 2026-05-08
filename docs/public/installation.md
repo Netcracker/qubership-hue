@@ -820,7 +820,15 @@ ini: >
   
   # Hue session timeout not session in Keycloak 
   idle_session_timeout=30
+
+  # Depending on your OpenID Connect provider (OP) you might need to change the default signing algorithm from HS256 to RS256 oidc_rp_sign_algo=RS256
   
+  # For RS256 and ES256 algorithms to work, you need to set the OP signing key in PEM or DER format.
+  # Key can be found at https://<keycloak_address>/auth/admin/master/console/#/<realm>/realm-settings/keys
+  oidc_rp_idp_sign_key="""-----BEGIN PUBLIC KEY-----
+  <key content>
+  -----END PUBLIC KEY-----"""
+
   [[oidc]]
   
   # Keycloak client name
