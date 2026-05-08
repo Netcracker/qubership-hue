@@ -53,8 +53,10 @@ spec:
               done
 {{ end }}
 # Qubership custom change: Qubership Custom pod-level settings for Hue: security, scheduling, host aliases, and restart policy from Helm values
+          {{- if .Values.hue.securityContext }}
           securityContext:
-            {{- include "hue.securityContext" . | nindent 12 }}
+            {{- toYaml .Values.hue.securityContext | nindent 12 }}
+          {{- end }}
       {{- if .Values.hue.priorityClassName }}
       priorityClassName: {{ .Values.hue.priorityClassName }}
       {{- end }}
@@ -76,14 +78,16 @@ spec:
         {{- toYaml .Values.hue.tolerations | nindent 8 }}
       {{- end }}
       securityContext:
-        {{- include "hue.podSecurityContext" . | nindent 8 }}
+        {{- include "hue.podSecurityContext" . }}
       containers:
       # Qubership custom change: Qubership Custom container config for Hue with dynamic image, security, args, and env based on Helm values
       - name: {{ .Chart.Name }}-hue
         image: {{ include "hue.image" . }}
         imagePullPolicy: {{ .Values.hue.imagePullPolicy }}
+        {{- if .Values.hue.securityContext }}
         securityContext:
-          {{- include "hue.securityContext" . | nindent 10 }}
+          {{- toYaml .Values.hue.securityContext | nindent 10 }}
+        {{- end }}
         {{- if .Values.hue.args }}
         args: {{ tpl (toYaml .Values.hue.args) . | nindent 12 }}
           {{- end }}

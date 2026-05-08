@@ -60,7 +60,6 @@ hue:
     allowPrivilegeEscalation: false
     runAsNonRoot: true
     readOnlyRootFilesystem: true
-    runAsUser: 1001
   hostAliases: []
 
   interpreters: |
@@ -260,10 +259,10 @@ trino:
       memory: 600Mi
   service:
     annotations: {}
-  securityContext:
+  podSecurityContext:    
     runAsUser: 1000
     runAsGroup: 1000
-  podSecurityContext:
+  securityContext:
     capabilities:
       drop:
         - ALL

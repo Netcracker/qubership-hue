@@ -52,13 +52,13 @@ spec:
       {{- end }}
       
       securityContext:
-        {{- include "trino.securityContext" . | nindent 8 }}
+        {{- include "trino.podSecurityContext" . }}
       containers:
       - name: {{ .Chart.Name }}-trino
         image: {{ template "trinodb.image" . }}
         imagePullPolicy: {{ .Values.trino.imagePullPolicy }}
         securityContext:
-          {{- include "trino.podSecurityContext" . | nindent 10 }}
+          {{- toYaml .Values.trino.securityContext  | nindent 10 }}
         ports:
         - containerPort: 8080
         env:

@@ -76,9 +76,14 @@ The parameters are specified in the below sub-sections.
 
 ## Qubership-hue Deployment Schema
 
-Qubership-hue helm charts contain several Hue and Trino components for working with databases.
+The Qubership-hue Helm chart includes several Hue and Trino components for working with databases.
 
-The chart for Hue deployment mostly follows community chart from https://github.com/gethue/hue/tree/master/tools/kubernetes/helm/hue with a few additions, like resources, custom labels and `priorityClassName`. The following table lists the configurable parameters of the Qubership-hue chart and their default values.
+The chart for Hue deployment is largely based on the community chart from https://github.com/gethue/hue/tree/master/tools/kubernetes/helm/hue
+, with a few additions such as resource configurations, custom labels, and `priorityClassName`. It also includes a values.schema.json file, a custom schema that defines the structure, types, and allowed fields for values.yaml, ensuring configurations are valid and consistent. This enables Helm to validate the inputs during linting and templating, helping prevent misconfigurations at deployment time.
+
+The following table lists the configurable parameters of the Qubership-hue chart and their default values:
+
+
 
 | Parameter                                 | Type            | Mandatory | Default value                                               | Description                                                                                                                                                                                                                                                                                                                                             |
 |-------------------------------------------|-----------------|-----------|-------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -815,7 +820,7 @@ ini: >
   
   # Hue session timeout not session in Keycloak 
   idle_session_timeout=30
-  
+
   [[oidc]]
   
   # Keycloak client name
@@ -826,10 +831,23 @@ ini: >
   
   # Keycloak endpoints. Use https://<keycloak_address>/auth/realms/<realm>/.well-known/openid-configuration to get the endpoints.
   oidc_op_authorization_endpoint=https://<keycloak_address>/auth/realms/<realm>/protocol/openid-connect/auth
+
   oidc_op_token_endpoint=https://<keycloak_address>/auth/realms/<realm>/protocol/openid-connect/token
+
   oidc_op_user_endpoint=https://<keycloak_address>/auth/realms/<realm>/protocol/openid-connect/userinfo
+
   oidc_op_jwks_endpoint=https://<keycloak_address>/auth/realms/<realm>/protocol/openid-connect/certs
+
   logout_redirect_url=https://<keycloak_address>/auth/realms/<realm>/protocol/openid-connect/logout
+
+  # Depending on your OpenID Connect provider (OP) you might need to change the default signing algorithm from HS256 to RS256 oidc_rp_sign_algo=RS256
+  
+  # For RS256 and ES256 algorithms to work, you need to set the OP signing key in PEM or DER format.
+  # Key can be found at https://<keycloak_address>/auth/admin/master/console/#/<realm>/realm-settings/keys
+  oidc_rp_idp_sign_key="""-----BEGIN PUBLIC KEY-----
+  <key content>
+  -----END PUBLIC KEY-----"""
+
   
   # Enables Keycloak TLS certificate validation
   oidc_verify_ssl=true

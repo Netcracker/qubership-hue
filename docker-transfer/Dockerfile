@@ -6,7 +6,10 @@ COPY docker-transfer/sync.py /app/sync.py
 COPY chart /app/chart
 COPY docs /app/docs
 
-RUN pip install --no-cache-dir ruamel.yaml && \
+COPY docker-transfer/validation.py /app/validation.py
+
+RUN pip install --no-cache-dir ruamel.yaml pyyaml && \
+    python validation.py chart/helm/hue/values.yaml chart/helm/hue/values.schema.json && \
     python sync.py chart/helm/hue/release-images.yaml chart/helm/hue/values.yaml
 
 FROM scratch
