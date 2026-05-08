@@ -79,9 +79,9 @@ The parameters are specified in the below sub-sections.
 The Qubership-hue Helm chart includes several Hue and Trino components for working with databases.
 
 The chart for Hue deployment is largely based on the community chart from https://github.com/gethue/hue/tree/master/tools/kubernetes/helm/hue
-, with a few additions such as resource configurations, custom labels, and `priorityClassName`. It also includes a values.schema.json file, a custom schema that defines the structure, types, and allowed fields for values.yaml, ensuring configurations are valid and consistent. This enables Helm to validate inputs during linting and templating, helping prevent misconfigurations at deployment time.
+, with a few additions such as resource configurations, custom labels, and `priorityClassName`. It also includes a values.schema.json file, a custom schema that defines the structure, types, and allowed fields for values.yaml, ensuring configurations are valid and consistent. This enables Helm to validate the inputs during linting and templating, helping prevent misconfigurations at deployment time.
 
-The following table lists the configurable parameters of the Qubership-hue chart and their default values.
+The following table lists the configurable parameters of the Qubership-hue chart and their default values:
 
 
 
