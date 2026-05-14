@@ -633,7 +633,8 @@
             "seccompProfile": {
               "type": "RuntimeDefault"
             }
-          }
+          },
+          "additionalProperties": true
         },
         "hostAliases": {
           "description": "Host aliases for hue pods.",
