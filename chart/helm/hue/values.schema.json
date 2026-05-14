@@ -434,14 +434,12 @@
           },
           "valueFrom": {
             "description": "The source of the environment variable value.",
-            "type": "object",
-            "additionalProperties": true
+            "type": "object"
           }
         },
         "required": [
           "name"
-        ],
-        "additionalProperties": true
+        ]
       }
     },
     "image": {
@@ -472,8 +470,7 @@
       "required": [
         "registry",
         "tag"
-      ],
-      "additionalProperties": true
+      ]
     },
     "api": {
       "description": "api configuration.",
@@ -489,8 +486,7 @@
           "type": "string",
           "default": "api."
         }
-      },
-      "additionalProperties": true
+      }
     },
     "hue": {
       "description": "Hue configuration.",
@@ -535,8 +531,7 @@
                 "type": "string"
               }
             }
-          },
-          "additionalProperties": true
+          }
         },
         "database": {
           "description": "Database configuration for hue.",
@@ -599,8 +594,7 @@
               "type": "string",
               "default": "admin password"
             }
-          },
-          "additionalProperties": true
+          }
         },
         "imagePullPolicy": {
           "description": "Image pull policy for hue pods.",
@@ -614,8 +608,7 @@
           "default": {
             "runAsUser": 1001,
             "fsGroup": 1001
-          },
-          "additionalProperties": true
+          }
         },
         "securityContext": {
           "description": "Container-level security context for hue containers.",
@@ -633,16 +626,14 @@
             "seccompProfile": {
               "type": "RuntimeDefault"
             }
-          },
-          "additionalProperties": true
+          }
         },
         "hostAliases": {
           "description": "Host aliases for hue pods.",
           "type": "array",
           "default": [],
           "items": {
-            "type": "object",
-            "additionalProperties": true
+            "type": "object"
           }
         },
         "interpreters": {
@@ -658,8 +649,7 @@
       },
       "required": [
         "database"
-      ],
-      "additionalProperties": true
+      ]
     },
     "createDBJob": {
       "description": "Configuration for the database initialization job.",
@@ -679,8 +669,7 @@
             }
           }
         }
-      },
-      "additionalProperties": true
+      }
     },
     "ingress": {
       "description": "Configuration for the Hue ingress controller.",
@@ -715,8 +704,7 @@
               "type": "string",
               "default": null
             }
-          },
-          "additionalProperties": true
+          }
         },
         "annotations": {
           "description": "Annotations for the ingress controller.",
@@ -740,8 +728,7 @@
             "type": "string"
           }
         }
-      },
-      "additionalProperties": true
+      }
     },
     "hive": {
       "description": "Hive configuration.",
@@ -752,8 +739,7 @@
           "type": "string",
           "default": "see the values.yaml file"
         }
-      },
-      "additionalProperties": true
+      }
     },
     "ssl": {
       "description": "SSL configuration for the service.",
@@ -769,8 +755,7 @@
           "type": "string",
           "default": "see the values.yaml file"
         }
-      },
-      "additionalProperties": true
+      }
     },
     "kerberos": {
       "description": "Kerberos configuration for the service.",
@@ -791,8 +776,7 @@
           "type": "string",
           "default": "see the values.yaml file"
         }
-      },
-      "additionalProperties": true
+      }
     },
     "ldap": {
       "description": "LDAP configuration for the service.",
@@ -808,8 +792,7 @@
           "type": "string",
           "default": "see the values.yaml file"
         }
-      },
-      "additionalProperties": true
+      }
     },
     "databasescommon": {
       "description": "Common database configuration.",
@@ -827,8 +810,7 @@
             "type": "string"
           }
         }
-      },
-      "additionalProperties": true
+      }
     },
     "trino": {
       "description": "Trino configuration.",
@@ -864,13 +846,11 @@
         },
         "livenessProbe": {
           "description": "The liveness probe for the Trino container.",
-          "type": "object",
-          "additionalProperties": true
+          "type": "object"
         },
         "readinessProbe": {
           "description": "The readiness probe for the Trino container.",
-          "type": "object",
-          "additionalProperties": true
+          "type": "object"
         },
         "resources": {
           "$ref": "#/definitions/io.k8s.api.core.v1.ResourceRequirements",
@@ -899,8 +879,7 @@
                 "type": "string"
               }
             }
-          },
-          "additionalProperties": true
+          }
         },
         "securityContext": {
           "description": "Security context for the Trino container.",
@@ -934,8 +913,7 @@
           "type": "array",
           "default": [],
           "items": {
-            "type": "object",
-            "additionalProperties": true
+            "type": "object"
           }
         },
         "extraVolumes": {
@@ -943,8 +921,7 @@
           "type": "array",
           "default": [],
           "items": {
-            "type": "object",
-            "additionalProperties": true
+            "type": "object"
           }
         },
         "extraVolumeMounts": {
@@ -952,12 +929,10 @@
           "type": "array",
           "default": [],
           "items": {
-            "type": "object",
-            "additionalProperties": true
+            "type": "object"
           }
         }
-      },
-      "additionalProperties": true
+      }
     },
     "jvmconfig": {
       "description": "JVM configuration for Trino.",
@@ -992,14 +967,11 @@
                   "type": "string",
                   "default": "16M"
                 }
-              },
-              "additionalProperties": true
+              }
             }
-          },
-          "additionalProperties": true
+          }
         }
-      },
-      "additionalProperties": true
+      }
     },
     "certManagerInegration": {
       "description": "Configuration for cert-manager integration.",
@@ -1034,8 +1006,7 @@
             },
             "required": [
               "mountPath"
-            ],
-            "additionalProperties": true
+            ]
           }
         },
         "duration": {
@@ -1063,8 +1034,7 @@
                 "type": "string"
               }
             }
-          },
-          "additionalProperties": true
+          }
         },
         "clusterIssuerName": {
           "description": "The name of the cluster issuer to use for the TLS certificate.",
@@ -1074,21 +1044,18 @@
           ],
           "default": null
         }
-      },
-      "additionalProperties": true
+      }
     },
     "extraSecrets": {
       "description": "Additional secrets for the Hue pods.",
-      "type": "object",
-      "additionalProperties": true
+      "type": "object"
     },
     "extraVolumes": {
       "description": "Additional volumes for the Hue pods.",
       "type": "array",
       "default": [],
       "items": {
-        "type": "object",
-        "additionalProperties": true
+        "type": "object"
       }
     },
     "extraVolumeMounts": {
@@ -1096,8 +1063,7 @@
       "type": "array",
       "default": [],
       "items": {
-        "type": "object",
-        "additionalProperties": true
+        "type": "object"
       }
     },
     "gateway": {
@@ -1130,8 +1096,7 @@
           "type": "array",
           "default": [],
           "items": {
-            "type": "object",
-            "additionalProperties": true
+            "type": "object"
           }
         },
         "hostnames": {
@@ -1147,8 +1112,7 @@
           "type": "array",
           "default": [],
           "items": {
-            "type": "object",
-            "additionalProperties": true
+            "type": "object"
           }
         },
         "redirectRoute": {
@@ -1165,12 +1129,10 @@
               "type": "array",
               "default": [],
               "items": {
-                "type": "object",
-                "additionalProperties": true
+                "type": "object"
               }
             }
-          },
-          "additionalProperties": true
+          }
         },
         "backendTLSPolicy": {
           "description": "TLS policy for the backend.",
@@ -1191,8 +1153,7 @@
               "type": "array",
               "default": [],
               "items": {
-                "type": "object",
-                "additionalProperties": true
+                "type": "object"
               }
             },
             "wellKnownCACertificates": {
@@ -1208,16 +1169,13 @@
                 "type": "string"
               }
             }
-          },
-          "additionalProperties": true
+          }
         }
-      },
-      "additionalProperties": true
+      }
     },
     "PAAS_PLATFORM": {
       "type": "string",
       "description": "The PaaS platform where Hive Metastore is being deployed to."
     }
-  },
-  "additionalProperties": true
+  }
 }
