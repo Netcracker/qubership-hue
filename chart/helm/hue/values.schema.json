@@ -1,882 +1,1181 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Hue Helm Chart Values",
-    "description": "Schema for validating Hue and Trino deployment configurations.",
-    "type": "object",
-    "definitions": {
-        "io.k8s.apimachinery.pkg.api.resource.Quantity": {
-            "oneOf": [
-                {
-                    "type": "string"
-                },
-                {
-                    "type": "number"
-                }
-            ]
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Hue Helm Chart Values",
+  "description": "Schema for the Hue and Trino Helm chart values. Some Kubernetes object definitions are derived from https://github.com/yannh/kubernetes-json-schema.",
+  "type": "object",
+  "definitions": {
+    "io.k8s.api.core.v1.SELinuxOptions": {
+      "description": "SELinuxOptions are the labels to be applied to the container",
+      "properties": {
+        "level": {
+          "description": "Level is SELinux level label that applies to the container.",
+          "type": [
+            "string",
+            "null"
+          ]
         },
-        "io.k8s.api.core.v1.ResourceRequirements": {
-            "description": "ResourceRequirements describes the compute resource requirements.",
-            "properties": {
-                "limits": {
-                    "additionalProperties": {
-                        "$ref": "#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
-                    },
-                    "description": "Limits describes the maximum amount of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
-                    "type": "object"
-                },
-                "requests": {
-                    "additionalProperties": {
-                        "$ref": "#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
-                    },
-                    "description": "Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. Requests cannot exceed Limits. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
-                    "type": "object"
-                }
-            },
-            "type": "object",
-            "additionalProperties": false
+        "role": {
+          "description": "Role is a SELinux role label that applies to the container.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "type": {
+          "description": "Type is a SELinux type label that applies to the container.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "user": {
+          "description": "User is a SELinux user label that applies to the container.",
+          "type": [
+            "string",
+            "null"
+          ]
         }
+      },
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false
     },
-    "properties": {
-        "env": {
-            "description": "Additional env parameters for Hue Service and DB init job",
+    "io.k8s.api.core.v1.AppArmorProfile": {
+      "description": "AppArmorProfile defines a pod or container's AppArmor settings.",
+      "properties": {
+        "localhostProfile": {
+          "description": "localhostProfile indicates a profile loaded on the node that should be used. The profile must be preconfigured on the node to work. Must match the loaded name of the profile. Must be set if and only if type is \"Localhost\".",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "type": {
+          "description": "type indicates which kind of AppArmor profile will be applied. Valid options are:\n  Localhost - a profile pre-loaded on the node.\n  RuntimeDefault - the container runtime's default profile.\n  Unconfined - no AppArmor enforcement.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": [
+        "object",
+        "null"
+      ],
+      "x-kubernetes-unions": [
+        {
+          "discriminator": "type",
+          "fields-to-discriminateBy": {
+            "localhostProfile": "LocalhostProfile"
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "io.k8s.api.core.v1.SeccompProfile": {
+      "description": "SeccompProfile defines a pod/container's seccomp profile settings. Only one profile source may be set.",
+      "properties": {
+        "localhostProfile": {
+          "description": "localhostProfile indicates a profile defined in a file on the node should be used. The profile must be preconfigured on the node to work. Must be a descending path, relative to the kubelet's configured seccomp profile location. Must be set if type is \"Localhost\". Must NOT be set for any other type.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "type": {
+          "description": "type indicates which kind of seccomp profile will be applied. Valid options are:\n\nLocalhost - a profile defined in a file on the node should be used. RuntimeDefault - the container runtime default profile should be used. Unconfined - no profile should be applied.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": [
+        "object",
+        "null"
+      ],
+      "x-kubernetes-unions": [
+        {
+          "discriminator": "type",
+          "fields-to-discriminateBy": {
+            "localhostProfile": "LocalhostProfile"
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "io.k8s.api.core.v1.Sysctl": {
+      "description": "Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported sysctls (by the container runtime) might fail to launch. Note that this field cannot be set when spec.os.name is windows.",
+      "items": {
+        "description": "Sysctl defines a kernel parameter to be set",
+        "properties": {
+          "name": {
+            "description": "Name of a property to set",
+            "type": "string"
+          },
+          "value": {
+            "description": "Value of a property to set",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "value"
+        ],
+        "type": [
+          "object",
+          "null"
+        ]
+      },
+      "type": [
+        "array",
+        "null"
+      ],
+      "x-kubernetes-list-type": "atomic",
+      "additionalProperties": false
+    },
+    "io.k8s.api.core.v1.WindowsSecurityContextOptions": {
+      "description": "WindowsSecurityContextOptions contain Windows-specific options and credentials.",
+      "properties": {
+        "gmsaCredentialSpec": {
+          "description": "GMSACredentialSpec is where the GMSA admission webhook (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the GMSA credential spec named by the GMSACredentialSpecName field.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "gmsaCredentialSpecName": {
+          "description": "GMSACredentialSpecName is the name of the GMSA credential spec to use.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "hostProcess": {
+          "description": "HostProcess determines if a container should be run as a 'Host Process' container. All of a Pod's containers must have the same effective HostProcess value (it is not allowed to have a mix of HostProcess containers and non-HostProcess containers). In addition, if HostProcess is true then HostNetwork must also be set to true.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "runAsUserName": {
+          "description": "The UserName in Windows to run the entrypoint of the container process. Defaults to the user specified in image metadata if unspecified. May also be set in PodSecurityContext. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false
+    },
+    "io.k8s.api.core.v1.Capabilities": {
+      "description": "Adds and removes POSIX capabilities from running containers.",
+      "properties": {
+        "add": {
+          "description": "Added capabilities",
+          "items": {
             "type": [
-                "array",
-                "null"
-            ],
-            "default": null,
-            "items": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "description": "The name of the environment variable.",
-                        "type": "string"
-                    },
-                    "value": {
-                        "description": "The value of the environment variable.",
-                        "type": "string"
-                    },
-                    "valueFrom": {
-                        "description": "The source of the environment variable value.",
-                        "type": "object",
-                        "additionalProperties": true
-                    }
-                },
-                "required": [
-                    "name"
-                ],
-                "additionalProperties": true
+              "string",
+              "null"
+            ]
+          },
+          "type": [
+            "array",
+            "null"
+          ],
+          "x-kubernetes-list-type": "atomic"
+        },
+        "drop": {
+          "description": "Removed capabilities",
+          "items": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": [
+            "array",
+            "null"
+          ],
+          "x-kubernetes-list-type": "atomic"
+        }
+      },
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false
+    },
+    "io.k8s.api.core.v1.PodSecurityContext": {
+      "description": "PodSecurityContext holds pod-level security attributes and common container settings. Some fields are also present in container.securityContext.  Field values of container.securityContext take precedence over field values of PodSecurityContext.",
+      "properties": {
+        "appArmorProfile": {
+          "$ref": "#/definitions/io.k8s.api.core.v1.AppArmorProfile",
+          "description": "appArmorProfile is the AppArmor options to use by the containers in this pod. Note that this field cannot be set when spec.os.name is windows."
+        },
+        "fsGroup": {
+          "description": "A special supplemental group that applies to all containers in a pod. Some volume types allow the Kubelet to change the ownership of that volume to be owned by the pod:\n\n1. The owning GID will be the FSGroup 2. The setgid bit is set (new files created in the volume will be owned by FSGroup) 3. The permission bits are OR'd with rw-rw----\n\nIf unset, the Kubelet will not modify the ownership and permissions of any volume. Note that this field cannot be set when spec.os.name is windows.",
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "fsGroupChangePolicy": {
+          "description": "fsGroupChangePolicy defines behavior of changing ownership and permission of the volume before being exposed inside Pod. This field will only apply to volume types which support fsGroup based ownership(and permissions). It will have no effect on ephemeral volume types such as: secret, configmaps and emptydir. Valid values are \"OnRootMismatch\" and \"Always\". If not specified, \"Always\" is used. Note that this field cannot be set when spec.os.name is windows.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "runAsGroup": {
+          "description": "The GID to run the entrypoint of the container process. Uses runtime default if unset. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container. Note that this field cannot be set when spec.os.name is windows.",
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "runAsNonRoot": {
+          "description": "Indicates that the container must run as a non-root user. If true, the Kubelet will validate the image at runtime to ensure that it does not run as UID 0 (root) and fail to start the container if it does. If unset or false, no such validation will be performed. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "runAsUser": {
+          "description": "The UID to run the entrypoint of the container process. Defaults to user specified in image metadata if unspecified. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container. Note that this field cannot be set when spec.os.name is windows.",
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "seLinuxOptions": {
+          "$ref": "#/definitions/io.k8s.api.core.v1.SELinuxOptions",
+          "description": "The SELinux context to be applied to all containers. If unspecified, the container runtime will allocate a random SELinux context for each container.  May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container. Note that this field cannot be set when spec.os.name is windows."
+        },
+        "seccompProfile": {
+          "$ref": "#/definitions/io.k8s.api.core.v1.SeccompProfile",
+          "description": "The seccomp options to use by the containers in this pod. Note that this field cannot be set when spec.os.name is windows."
+        },
+        "supplementalGroups": {
+          "description": "A list of groups applied to the first process run in each container, in addition to the container's primary GID and fsGroup (if specified).  If the SupplementalGroupsPolicy feature is enabled, the supplementalGroupsPolicy field determines whether these are in addition to or instead of any group memberships defined in the container image. If unspecified, no additional groups are added, though group memberships defined in the container image may still be used, depending on the supplementalGroupsPolicy field. Note that this field cannot be set when spec.os.name is windows.",
+          "items": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "type": "array",
+          "x-kubernetes-list-type": "atomic"
+        },
+        "supplementalGroupsPolicy": {
+          "description": "Defines how supplemental groups of the first container processes are calculated. Valid values are \"Merge\" and \"Strict\". If not specified, \"Merge\" is used. (Alpha) Using the field requires the SupplementalGroupsPolicy feature gate to be enabled and the container runtime must implement support for this feature. Note that this field cannot be set when spec.os.name is windows.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sysctls": {
+          "description": "Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported sysctls (by the container runtime) might fail to launch. Note that this field cannot be set when spec.os.name is windows.",
+          "items": {
+            "$ref": "#/definitions/io.k8s.api.core.v1.Sysctl"
+          },
+          "type": "array",
+          "x-kubernetes-list-type": "atomic"
+        },
+        "windowsOptions": {
+          "$ref": "#/definitions/io.k8s.api.core.v1.WindowsSecurityContextOptions",
+          "description": "The Windows specific settings applied to all containers. If unspecified, the options within a container's SecurityContext will be used. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. Note that this field cannot be set when spec.os.name is linux."
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "io.k8s.api.core.v1.SecurityContext": {
+      "description": "SecurityContext holds security configuration that will be applied to a container. Some fields are present in both SecurityContext and PodSecurityContext.  When both are set, the values in SecurityContext take precedence.",
+      "properties": {
+        "allowPrivilegeEscalation": {
+          "description": "AllowPrivilegeEscalation controls whether a process can gain more privileges than its parent process. This bool directly controls if the no_new_privs flag will be set on the container process. AllowPrivilegeEscalation is true always when the container is: 1) run as Privileged 2) has CAP_SYS_ADMIN Note that this field cannot be set when spec.os.name is windows.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "appArmorProfile": {
+          "$ref": "#/definitions/io.k8s.api.core.v1.AppArmorProfile",
+          "description": "appArmorProfile is the AppArmor options to use by this container. If set, this profile overrides the pod's appArmorProfile. Note that this field cannot be set when spec.os.name is windows."
+        },
+        "capabilities": {
+          "$ref": "#/definitions/io.k8s.api.core.v1.Capabilities",
+          "description": "The capabilities to add/drop when running containers. Defaults to the default set of capabilities granted by the container runtime. Note that this field cannot be set when spec.os.name is windows."
+        },
+        "privileged": {
+          "description": "Run container in privileged mode. Processes in privileged containers are essentially equivalent to root on the host. Defaults to false. Note that this field cannot be set when spec.os.name is windows.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "procMount": {
+          "description": "procMount denotes the type of proc mount to use for the containers. The default value is Default which uses the container runtime defaults for readonly paths and masked paths. This requires the ProcMountType feature flag to be enabled. Note that this field cannot be set when spec.os.name is windows.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "readOnlyRootFilesystem": {
+          "description": "Whether this container has a read-only root filesystem. Default is false. Note that this field cannot be set when spec.os.name is windows.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "runAsGroup": {
+          "description": "The GID to run the entrypoint of the container process. Uses runtime default if unset. May also be set in PodSecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. Note that this field cannot be set when spec.os.name is windows.",
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "runAsNonRoot": {
+          "description": "Indicates that the container must run as a non-root user. If true, the Kubelet will validate the image at runtime to ensure that it does not run as UID 0 (root) and fail to start the container if it does. If unset or false, no such validation will be performed. May also be set in PodSecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "runAsUser": {
+          "description": "The UID to run the entrypoint of the container process. Defaults to user specified in image metadata if unspecified. May also be set in PodSecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. Note that this field cannot be set when spec.os.name is windows.",
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "seLinuxOptions": {
+          "$ref": "#/definitions/io.k8s.api.core.v1.SELinuxOptions",
+          "description": "The SELinux context to be applied to the container. If unspecified, the container runtime will allocate a random SELinux context for each container.  May also be set in PodSecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. Note that this field cannot be set when spec.os.name is windows."
+        },
+        "seccompProfile": {
+          "$ref": "#/definitions/io.k8s.api.core.v1.SeccompProfile",
+          "description": "The seccomp options to use by this container. If seccomp options are provided at both the pod & container level, the container options override the pod options. Note that this field cannot be set when spec.os.name is windows."
+        },
+        "windowsOptions": {
+          "$ref": "#/definitions/io.k8s.api.core.v1.WindowsSecurityContextOptions",
+          "description": "The Windows specific settings applied to all containers. If unspecified, the options from the PodSecurityContext will be used. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. Note that this field cannot be set when spec.os.name is linux."
+        }
+      },
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false
+    },
+    "io.k8s.apimachinery.pkg.api.resource.Quantity": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        }
+      ]
+    },
+    "io.k8s.api.core.v1.ResourceRequirements": {
+      "description": "ResourceRequirements describes the compute resource requirements.",
+      "properties": {
+        "limits": {
+          "additionalProperties": {
+            "$ref": "#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
+          },
+          "description": "Limits describes the maximum amount of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+          "type": "object"
+        },
+        "requests": {
+          "additionalProperties": {
+            "$ref": "#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
+          },
+          "description": "Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. Requests cannot exceed Limits. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+          "type": "object"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "env": {
+      "description": "Additional env parameters for Hue Service and DB init job",
+      "type": [
+        "array",
+        "null"
+      ],
+      "default": null,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "The name of the environment variable.",
+            "type": "string"
+          },
+          "value": {
+            "description": "The value of the environment variable.",
+            "type": "string"
+          },
+          "valueFrom": {
+            "description": "The source of the environment variable value.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    "image": {
+      "description": "Hue image configuration.",
+      "type": "object",
+      "properties": {
+        "registry": {
+          "description": "The image repository",
+          "type": "string",
+          "default": "ghcr.io/netcracker/qubership-hue"
+        },
+        "tag": {
+          "description": "This overrides the image tag, which is the hue version by default.",
+          "type": "string",
+          "default": "main"
+        },
+        "pullPolicy": {
+          "description": "The image pull policy.",
+          "type": "string",
+          "enum": [
+            "Always",
+            "IfNotPresent",
+            "Never"
+          ],
+          "default": "IfNotPresent"
+        }
+      },
+      "required": [
+        "registry",
+        "tag"
+      ]
+    },
+    "api": {
+      "description": "api configuration.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Whether to enable the API.",
+          "type": "boolean",
+          "default": false
+        },
+        "domain": {
+          "description": "The domain for the API.",
+          "type": "string",
+          "default": "api."
+        }
+      }
+    },
+    "hue": {
+      "description": "Hue configuration.",
+      "type": "object",
+      "properties": {
+        "priorityClassName": {
+          "description": "Priority class name for hue pods.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "replicas": {
+          "description": "The number of hue to run.",
+          "type": "integer",
+          "default": 1
+        },
+        "resources": {
+          "$ref": "#/definitions/io.k8s.api.core.v1.ResourceRequirements",
+          "description": "Compute Resources required by hue container. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+          "default": {
+            "limits": {
+              "cpu": "300m",
+              "memory": "500Mi"
+            },
+            "requests": {
+              "cpu": "200m",
+              "memory": "300Mi"
             }
+          }
+        },
+        "service": {
+          "description": "Service configuration for hue.",
+          "type": "object",
+          "properties": {
+            "annotations": {
+              "description": "Annotations for the hue service.",
+              "type": "object",
+              "default": {},
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "database": {
+          "description": "Database configuration for hue.",
+          "type": "object",
+          "properties": {
+            "create": {
+              "description": "The parameter for creating a database for HUE operation.",
+              "type": "boolean",
+              "default": true
+            },
+            "initJobAnnotations": {
+              "description": "Annotations for the database initialization job.",
+              "type": "object",
+              "default": {
+                "helm.sh/hook": "pre-install",
+                "helm.sh/hook-delete-policy": "before-hook-creation,hook-succeeded,hook-failed",
+                "helm.sh/hook-weight": "-4"
+              },
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "engine": {
+              "description": "The database engine to use.",
+              "type": "string",
+              "default": "postgresql_psycopg2"
+            },
+            "host": {
+              "description": "The host for connecting to the database.",
+              "type": "string",
+              "default": "pg-patroni.postgres.svc"
+            },
+            "port": {
+              "description": "The port for connecting to the database.",
+              "type": "integer",
+              "default": 5432
+            },
+            "user": {
+              "description": "The username for working with the table.",
+              "type": "string",
+              "default": "user"
+            },
+            "password": {
+              "description": "The password for working with the table.",
+              "type": "string",
+              "default": "password"
+            },
+            "name": {
+              "description": "The name of the table to work with.",
+              "type": "string",
+              "default": "postgres"
+            },
+            "adminUser": {
+              "description": "The username for connecting to the database.",
+              "type": "string",
+              "default": "admin user name"
+            },
+            "adminPassword": {
+              "description": "The password for connecting to the database.",
+              "type": "string",
+              "default": "admin password"
+            }
+          }
+        },
+        "imagePullPolicy": {
+          "description": "Image pull policy for hue pods.",
+          "type": "string",
+          "default": "Always"
+        },
+        "podSecurityContext": {
+          "description": "Pod-level security context for hue pods.",
+          "type": "object",
+          "$ref": "#/definitions/io.k8s.api.core.v1.PodSecurityContext",
+          "default": {
+            "runAsUser": 1001,
+            "fsGroup": 1001
+          }
+        },
+        "securityContext": {
+          "description": "Container-level security context for hue containers.",
+          "type": "object",
+          "$ref": "#/definitions/io.k8s.api.core.v1.SecurityContext",
+          "default": {
+            "readOnlyRootFilesystem": true,
+            "allowPrivilegeEscalation": false,
+            "runAsNonRoot": true,
+            "capabilities": {
+              "drop": [
+                "ALL"
+              ]
+            },
+            "seccompProfile": {
+              "type": "RuntimeDefault"
+            }
+          }
+        },
+        "hostAliases": {
+          "description": "Host aliases for hue pods.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "object"
+          }
+        },
+        "interpreters": {
+          "description": "Parameters for connecting to databases for hue and others.",
+          "type": "string",
+          "default": "see the values.yaml file"
+        },
+        "ini": {
+          "description": "Section is about configuring the Hue server itself.",
+          "type": "string",
+          "default": "see the values.yaml file"
+        }
+      },
+      "required": [
+        "database"
+      ]
+    },
+    "createDBJob": {
+      "description": "Configuration for the database initialization job.",
+      "type": "object",
+      "properties": {
+        "resources": {
+          "$ref": "#/definitions/io.k8s.api.core.v1.ResourceRequirements",
+          "description": "Compute Resources required by create DB job container. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+          "default": {
+            "requests": {
+              "cpu": "300m",
+              "memory": "300Mi"
+            },
+            "limits": {
+              "cpu": "500m",
+              "memory": "512Mi"
+            }
+          }
+        }
+      }
+    },
+    "ingress": {
+      "description": "Configuration for the Hue ingress controller.",
+      "type": "object",
+      "properties": {
+        "create": {
+          "description": "Whether to create the ingress resource.",
+          "type": "boolean",
+          "default": true
+        },
+        "type": {
+          "description": "The type of ingress controller to use.",
+          "type": "string",
+          "default": "nginx"
+        },
+        "domain": {
+          "description": "The address of access to the UI HUE.",
+          "type": "string",
+          "default": ""
+        },
+        "tls": {
+          "description": "TLS configuration for the ingress controller.",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "Whether to enable TLS for the ingress controller.",
+              "type": "boolean",
+              "default": false
+            },
+            "secretName": {
+              "description": "The name of the secret containing the TLS certificate.",
+              "type": "string",
+              "default": null
+            }
+          }
+        },
+        "annotations": {
+          "description": "Annotations for the ingress controller.",
+          "type": "object",
+          "default": {
+            "gateway-api-converter.netcracker.com/ignore": "true"
+          },
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "labels": {
+          "description": "Labels for the ingress controller.",
+          "type": "object",
+          "default": {
+            "deployment.netcracker.com/ingress-type": "public-network",
+            "deployment.netcracker.com/ingress-audience-type": "ops-user",
+            "app.kubernetes.io/component": "ingress"
+          },
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "hive": {
+      "description": "Hive configuration.",
+      "type": "object",
+      "properties": {
+        "site": {
+          "description": "Configuration file for working with hive.",
+          "type": "string",
+          "default": "see the values.yaml file"
+        }
+      }
+    },
+    "ssl": {
+      "description": "SSL configuration for the service.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Whether to enable SSL for the service.",
+          "type": "boolean",
+          "default": false
+        },
+        "cacerts": {
+          "description": "The CA certificates for SSL.",
+          "type": "string",
+          "default": "see the values.yaml file"
+        }
+      }
+    },
+    "kerberos": {
+      "description": "Kerberos configuration for the service.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Whether to enable Kerberos for the service.",
+          "type": "boolean",
+          "default": false
+        },
+        "keytab": {
+          "description": "The Kerberos Keytab file contains mappings between Kerberos Principal names and DES-encrypted keys.",
+          "type": "string",
+          "default": "see the values.yaml file"
+        },
+        "config": {
+          "description": "The configuration file for the operation of Kerberos.",
+          "type": "string",
+          "default": "see the values.yaml file"
+        }
+      }
+    },
+    "ldap": {
+      "description": "LDAP configuration for the service.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Whether to enable LDAP for the service.",
+          "type": "boolean",
+          "default": false
+        },
+        "bind_password_script": {
+          "description": "Password for LDAP operation.",
+          "type": "string",
+          "default": "see the values.yaml file"
+        }
+      }
+    },
+    "databasescommon": {
+      "description": "Common database configuration.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "A parameter for working with databases in Trino",
+          "type": "boolean",
+          "default": false
+        },
+        "configs": {
+          "description": "Configuration options for database access.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "trino": {
+      "description": "Trino configuration.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Whether to enable Trino.",
+          "type": "boolean",
+          "default": false
         },
         "image": {
-            "description": "Hue image configuration.",
-            "type": "object",
-            "properties": {
-                "registry": {
-                    "description": "The image repository",
-                    "type": "string",
-                    "default": "ghcr.io/netcracker/qubership-hue"
-                },
-                "tag": {
-                    "description": "This overrides the image tag, which is the hue version by default.",
-                    "type": "string",
-                    "default": "main"
-                },
-                "pullPolicy": {
-                    "description": "The image pull policy.",
-                    "type": "string",
-                    "enum": [
-                        "Always",
-                        "IfNotPresent",
-                        "Never"
-                    ],
-                    "default": "IfNotPresent"
-                }
+          "description": "The Docker image for the Trino container.",
+          "type": "string",
+          "default": "ghcr.io/netcracker/qubership-trino:main"
+        },
+        "imagePullPolicy": {
+          "description": "The image pull policy for the Trino container.",
+          "type": "string",
+          "default": "IfNotPresent"
+        },
+        "replicas": {
+          "description": "The number of Trino replicas.",
+          "type": "integer",
+          "default": 1
+        },
+        "priorityClassName": {
+          "description": "The priority class name for the Trino pods.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "livenessProbe": {
+          "description": "The liveness probe for the Trino container.",
+          "type": "object"
+        },
+        "readinessProbe": {
+          "description": "The readiness probe for the Trino container.",
+          "type": "object"
+        },
+        "resources": {
+          "$ref": "#/definitions/io.k8s.api.core.v1.ResourceRequirements",
+          "description": "Compute Resources required by trino container. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+          "default": {
+            "limits": {
+              "cpu": "150m",
+              "memory": "800Mi"
             },
-            "required": [
-                "registry",
-                "tag"
-            ],
-            "additionalProperties": true
+            "requests": {
+              "cpu": "100m",
+              "memory": "600Mi"
+            }
+          }
+
         },
-        "api": {
-            "description": "api configuration.",
-            "type": "object",
-            "properties": {
-                "enabled": {
-                    "description": "Whether to enable the API.",
-                    "type": "boolean",
-                    "default": false
-                },
-                "domain": {
-                    "description": "The domain for the API.",
-                    "type": "string",
-                    "default": "api."
-                }
+        "service": {
+          "description": "Service configuration for Trino.",
+          "type": "object",
+          "properties": {
+            "annotations": {
+              "description": "Annotations for the Trino service.",
+              "type": "object",
+              "default": {},
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "securityContext": {
+          "description": "Security context for the Trino container.",
+          "type": "object",
+          "$ref": "#/definitions/io.k8s.api.core.v1.SecurityContext",
+          "default": {
+            "readOnlyRootFilesystem": true,
+            "allowPrivilegeEscalation": false,
+            "runAsNonRoot": true,
+            "capabilities": {
+              "drop": [
+                "ALL"
+              ]
             },
-            "additionalProperties": true
+            "seccompProfile": {
+              "type": "RuntimeDefault"
+            }
+          }
         },
-        "hue": {
-            "description": "Hue configuration.",
-            "type": "object",
-            "properties": {
-                "priorityClassName": {
-                    "description": "Priority class name for hue pods.",
-                    "type": [
-                        "string",
-                        "null"
-                    ],
-                    "default": null
-                },
-                "replicas": {
-                    "description": "The number of hue to run.",
-                    "type": "integer",
-                    "default": 1
-                },
-                "resources": {
-                    "$ref": "#/definitions/io.k8s.api.core.v1.ResourceRequirements",
-                    "description": "Compute Resources required by this container. Cannot be updated. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/"
-                },
-                "service": {
-                    "description": "Service configuration for hue.",
-                    "type": "object",
-                    "properties": {
-                        "annotations": {
-                            "description": "Annotations for the hue service.",
-                            "type": "object",
-                            "default": {},
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "additionalProperties": true
-                },
-                "database": {
-                    "description": "Database configuration for hue.",
-                    "type": "object",
-                    "properties": {
-                        "create": {
-                            "description": "The parameter for creating a database for HUE operation.",
-                            "type": "boolean",
-                            "default": true
-                        },
-                        "initJobAnnotations": {
-                            "description": "Annotations for the database initialization job.",
-                            "type": "object",
-                            "default": {
-                                "helm.sh/hook": "pre-install",
-                                "helm.sh/hook-delete-policy": "before-hook-creation,hook-succeeded,hook-failed",
-                                "helm.sh/hook-weight": "-4"
-                            },
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        },
-                        "engine": {
-                            "description": "The database engine to use.",
-                            "type": "string",
-                            "default": "postgresql_psycopg2"
-                        },
-                        "host": {
-                            "description": "The host for connecting to the database.",
-                            "type": "string",
-                            "default": "pg-patroni.postgres.svc"
-                        },
-                        "port": {
-                            "description": "The port for connecting to the database.",
-                            "type": "integer",
-                            "default": 5432
-                        },
-                        "user": {
-                            "description": "The username for working with the table.",
-                            "type": "string",
-                            "default": "user"
-                        },
-                        "password": {
-                            "description": "The password for working with the table.",
-                            "type": "string",
-                            "default": "password"
-                        },
-                        "name": {
-                            "description": "The name of the table to work with.",
-                            "type": "string",
-                            "default": "postgres"
-                        },
-                        "adminUser": {
-                            "description": "The username for connecting to the database.",
-                            "type": "string",
-                            "default": "admin user name"
-                        },
-                        "adminPassword": {
-                            "description": "The password for connecting to the database.",
-                            "type": "string",
-                            "default": "admin password"
-                        }
-                    },
-                    "additionalProperties": true
-                },
-                "imagePullPolicy": {
-                    "description": "Image pull policy for hue pods.",
-                    "type": "string",
-                    "default": "Always"
-                },
-                "podSecurityContext": {
-                    "description": "Pod-level security context for hue pods.",
-                    "type": "object",
-                    "properties": {
-                        "runAsUser": {
-                            "description": "The user ID to run all the containers in the pod.",
-                            "format": "int64",
-                            "type": "integer",
-                            "default": 1001
-                        },
-                        "fsGroup": {
-                            "description": "The group ID for the filesystem.",
-                            "format": "int64",
-                            "type": "integer",
-                            "default": 1001
-                        }
-                    },
-                    "additionalProperties": true
-                },
-                "securityContext": {
-                    "description": "Container-level security context for hue containers.",
-                    "type": "object",
-                    "properties": {
-                        "readOnlyRootFilesystem": {
-                            "description": "Whether to make the root filesystem read-only.",
-                            "type": "boolean",
-                            "default": true
-                        },
-                        "allowPrivilegeEscalation": {
-                            "description": "Whether to allow privilege escalation.",
-                            "type": "boolean",
-                            "default": false
-                        },
-                        "runAsNonRoot": {
-                            "description": "Whether to run the container as a non-root user.",
-                            "type": "boolean",
-                            "default": true
-                        },
-                        "capabilities": {
-                            "description": "The capabilities to set for the container.",
-                             "type": "object",
-                            "properties": {
-                                "drop": {
-                                    "description": "Removed capabilities",
-                                    "items": {
-                                        "type": "string"
-                                    },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
-                                }
-                            },
-                            "additionalProperties": true
-                        },
-                        "seccompProfile": {
-                            "description": "The seccomp profile to use for the container.",
-                            "type": "object",
-                            "properties": {
-                                "type": {
-                                    "type": "string",
-                                    "default": "RuntimeDefault"
-                                }
-                            },
-                            "required": ["type"],
-                            "additionalProperties": true
-                        }
-                    },
-                    "additionalProperties": true
-                },
-                "hostAliases": {
-                    "description": "Host aliases for hue pods.",
-                    "type": "array",
-                    "default": [],
-                    "items": {
-                        "type": "object",
-                        "additionalProperties": true
-                    }
-                },
-                "interpreters": {
-                    "description": "Parameters for connecting to databases for hue and others.",
-                    "type": "string"
-                },
-                "ini": {
-                    "description": "Section is about configuring the Hue server itself.",
-                    "type": "string"
-                }
-            },
-            "required": [
-                "database"
-            ],
-            "additionalProperties": true
+        "podSecurityContext": {
+          "description": "Pod-level security context for the Trino pods.",
+          "type": "object",
+          "$ref": "#/definitions/io.k8s.api.core.v1.PodSecurityContext",
+          "default": {
+            "runAsUser": 1000,
+            "fsGroup": 1000
+          }
         },
-        "createDBJob": {
-            "description": "Configuration for the database initialization job.",
-            "type": "object",
-            "properties": {
-                "resources": {
-                    "$ref": "#/definitions/io.k8s.api.core.v1.ResourceRequirements",
-                    "description": "Compute Resources required by this container. Cannot be updated. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/"
-                }
-            },
-            "additionalProperties": true
-        },
-        "ingress": {
-            "description": "Configuration for the Hue ingress controller.",
-            "type": "object",
-            "properties": {
-                "create": {
-                    "description": "Whether to create the ingress resource.",
-                    "type": "boolean",
-                    "default": true
-                },
-                "type": {
-                    "description": "The type of ingress controller to use.",
-                    "type": "string",
-                    "default": "nginx"
-                },
-                "domain": {
-                    "description": "The address of access to the UI HUE.",
-                    "type": "string",
-                    "default": ""
-                },
-                "tls": {
-                    "description": "TLS configuration for the ingress controller.",
-                    "type": "object",
-                    "properties": {
-                        "enabled": {
-                            "description": "Whether to enable TLS for the ingress controller.",
-                            "type": "boolean",
-                            "default": false
-                        },
-                        "secretName": {
-                            "description": "The name of the secret containing the TLS certificate.",
-                            "type": "string",
-                            "default": null
-                        }
-                    },
-                    "additionalProperties": true
-                },
-                "annotations": {
-                    "description": "Annotations for the ingress controller.",
-                    "type": "object",
-                    "default": {
-                        "gateway-api-converter.netcracker.com/ignore": "true"
-                    },
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "labels": {
-                    "description": "Labels for the ingress controller.",
-                    "type": "object",
-                    "default": {
-                        "deployment.netcracker.com/ingress-type": "public-network",
-                        "deployment.netcracker.com/ingress-audience-type": "ops-user",
-                        "app.kubernetes.io/component": "ingress"
-                    },
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                }
-            },
-            "additionalProperties": true
-        },
-        "hive": {
-            "description": "Hive configuration.",
-            "type": "object",
-            "properties": {
-                "site": {
-                    "description": "Configuration file for working with hive.",
-                    "type": "string"
-                }
-            },
-            "additionalProperties": true
-        },
-        "ssl": {
-            "description": "SSL configuration for the service.",
-            "type": "object",
-            "properties": {
-                "enabled": {
-                    "description": "Whether to enable SSL for the service.",
-                    "type": "boolean",
-                    "default": false
-                },
-                "cacerts": {
-                    "description": "The CA certificates for SSL.",
-                    "type": "string"
-                }
-            },
-            "additionalProperties": true
-        },
-        "kerberos": {
-            "description": "Kerberos configuration for the service.",
-            "type": "object",
-            "properties": {
-                "enabled": {
-                    "description": "Whether to enable Kerberos for the service.",
-                    "type": "boolean",
-                    "default": false
-                },
-                "keytab": {
-                    "description": "The Kerberos Keytab file contains mappings between Kerberos Principal names and DES-encrypted keys.",
-                    "type": "string"
-                },
-                "config": {
-                    "description": "The configuration file for the operation of Kerberos.",
-                    "type": "string"
-                }
-            },
-            "additionalProperties": true
-        },
-        "ldap": {
-            "description": "LDAP configuration for the service.",
-            "type": "object",
-            "properties": {
-                "enabled": {
-                    "description": "Whether to enable LDAP for the service.",
-                    "type": "boolean",
-                    "default": false
-                },
-                "bind_password_script": {
-                    "description": "Password for LDAP operation.",
-                    "type": "string"
-                }
-            },
-            "additionalProperties": true
-        },
-        "databasescommon": {
-            "description": "Common database configuration.",
-            "type": "object",
-            "properties": {
-                "enabled": {
-                    "description": "A parameter for working with databases in Trino",
-                    "type": "boolean",
-                    "default": false
-                },
-                "configs": {
-                    "description": "Configuration options for database access.",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                }
-            },
-            "additionalProperties": true
-        },
-        "trino": {
-            "description": "Trino configuration.",
-            "type": "object",
-            "properties": {
-                "enabled": {
-                    "description": "Whether to enable Trino.",
-                    "type": "boolean",
-                    "default": false
-                },
-                "image": {
-                    "description": "The Docker image for the Trino container.",
-                    "type": "string",
-                    "default": "ghcr.io/netcracker/qubership-trino:main"
-                },
-                "imagePullPolicy": {
-                    "description": "The image pull policy for the Trino container.",
-                    "type": "string",
-                    "default": "IfNotPresent"
-                },
-                "replicas": {
-                    "description": "The number of Trino replicas.",
-                    "type": "integer",
-                    "default": 1
-                },
-                "priorityClassName": {
-                    "description": "The priority class name for the Trino pods.",
-                    "type": [
-                        "string",
-                        "null"
-                    ],
-                    "default": null
-                },
-                "livenessProbe": {
-                    "description": "The liveness probe for the Trino container.",
-                    "type": "object",
-                    "additionalProperties": true
-                },
-                "readinessProbe": {
-                    "description": "The readiness probe for the Trino container.",
-                    "type": "object",
-                    "additionalProperties": true
-                },
-                "resources": {
-                    "$ref": "#/definitions/io.k8s.api.core.v1.ResourceRequirements",
-                    "description": "Compute Resources required by this container. Cannot be updated. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/"
-                },
-                "service": {
-                    "description": "Service configuration for Trino.",
-                    "type": "object",
-                    "properties": {
-                        "annotations": {
-                            "description": "Annotations for the Trino service.",
-                            "type": "object",
-                            "default": {},
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "additionalProperties": true
-                },
-                "securityContext": {
-                    "description": "Security context for the Trino container.",
-                    "type": "object",
-                    "properties": {
-                        "readOnlyRootFilesystem": {
-                            "description": "Whether to mount the root filesystem as read-only.",
-                            "type": "boolean",
-                            "default": true
-                        },
-                        "allowPrivilegeEscalation": {
-                            "description": "Whether to allow privilege escalation.",
-                            "type": "boolean",
-                            "default": false
-                        },
-                        "runAsNonRoot": {
-                            "description": "Whether to run the container as a non-root user.",
-                            "type": "boolean",
-                            "default": true
-                        },
-                        "capabilities": {
-                            "description": "The capabilities to set for the container.",
-                             "type": "object",
-                            "properties": {
-                                "drop": {
-                                    "description": "Removed capabilities",
-                                    "items": {
-                                        "type": "string"
-                                    },
-                                    "type": "array",
-                                    "x-kubernetes-list-type": "atomic"
-                                }
-                            },
-                            "additionalProperties": true
-                        },
-                        "seccompProfile": {
-                            "description": "The seccomp profile to use for the container.",
-                            "type": "object",
-                            "properties": {
-                                "type": {
-                                    "type": "string",
-                                    "default": "RuntimeDefault"
-                                }
-                            },
-                            "required": ["type"],
-                            "additionalProperties": true
-                        }
-                    },
-                    "additionalProperties": true
-                },
-                "podSecurityContext": {
-                    "description": "Pod-level security context for the Trino pods.",
-                    "type": "object",
-                    "properties": {
-                        "runAsUser": {
-                            "description": "The user ID to run the pod as.",
-                            "format": "int64",
-                            "type": "integer",
-                            "default": 1000
-                        },
-                        "runAsGroup": {
-                            "description": "The group ID to run the pod as.",
-                            "format": "int64",
-                            "type": "integer",
-                            "default": 1000
-                        }
-                    },
-                    "additionalProperties": true
-                },
-                "hostAliases": {
-                    "description": "Host aliases for the Trino pods.",
-                    "type": "array",
-                    "default": [],
-                    "items": {
-                        "type": "object",
-                        "additionalProperties": true
-                    }
-                },
-                "extraVolumes": {
-                    "description": "Additional volumes for the Trino pods.",
-                    "type": "array",
-                    "default": [],
-                    "items": {
-                        "type": "object",
-                        "additionalProperties": true
-                    }
-                },
-                "extraVolumeMounts": {
-                    "description": "Additional volume mounts for the Trino pods.",
-                    "type": "array",
-                    "default": [],
-                    "items": {
-                        "type": "object",
-                        "additionalProperties": true
-                    }
-                }
-            },
-            "additionalProperties": true
-        },
-        "jvmconfig": {
-            "description": "JVM configuration for Trino.",
-            "type": "string"
-        },
-        "jvm": {
-            "description": "JVM configuration for the Trino container.",
-            "type": "object",
-            "properties": {
-                "maxHeapSize": {
-                    "description": "The maximum heap size for the JVM.",
-                    "type": "string",
-                    "default": "1G"
-                },
-                "gcMethod": {
-                    "description": "Garbage collection method for the JVM.",
-                    "type": "object",
-                    "properties": {
-                        "type": {
-                            "description": "The garbage collection method to use.",
-                            "type": "string",
-                            "default": "UseG1GC"
-                        },
-                        "g1": {
-                            "description": "Configuration for the G1 garbage collector.",
-                            "type": "object",
-                            "properties": {
-                                "heapRegionSize": {
-                                    "description": "The size of each heap region.",
-                                    "type": "string",
-                                    "default": "16M"
-                                }
-                            },
-                            "additionalProperties": true
-                        }
-                    },
-                    "additionalProperties": true
-                }
-            },
-            "additionalProperties": true
-        },
-        "certManagerInegration": {
-            "description": "Configuration for cert-manager integration.",
-            "type": "object",
-            "properties": {
-                "enabled": {
-                    "description": "Whether cert-manager integration is enabled.",
-                    "type": "boolean",
-                    "default": false
-                },
-                "secretName": {
-                    "description": "The name of the secret to store the TLS certificate.",
-                    "type": "string",
-                    "default": "hue-tls-cm"
-                },
-                "secretMounts": {
-                    "description": "Secret mounts for the TLS certificate.",
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "mountPath": {
-                                "description": "The path where the secret will be mounted.",
-                                "type": "string",
-                                "default": "/home/hue/trustcerts/ca.crt"
-                            },
-                            "subPath": {
-                                "description": "The path within the secret to mount.",
-                                "type": "string",
-                                "default": "ca.crt"
-                            }
-                        },
-                        "required": [
-                            "mountPath"
-                        ],
-                        "additionalProperties": true
-                    }
-                },
-                "duration": {
-                    "description": "The duration for which the TLS certificate will be valid.",
-                    "type": "integer",
-                    "default": 365
-                },
-                "subjectAlternativeName": {
-                    "description": "Subject alternative name configuration for the TLS certificate.",
-                    "type": "object",
-                    "properties": {
-                        "additionalDnsNames": {
-                            "description": "Additional DNS names for the TLS certificate.",
-                            "type": "array",
-                            "default": [],
-                            "items": {
-                                "type": "string"
-                            }
-                        },
-                        "additionalIpAddresses": {
-                            "description": "Additional IP addresses for the TLS certificate.",
-                            "type": "array",
-                            "default": [],
-                            "items": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "additionalProperties": true
-                },
-                "clusterIssuerName": {
-                    "description": "The name of the cluster issuer to use for the TLS certificate.",
-                    "type": [
-                        "string",
-                        "null"
-                    ],
-                    "default": null
-                }
-            },
-            "additionalProperties": true
-        },
-        "extraSecrets": {
-            "description": "Additional secrets for the Hue pods.",
-            "type": "object",
-            "additionalProperties": true
+        "hostAliases": {
+          "description": "Host aliases for the Trino pods.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "object"
+          }
         },
         "extraVolumes": {
-            "description": "Additional volumes for the Hue pods.",
-            "type": "array",
-            "default": [],
-            "items": {
-                "type": "object",
-                "additionalProperties": true
-            }
+          "description": "Additional volumes for the Trino pods.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "object"
+          }
         },
         "extraVolumeMounts": {
-            "description": "Additional volume mounts for the Hue pods.",
-            "type": "array",
-            "default": [],
-            "items": {
-                "type": "object",
-                "additionalProperties": true
-            }
+          "description": "Additional volume mounts for the Trino pods.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "jvmconfig": {
+      "description": "JVM configuration for Trino.",
+      "type": "string",
+      "default": "see the values.yaml file"
+
+    },
+    "jvm": {
+      "description": "JVM configuration for the Trino container.",
+      "type": "object",
+      "properties": {
+        "maxHeapSize": {
+          "description": "The maximum heap size for the JVM.",
+          "type": "string",
+          "default": "1G"
         },
-        "gateway": {
-            "description": "Configuration for the gateway.",
+        "gcMethod": {
+          "description": "Garbage collection method for the JVM.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "description": "The garbage collection method to use.",
+              "type": "string",
+              "default": "UseG1GC"
+            },
+            "g1": {
+              "description": "Configuration for the G1 garbage collector.",
+              "type": "object",
+              "properties": {
+                "heapRegionSize": {
+                  "description": "The size of each heap region.",
+                  "type": "string",
+                  "default": "16M"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "certManagerInegration": {
+      "description": "Configuration for cert-manager integration.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Whether cert-manager integration is enabled.",
+          "type": "boolean",
+          "default": false
+        },
+        "secretName": {
+          "description": "The name of the secret to store the TLS certificate.",
+          "type": "string",
+          "default": "hue-tls-cm"
+        },
+        "secretMounts": {
+          "description": "Secret mounts for the TLS certificate.",
+          "type": "array",
+          "items": {
             "type": "object",
             "properties": {
-                "enabled": {
-                    "description": "Whether the gateway is enabled.",
-                    "type": "boolean",
-                    "default": false
-                },
-                "annotations": {
-                    "description": "Annotations for the gateway.",
-                    "type": "object",
-                    "default": {},
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "labels": {
-                    "description": "Labels for the gateway.",
-                    "type": "object",
-                    "default": {},
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "parentRefs": {
-                    "description": "References to parent resources.",
-                    "type": "array",
-                    "default": [],
-                    "items": {
-                        "type": "object",
-                        "additionalProperties": true
-                    }
-                },
-                "hostnames": {
-                    "description": "Hostnames for the gateway.",
-                    "type": "array",
-                    "default": [],
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "rules": {
-                    "description": "Rules for the gateway.",
-                    "type": "array",
-                    "default": [],
-                    "items": {
-                        "type": "object",
-                        "additionalProperties": true
-                    }
-                },
-                "redirectRoute": {
-                    "description": "Configuration for the redirect route.",
-                    "type": "object",
-                    "properties": {
-                        "enabled": {
-                            "description": "Whether the redirect route is enabled.",
-                            "type": "boolean",
-                            "default": false
-                        },
-                        "parentRefs": {
-                            "description": "References to parent resources for the redirect route.",
-                            "type": "array",
-                            "default": [],
-                            "items": {
-                                "type": "object",
-                                "additionalProperties": true
-                            }
-                        }
-                    },
-                    "additionalProperties": true
-                },
-                "backendTLSPolicy": {
-                    "description": "TLS policy for the backend.",
-                    "type": "object",
-                    "properties": {
-                        "enabled": {
-                            "description": "Whether the backend TLS policy is enabled.",
-                            "type": "boolean",
-                            "default": false
-                        },
-                        "hostname": {
-                            "description": "The hostname for the backend.",
-                            "type": "string",
-                            "default": ""
-                        },
-                        "caCertificateRefs": {
-                            "description": "References to CA certificates for the backend.",
-                            "type": "array",
-                            "default": [],
-                            "items": {
-                                "type": "object",
-                                "additionalProperties": true
-                            }
-                        },
-                        "wellKnownCACertificates": {
-                            "description": "Well-known CA certificates for the backend.",
-                            "type": "string",
-                            "default": ""
-                        },
-                        "subjectAltNames": {
-                            "description": "Subject Alternative Names for the backend.",
-                            "type": "array",
-                            "default": [],
-                            "items": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "additionalProperties": true
-                }
+              "mountPath": {
+                "description": "The path where the secret will be mounted.",
+                "type": "string",
+                "default": "/home/hue/trustcerts/ca.crt"
+              },
+              "subPath": {
+                "description": "The path within the secret to mount.",
+                "type": "string",
+                "default": "ca.crt"
+              }
             },
-            "additionalProperties": true
+            "required": [
+              "mountPath"
+            ]
+          }
+        },
+        "duration": {
+          "description": "The duration for which the TLS certificate will be valid.",
+          "type": "integer",
+          "default": 365
+        },
+        "subjectAlternativeName": {
+          "description": "Subject alternative name configuration for the TLS certificate.",
+          "type": "object",
+          "properties": {
+            "additionalDnsNames": {
+              "description": "Additional DNS names for the TLS certificate.",
+              "type": "array",
+              "default": [],
+              "items": {
+                "type": "string"
+              }
+            },
+            "additionalIpAddresses": {
+              "description": "Additional IP addresses for the TLS certificate.",
+              "type": "array",
+              "default": [],
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "clusterIssuerName": {
+          "description": "The name of the cluster issuer to use for the TLS certificate.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
         }
+      }
     },
-    "additionalProperties": true
+    "extraSecrets": {
+      "description": "Additional secrets for the Hue pods.",
+      "type": "object"
+    },
+    "extraVolumes": {
+      "description": "Additional volumes for the Hue pods.",
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object"
+      }
+    },
+    "extraVolumeMounts": {
+      "description": "Additional volume mounts for the Hue pods.",
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object"
+      }
+    },
+    "gateway": {
+      "description": "Configuration for the gateway.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Whether the gateway is enabled.",
+          "type": "boolean",
+          "default": false
+        },
+        "annotations": {
+          "description": "Annotations for the gateway.",
+          "type": "object",
+          "default": {},
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "labels": {
+          "description": "Labels for the gateway.",
+          "type": "object",
+          "default": {},
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "parentRefs": {
+          "description": "References to parent resources.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "object"
+          }
+        },
+        "hostnames": {
+          "description": "Hostnames for the gateway.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          }
+        },
+        "rules": {
+          "description": "Rules for the gateway.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "object"
+          }
+        },
+        "redirectRoute": {
+          "description": "Configuration for the redirect route.",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "Whether the redirect route is enabled.",
+              "type": "boolean",
+              "default": false
+            },
+            "parentRefs": {
+              "description": "References to parent resources for the redirect route.",
+              "type": "array",
+              "default": [],
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "backendTLSPolicy": {
+          "description": "TLS policy for the backend.",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "Whether the backend TLS policy is enabled.",
+              "type": "boolean",
+              "default": false
+            },
+            "hostname": {
+              "description": "The hostname for the backend.",
+              "type": "string",
+              "default": ""
+            },
+            "caCertificateRefs": {
+              "description": "References to CA certificates for the backend.",
+              "type": "array",
+              "default": [],
+              "items": {
+                "type": "object"
+              }
+            },
+            "wellKnownCACertificates": {
+              "description": "Well-known CA certificates for the backend.",
+              "type": "string",
+              "default": ""
+            },
+            "subjectAltNames": {
+              "description": "Subject Alternative Names for the backend.",
+              "type": "array",
+              "default": [],
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "PAAS_PLATFORM": {
+      "type": "string",
+      "description": "The PaaS platform where Hive Metastore is being deployed to."
+    }
+  }
 }
