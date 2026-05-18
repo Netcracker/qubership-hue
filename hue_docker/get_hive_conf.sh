@@ -27,7 +27,7 @@ AMBARIVariablesArray=(
   done
 
 echo "Start hadoop conf creation"
-export TMP_HCC=~/tmp_hadoop_conf_creation
+export TMP_HCC=/tmp/tmp_hadoop_conf_creation
 rm -rf $TMP_HCC
 mkdir $TMP_HCC
 
