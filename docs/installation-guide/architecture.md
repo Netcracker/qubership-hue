@@ -24,7 +24,7 @@ The information on the supported deployment schemes is provided in the below sub
 
 Qubership-hue deployment schema in the non-HA mode has only one replica of each component. 
 
-![Qubership-hue deployment Schema non-HA Scheme](/docs/public/images/qubership-hue-non-ha-scheme.png)
+![Qubership-hue deployment Schema non-HA Scheme](/docs/images/qubership-hue-non-ha-scheme.png)
 
 Structure service:
 
