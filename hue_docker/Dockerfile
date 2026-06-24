@@ -10,6 +10,8 @@ RUN mkdir /etc/hadoop \
 
 COPY hue_docker/requrements.txt /bin/requrements.txt
 
+COPY gunicorn_log.conf /usr/share/hue/desktop/conf/gunicorn_log.conf
+
 RUN ./build/env/bin/pip install --no-cache-dir -r /bin/requrements.txt
 
 RUN apt-get update \
