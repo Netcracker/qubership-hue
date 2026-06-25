@@ -88,6 +88,7 @@ hue:
 
   ini: |
     [desktop]
+    log_listener_socket_name=/tmp/hue.uds
     app_blacklist=filebrowser,search,hbase,security,jobbrowser,oozie
     enable_xff_for_hive_impala=false
     django_debug_mode=false

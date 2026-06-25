@@ -2,6 +2,7 @@ FROM gethue/hue:20260428-140101
 USER root
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV DESKTOP_LOG_DIR=/tmp
 
 RUN mkdir /etc/hadoop \
     && chmod 777 /etc/hadoop \
