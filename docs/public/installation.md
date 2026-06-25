@@ -990,6 +990,11 @@ The following volumes are already provisioned in the deployment to handle standa
  | hadoop-conf | /etc/hadoop/conf | Stores Hadoop configuration.|
  | gunicorn-log-volume | /usr/share/hue/desktop/conf/gunicorn_log.conf | Updates the logging configuration to redirect all of Gunicorn's internal logging streams directly to standard out (stdout) and standard error (stderr). |
 
+```bash
+sed -i 's|\./build/env/bin/supervisor|exec ./build/env/bin/supervisor --log-dir /tmp|g' /usr/share/hue/startup.sh
+```
+ This patch configures the supervisor entrypoint to use /tmp as its logging directory via the native --log-dir parameter because DESKTOP_LOG_DIR is overridden to /usr/share/hue/logs/ in supervisor. This safely moves the hue_recovery.json file into writeable memory, completely eliminating the read-only filesystem crash.
+
 ## Replace Secret to ENV Mapping with File Based Secret Mounts
 
 To improve the application security, it is recommended to replace the secret-to-environment variable mapping with file-based secret mounts for handling sensitive data.
