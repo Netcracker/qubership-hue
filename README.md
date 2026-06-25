@@ -625,6 +625,8 @@ _helpers.tpl added to define Qubership custom Helm template functions for defini
 
 configmap-hive.yaml is converted to secret-hive.yaml and configmap-hue-extra.yaml, configmap-hue.yaml files are converted to secret-hue.yaml for security reasons.
 
+gunicorn-log-configmap.yaml is for storing the Gunicorn logging configuration.
+
 createdbjob.yaml and posgressconnparams are added as a pg pre install hooks to initlize the Qubership Hue DB and a secret contains  PostgreSQL credentials for initialization Job.
 
 extrasecrets.yaml,tls-certificate-hue.yaml, tls-issuer-hue.yaml these files are added to provide complete TLS support and enable integration with cert-manager for secure HTTPS communication.

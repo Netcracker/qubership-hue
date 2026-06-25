@@ -988,6 +988,7 @@ The following volumes are already provisioned in the deployment to handle standa
  |:-------------:|:---------:|:------------:|
  | tmp | /tmp | Provides a writable area for temporary files, logs, and general OS-level buffers. |
  | hadoop-conf | /etc/hadoop/conf | Stores Hadoop configuration.|
+ | gunicorn-log-volume | /usr/share/hue/desktop/conf/gunicorn_log.conf | Updates the logging configuration to redirect all of Gunicorn's internal logging streams directly to standard out (stdout) and standard error (stderr). |
 
 ## Replace Secret to ENV Mapping with File Based Secret Mounts
 

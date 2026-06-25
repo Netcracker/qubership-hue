@@ -103,6 +103,10 @@ spec:
         ports:
           - containerPort: 8888
         volumeMounts:
+        # Qubership custom change: Qubership Custom volume mounts for Gunicorn logging configuration
+          - name: gunicorn-log-volume
+            mountPath: /usr/share/hue/desktop/conf/gunicorn_log.conf
+            subPath: gunicorn_log.conf
         # Qubership custom change: Qubership Custom volume mounts to support ReadOnlyRootFS
           - name: tmp
             mountPath: /tmp
@@ -180,6 +184,13 @@ spec:
         resources:
           {{- toYaml .Values.hue.resources | nindent 12 }}
       volumes:
+      # Qubership custom change: Qubership Custom volume for Gunicorn logging configuration
+        - name: gunicorn-log-volume
+          configMap:
+            name: hue-gunicorn-log-config
+            items:
+              - key: gunicorn_log.conf
+                path: gunicorn_log.conf
       # Qubership custom change: Qubership Custom volume mounts to support ReadOnlyRootFS
         - name: tmp
           emptyDir: {}

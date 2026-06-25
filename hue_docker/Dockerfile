@@ -10,8 +10,6 @@ RUN mkdir /etc/hadoop \
 
 COPY hue_docker/requrements.txt /bin/requrements.txt
 
-COPY hue_docker/gunicorn_log.conf /usr/share/hue/desktop/conf/gunicorn_log.conf
-
 RUN ./build/env/bin/pip install --no-cache-dir -r /bin/requrements.txt
 
 RUN apt-get update \
@@ -22,12 +20,14 @@ RUN apt-get update \
        libssl3 \
        krb5-user \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    # forcing supervisor to use /tmp to write hue_recovery.json because DESKTOP_LOG_DIR is overridden to /usr/share/hue/logs/ in supervisor and the filesystem is read-only
+    && sed -i 's|\./build/env/bin/supervisor|exec ./build/env/bin/supervisor --log-dir /tmp|g' /usr/share/hue/startup.sh
+
 
 COPY hue_docker/createdb.py /bin/createdb.py
 COPY hue_docker/get_hive_conf.sh /bin/get_hive_conf.sh
-COPY hue_docker/startup.sh /usr/share/hue/startup.sh
 
-RUN chmod 777 /bin/get_hive_conf.sh && chmod +x /usr/share/hue/startup.sh
+RUN chmod 777 /bin/get_hive_conf.sh
 
 USER hue

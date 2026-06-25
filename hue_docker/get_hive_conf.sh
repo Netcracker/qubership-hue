@@ -49,4 +49,5 @@ rm -rf $TMP_HCC
 echo "Hadoop configuration updated"
 
 ./build/env/bin/hue migrate
+# forcing supervisor to use /tmp to write hue_recovery.json because DESKTOP_LOG_DIR is overridden to /usr/share/hue/logs/ in supervisor and the filesystem is read-only
 exec ./build/env/bin/supervisor --log-dir /tmp
