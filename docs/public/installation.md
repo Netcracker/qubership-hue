@@ -993,7 +993,7 @@ The following volumes are already provisioned in the deployment to handle standa
 ```bash
 sed -i 's|\./build/env/bin/supervisor|exec ./build/env/bin/supervisor --log-dir /tmp|g' /usr/share/hue/startup.sh
 ```
- This patch configures the supervisor entrypoint to use /tmp as its logging directory via the native --log-dir parameter because DESKTOP_LOG_DIR is overridden to /usr/share/hue/logs/ in supervisor. This safely moves the hue_recovery.json file into writeable memory, completely eliminating the read-only filesystem crash.
+ This Dockerfile patch configures the supervisor entrypoint to use /tmp as its logging directory via the native --log-dir parameter because DESKTOP_LOG_DIR is overridden to /usr/share/hue/logs/ in supervisor. This safely moves the hue_recovery.json file into writeable memory, completely eliminating the read-only filesystem crash.
 
 ## Replace Secret to ENV Mapping with File Based Secret Mounts
 
