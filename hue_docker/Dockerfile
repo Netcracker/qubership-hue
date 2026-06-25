@@ -24,9 +24,6 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# force supervisor to use /tmp as log dir so recovery file write doesn't fail
-RUN sed -i "s|sys.exit(main())|sys.argv.extend(['--log-dir', '/tmp']); sys.exit(main())|" /usr/share/hue/build/env/bin/supervisor    
-
 COPY hue_docker/createdb.py /bin/createdb.py
 COPY hue_docker/get_hive_conf.sh /bin/get_hive_conf.sh
 

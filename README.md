@@ -439,8 +439,6 @@ spec:
         # Qubership custom change: Qubership Custom volume mounts to support ReadOnlyRootFS
           - name: tmp
             mountPath: /tmp
-          - name: hue-logs
-            mountPath: /usr/share/hue/logs
           - name: hadoop-conf
             mountPath: /etc/hadoop/conf  
         # Qubership custom change: Qubership Custom volume mounts for Qubership Hue from cert-manager secrets and extra user-defined mounts via Helm values
@@ -514,8 +512,6 @@ spec:
     volumes:
     # Qubership custom change: Qubership Custom volume mounts to support ReadOnlyRootFS
         - name: tmp
-          emptyDir: {}
-        - name: hue-logs
           emptyDir: {}
         - name: hadoop-conf
           emptyDir: {}   

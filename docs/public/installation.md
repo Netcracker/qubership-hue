@@ -985,8 +985,9 @@ Since the root filesystem is locked, we use emptyDir volumes to provide writable
 The following volumes are already provisioned in the deployment to handle standard application requirements:
 
  | Volume Name | Mount Path | Purpose | 
- |:-------------:|:---------:|:------------:|:-------------:|
+ |:-------------:|:---------:|:------------:|
  | tmp | /tmp | Provides a writable area for temporary files, logs, and general OS-level buffers. |
+ | hadoop-conf | /etc/hadoop/conf | Stores Hadoop configuration.|
 
 ## Replace Secret to ENV Mapping with File Based Secret Mounts
 

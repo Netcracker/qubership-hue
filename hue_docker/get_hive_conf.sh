@@ -49,4 +49,4 @@ rm -rf $TMP_HCC
 echo "Hadoop configuration updated"
 
 ./build/env/bin/hue migrate
-./build/env/bin/supervisor
+exec ./build/env/bin/supervisor --log-dir /tmp
