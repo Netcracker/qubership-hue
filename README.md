@@ -439,8 +439,6 @@ spec:
         # Qubership custom change: Qubership Custom volume mounts to support ReadOnlyRootFS
           - name: tmp
             mountPath: /tmp
-          - name: hue-logs
-            mountPath: /usr/share/hue/logs
           - name: hadoop-conf
             mountPath: /etc/hadoop/conf  
         # Qubership custom change: Qubership Custom volume mounts for Qubership Hue from cert-manager secrets and extra user-defined mounts via Helm values
@@ -514,8 +512,6 @@ spec:
     volumes:
     # Qubership custom change: Qubership Custom volume mounts to support ReadOnlyRootFS
         - name: tmp
-          emptyDir: {}
-        - name: hue-logs
           emptyDir: {}
         - name: hadoop-conf
           emptyDir: {}   
@@ -628,6 +624,8 @@ spec:
 _helpers.tpl added to define Qubership custom Helm template functions for defining Kubernetes resources related to Qubership Hue and Trino deployments
 
 configmap-hive.yaml is converted to secret-hive.yaml and configmap-hue-extra.yaml, configmap-hue.yaml files are converted to secret-hue.yaml for security reasons.
+
+gunicorn-log-configmap.yaml is for storing the Gunicorn logging configuration.
 
 createdbjob.yaml and posgressconnparams are added as a pg pre install hooks to initlize the Qubership Hue DB and a secret contains  PostgreSQL credentials for initialization Job.
 
