@@ -607,7 +607,8 @@
           "$ref": "#/definitions/io.k8s.api.core.v1.PodSecurityContext",
           "default": {
             "runAsUser": 1001,
-            "fsGroup": 1001
+            "fsGroup": 1001,
+            "runAsGroup": 1001
           }
         },
         "securityContext": {
