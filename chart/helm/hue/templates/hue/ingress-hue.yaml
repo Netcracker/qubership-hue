@@ -1,7 +1,7 @@
 ##########################################################################################################
 # Qubership custom template. Ingress for Hue and API, with TLS and custom annotations based on Helm values
 ##########################################################################################################
-{{- if .Values.ingress.create }}
+{{- if eq (include "hue.ingressEnabled" .) "true" }}
 kind: Ingress
 apiVersion: networking.k8s.io/v1
 metadata:

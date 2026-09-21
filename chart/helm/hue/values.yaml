@@ -144,8 +144,15 @@ createDBJob:
       cpu: 300m
       memory: 300Mi
 
+# Qubership-platform provided parameters
+# that drive the automatic switch between ingress.create and gateway.enabled below.
+GATEWAY_SYSTEM_TYPE: "legacy-ingress"
+GATEWAY_SYSTEM_NAME: "default-external-gateway"
+GATEWAY_SYSTEM_NAMESPACE: "gateway-system"
+
 ingress:
-  create: true
+  # null = derive from GATEWAY_SYSTEM_TYPE (enabled when it contains "legacy-ingress"); set true/false to override.
+  create: null
   type: "nginx"
   domain: ""
   tls:
@@ -340,14 +347,17 @@ extraVolumeMounts: []
 #    subPath: cm-ca.crt
 #    readOnly: true
 gateway:
-  enabled: false
+  # null = derive from GATEWAY_SYSTEM_TYPE (enabled when it contains "gateway-api-default"); set true/false to override.
+  enabled: null
   annotations: {}
   labels: {}
+  # If empty, built from GATEWAY_SYSTEM_NAME / GATEWAY_SYSTEM_NAMESPACE.
   parentRefs: []
   hostnames: []
   rules: []
   redirectRoute:
     enabled: false
+    # If empty, built from GATEWAY_SYSTEM_NAME / GATEWAY_SYSTEM_NAMESPACE.
     parentRefs: []
   backendTLSPolicy:
       enabled: false

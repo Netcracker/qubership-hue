@@ -194,6 +194,46 @@ Hue PG User Password
 {{- end -}}
 
 {{/*
+Whether to render the legacy Ingress resource. Uses .Values.ingress.create when explicitly set
+(true/false); otherwise falls back to whether GATEWAY_SYSTEM_TYPE contains "legacy-ingress" -
+unless .Values.gateway.enabled is also unset and the HTTPRoute would be created, in which case
+the Ingress is skipped regardless of GATEWAY_SYSTEM_TYPE.
+*/}}
+{{- define "hue.ingressEnabled" -}}
+{{- if eq .Values.ingress.create nil -}}
+{{- if and (eq .Values.gateway.enabled nil) (eq (include "hue.gatewayEnabled" .) "true") -}}
+{{- false -}}
+{{- else -}}
+{{- contains "legacy-ingress" .Values.GATEWAY_SYSTEM_TYPE -}}
+{{- end -}}
+{{- else -}}
+{{- .Values.ingress.create -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Whether to render the Gateway API HTTPRoute resources. Uses .Values.gateway.enabled when
+explicitly set (true/false); otherwise falls back to whether GATEWAY_SYSTEM_TYPE contains
+"gateway-api-default".
+*/}}
+{{- define "hue.gatewayEnabled" -}}
+{{- if eq .Values.gateway.enabled nil -}}
+{{- contains "gateway-api-default" .Values.GATEWAY_SYSTEM_TYPE -}}
+{{- else -}}
+{{- .Values.gateway.enabled -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Default Gateway API parentRefs, built from GATEWAY_SYSTEM_NAME / GATEWAY_SYSTEM_NAMESPACE.
+Used whenever a parentRefs list is not explicitly set in values.
+*/}}
+{{- define "hue.gatewayDefaultParentRefs" -}}
+- name: {{ .Values.GATEWAY_SYSTEM_NAME }}
+  namespace: {{ .Values.GATEWAY_SYSTEM_NAMESPACE }}
+{{- end -}}
+
+{{/*
 Hue Pod SecurityContext values
 */}}
 {{- define "hue.podSecurityContext" -}}

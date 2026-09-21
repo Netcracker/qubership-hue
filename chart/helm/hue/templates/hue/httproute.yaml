@@ -1,7 +1,7 @@
 #################################################
 ## Qubership custom template. HTTPRoute for hUE when using a Kubernetes Gateway instead of an Ingress.
 #################################################
-{{- if  .Values.gateway.enabled -}}
+{{- if eq (include "hue.gatewayEnabled" .) "true" -}}
 {{- $fullname := (include "hue.fullname" .) }}
 {{- $Global := . }}
 apiVersion: gateway.networking.k8s.io/v1
@@ -24,10 +24,12 @@ metadata:
   annotations: {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- with .Values.gateway.parentRefs }}
   parentRefs:
-    {{- tpl (toYaml .) $Global | nindent 4 }}
-  {{- end }}
+    {{- if .Values.gateway.parentRefs }}
+    {{- tpl (toYaml .Values.gateway.parentRefs) $Global | nindent 4 }}
+    {{- else }}
+    {{- include "hue.gatewayDefaultParentRefs" . | nindent 4 }}
+    {{- end }}
   {{- with .Values.gateway.hostnames }}
   hostnames:
     {{- tpl (toYaml .) $Global | nindent 4 }}
@@ -126,10 +128,12 @@ metadata:
   annotations: {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- with .Values.gateway.redirectRoute.parentRefs }}
   parentRefs:
-    {{- tpl (toYaml .) $Global  | nindent 4 }}
-  {{- end }}
+    {{- if .Values.gateway.redirectRoute.parentRefs }}
+    {{- tpl (toYaml .Values.gateway.redirectRoute.parentRefs) $Global | nindent 4 }}
+    {{- else }}
+    {{- include "hue.gatewayDefaultParentRefs" . | nindent 4 }}
+    {{- end }}
   {{- with .Values.gateway.hostnames }}
   hostnames:
     {{- tpl (toYaml .) $Global  | nindent 4 }}
