@@ -1191,7 +1191,7 @@
     },
     "PAAS_PLATFORM": {
       "type": "string",
-      "description": "The PaaS platform where Hive Metastore is being deployed to."
+      "description": "The PaaS platform where Hue is being deployed to."
     },
     "GATEWAY_SYSTEM_TYPE": {
       "description": "The mode of Gateway applications must use during installation: \"legacy-ingress\", \"gateway-api-default\", or \"legacy-ingress, gateway-api-default\" for both.",
