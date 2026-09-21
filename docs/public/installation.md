@@ -31,6 +31,7 @@ The following topics are covered in this toic:
     * [Hue Keycloak (OIDC) for SSO Login](#hue-keycloak-oidc-for-sso-login)
       * [Keycloak with TLS](#keycloak-with-tls) 
     * [HTTPRoute for K8S Gateway API Support](#httproute-for-k8s-gateway-api-support) 
+      * [Automatic Switching Between Ingress and HTTPRoute](#automatic-switching-between-ingress-and-httproute)
     * [Read Only Root Filesystem for Hue](#read-only-root-filesystem-for-hue)     
     * [Replace Secret to ENV Mapping with File Based Secret Mounts](#replace-secret-to-env-mapping-with-file-based-secret-mounts)
   * [Configuration Trino](#configuration-trino)
@@ -908,25 +909,76 @@ It is possible to deploy the following three objects:
 * Redirect HTTPRoute - It can be used for redirecting Hue user interface client from HTTP to HTTPS when using gateway with custom certificate.
 * BackendTLSPolicy - It is required for verifying Hue certificate, when TLS is enabled on Hue server inside K8S.
 
+### Automatic Switching Between Ingress and HTTPRoute
+
+The Qubership platform provides the `GATEWAY_SYSTEM_TYPE`, `GATEWAY_SYSTEM_NAME`, and `GATEWAY_SYSTEM_NAMESPACE` parameters, which describe the shared Gateway available in the cluster. When `ingress.create` and `gateway.enabled` are left at their default value of `null`, the chart derives them from `GATEWAY_SYSTEM_TYPE`:
+* If `GATEWAY_SYSTEM_TYPE` contains `legacy-ingress`, the Ingress is created.
+* If `GATEWAY_SYSTEM_TYPE` contains `gateway-api-default`, the HTTPRoute is created.
+* If `GATEWAY_SYSTEM_TYPE` contains both values (for example, `"legacy-ingress, gateway-api-default"`), the HTTPRoute takes priority and the Ingress is skipped.
+
+Set `ingress.create` and/or `gateway.enabled` explicitly to `true` or `false` to override this behavior regardless of `GATEWAY_SYSTEM_TYPE`.
+
+`gateway.parentRefs` and `gateway.redirectRoute.parentRefs` default to the shared Gateway identified by `GATEWAY_SYSTEM_NAME` and `GATEWAY_SYSTEM_NAMESPACE`. Set them explicitly to attach to a different Gateway.
+
 Following configuration parameters are available:
 
 |Name|Type|Default|Description|
 |---|---|---|---|
-|gateway.enabled|`boolean`|`false`|Specifies if HTTPRoute for Hue server is deployed|
+|GATEWAY_SYSTEM_TYPE|`string`|`legacy-ingress`|Specifies whether to create the Ingress (`legacy-ingress`), the HTTPRoute (`gateway-api-default`), or both (`"legacy-ingress, gateway-api-default"`) when `ingress.create`/`gateway.enabled` are left as `null`|
+|GATEWAY_SYSTEM_NAME|`string`|`default-external-gateway`|Name of the shared Gateway, used as the default `parentRefs[].name` for HTTPRoute|
+|GATEWAY_SYSTEM_NAMESPACE|`string`|`gateway-system`|Namespace of the shared Gateway, used as the default `parentRefs[].namespace` for HTTPRoute|
+|ingress.create|`boolean`|`null`|Specifies if Ingress for Hue server is deployed. `null` derives it from `GATEWAY_SYSTEM_TYPE`; set to `true`/`false` to override|
+|gateway.enabled|`boolean`|`null`|Specifies if HTTPRoute for Hue server is deployed. `null` derives it from `GATEWAY_SYSTEM_TYPE`; set to `true`/`false` to override|
 |gateway.annotations|`object`|`{}`|Annotations for HTTPRoute and related objects|
 |gateway.labels|`object`|`{}`|Custom labels for HTTPRoute|
-|gateway.parentRefs|`array`|`[]`|parentRefs for HTTPRoute|
+|gateway.parentRefs|`array`|see below|parentRefs for HTTPRoute. Defaults to a single ref built from `GATEWAY_SYSTEM_NAME`/`GATEWAY_SYSTEM_NAMESPACE`|
 |gateway.hostnames|`array`|`[]`|hostnames for HTTPRoute|
 |gateway.rules|`array`|`[]`|Rules for HTTPRoute. When `rules[].matches` is not set, it defaults to `path.type=PathPrefix` and `path.value=/`. `backendRefs` in the rule will point to Hue server service, but the weight can be configured if needed.|
 |gateway.redirectRoute.enabled|`boolean`|`false`|Specifies if redirect HTTPRoute for Hue server is deployed|
-|gateway.redirectRoute.parentRefs|`array`|`[]`|parentRefs for redirect HTTPRoute|
+|gateway.redirectRoute.parentRefs|`array`|see below|parentRefs for redirect HTTPRoute. Defaults to a single ref built from `GATEWAY_SYSTEM_NAME`/`GATEWAY_SYSTEM_NAMESPACE`, targeting port `80`|
 |gateway.backendTLSPolicy.enabled|`boolean`|`false`|Specifies if the backendTLSPolicy should be deployed|
 |gateway.backendTLSPolicy.hostname|`string`|`''`|Hostname for backendTLSPolicy|
 |gateway.backendTLSPolicy.caCertificateRefs|`array`|`[]`|caCertificateRefs for backendTLSPolicy|
 |gateway.backendTLSPolicy.wellKnownCACertificates|`string`|`""`|wellKnownCACertificates for backendTLSPolicy|
 |gateway.backendTLSPolicy.subjectAltNames|`array`|`[]`|subjectAltNames for backendTLSPolicy|
 
+Default `gateway.parentRefs`:
+```yaml
+gateway:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: "{{ .Values.GATEWAY_SYSTEM_NAME }}"
+      namespace: "{{ .Values.GATEWAY_SYSTEM_NAMESPACE }}"
+      # Uncomment if using gateway.redirectRoute (HTTP-to-HTTPS redirect)
+      # so this route only targets the Envoy Gateway's HTTPS listener.
+      # port: 443
+```
+
+Default `gateway.redirectRoute.parentRefs`:
+```yaml
+gateway:
+  redirectRoute:
+    parentRefs:
+      - group: gateway.networking.k8s.io
+        kind: Gateway
+        name: "{{ .Values.GATEWAY_SYSTEM_NAME }}"
+        namespace: "{{ .Values.GATEWAY_SYSTEM_NAMESPACE }}"
+        port: 80
+```
+
 The configuration examples are given below:
+
+Zero-config (default): with `GATEWAY_SYSTEM_TYPE` set to `gateway-api-default` by the platform, no `gateway`/`ingress` values need to be set — the HTTPRoute is created automatically and attached to the shared Gateway named by `GATEWAY_SYSTEM_NAME`/`GATEWAY_SYSTEM_NAMESPACE`:
+```yaml
+gateway:
+  hostnames:
+    - hue-gateway.your.k8s.hostname
+  rules:
+    - path: {}
+```
+
+The following examples show explicit configuration, overriding the automatic defaults above:
 
 Non tls:
 ```yaml
