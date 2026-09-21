@@ -1093,9 +1093,16 @@
           }
         },
         "parentRefs": {
-          "description": "References to parent resources.",
+          "description": "References to parent resources. Defaults to a single ref built from GATEWAY_SYSTEM_NAME / GATEWAY_SYSTEM_NAMESPACE.",
           "type": "array",
-          "default": [],
+          "default": [
+            {
+              "group": "gateway.networking.k8s.io",
+              "kind": "Gateway",
+              "name": "{{ .Values.GATEWAY_SYSTEM_NAME }}",
+              "namespace": "{{ .Values.GATEWAY_SYSTEM_NAMESPACE }}"
+            }
+          ],
           "items": {
             "type": "object"
           }
@@ -1126,9 +1133,17 @@
               "default": false
             },
             "parentRefs": {
-              "description": "References to parent resources for the redirect route.",
+              "description": "References to parent resources for the redirect route. Defaults to a single ref built from GATEWAY_SYSTEM_NAME / GATEWAY_SYSTEM_NAMESPACE.",
               "type": "array",
-              "default": [],
+              "default": [
+                {
+                  "group": "gateway.networking.k8s.io",
+                  "kind": "Gateway",
+                  "name": "{{ .Values.GATEWAY_SYSTEM_NAME }}",
+                  "namespace": "{{ .Values.GATEWAY_SYSTEM_NAMESPACE }}",
+                  "port": 80
+                }
+              ],
               "items": {
                 "type": "object"
               }

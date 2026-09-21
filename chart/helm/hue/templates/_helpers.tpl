@@ -225,15 +225,6 @@ explicitly set (true/false); otherwise falls back to whether GATEWAY_SYSTEM_TYPE
 {{- end -}}
 
 {{/*
-Default Gateway API parentRefs, built from GATEWAY_SYSTEM_NAME / GATEWAY_SYSTEM_NAMESPACE.
-Used whenever a parentRefs list is not explicitly set in values.
-*/}}
-{{- define "hue.gatewayDefaultParentRefs" -}}
-- name: {{ .Values.GATEWAY_SYSTEM_NAME }}
-  namespace: {{ .Values.GATEWAY_SYSTEM_NAMESPACE }}
-{{- end -}}
-
-{{/*
 Hue Pod SecurityContext values
 */}}
 {{- define "hue.podSecurityContext" -}}

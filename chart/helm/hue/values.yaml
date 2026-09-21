@@ -351,14 +351,25 @@ gateway:
   enabled: null
   annotations: {}
   labels: {}
-  # If empty, built from GATEWAY_SYSTEM_NAME / GATEWAY_SYSTEM_NAMESPACE.
-  parentRefs: []
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: "{{ .Values.GATEWAY_SYSTEM_NAME }}"
+      namespace: "{{ .Values.GATEWAY_SYSTEM_NAMESPACE }}"
+      # Uncomment if using gateway.redirectRoute (HTTP-to-HTTPS redirect)
+      # so this route only targets the Envoy Gateway's HTTPS listener.
+      # port: 443
   hostnames: []
   rules: []
   redirectRoute:
     enabled: false
-    # If empty, built from GATEWAY_SYSTEM_NAME / GATEWAY_SYSTEM_NAMESPACE.
-    parentRefs: []
+    # Targets the Envoy Gateway's HTTP listener.
+    parentRefs:
+      - group: gateway.networking.k8s.io
+        kind: Gateway
+        name: "{{ .Values.GATEWAY_SYSTEM_NAME }}"
+        namespace: "{{ .Values.GATEWAY_SYSTEM_NAMESPACE }}"
+        port: 80
   backendTLSPolicy:
       enabled: false
       hostname: ''

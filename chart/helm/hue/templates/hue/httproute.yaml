@@ -24,12 +24,10 @@ metadata:
   annotations: {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  {{- with .Values.gateway.parentRefs }}
   parentRefs:
-    {{- if .Values.gateway.parentRefs }}
-    {{- tpl (toYaml .Values.gateway.parentRefs) $Global | nindent 4 }}
-    {{- else }}
-    {{- include "hue.gatewayDefaultParentRefs" . | nindent 4 }}
-    {{- end }}
+    {{- tpl (toYaml .) $Global | nindent 4 }}
+  {{- end }}
   {{- with .Values.gateway.hostnames }}
   hostnames:
     {{- tpl (toYaml .) $Global | nindent 4 }}
@@ -128,12 +126,10 @@ metadata:
   annotations: {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  {{- with .Values.gateway.redirectRoute.parentRefs }}
   parentRefs:
-    {{- if .Values.gateway.redirectRoute.parentRefs }}
-    {{- tpl (toYaml .Values.gateway.redirectRoute.parentRefs) $Global | nindent 4 }}
-    {{- else }}
-    {{- include "hue.gatewayDefaultParentRefs" . | nindent 4 }}
-    {{- end }}
+    {{- tpl (toYaml .) $Global  | nindent 4 }}
+  {{- end }}
   {{- with .Values.gateway.hostnames }}
   hostnames:
     {{- tpl (toYaml .) $Global  | nindent 4 }}
