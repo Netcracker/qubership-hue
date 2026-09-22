@@ -144,8 +144,15 @@ createDBJob:
       cpu: 300m
       memory: 300Mi
 
+# Qubership-platform provided parameters
+# that drive the automatic switch between ingress.create and gateway.enabled below.
+GATEWAY_SYSTEM_TYPE: "legacy-ingress"
+GATEWAY_SYSTEM_NAME: "default-external-gateway"
+GATEWAY_SYSTEM_NAMESPACE: "gateway-system"
+
 ingress:
-  create: true
+  # null = derive from GATEWAY_SYSTEM_TYPE (enabled when it contains "legacy-ingress"); set true/false to override.
+  create: null
   type: "nginx"
   domain: ""
   tls:
@@ -340,15 +347,34 @@ extraVolumeMounts: []
 #    subPath: cm-ca.crt
 #    readOnly: true
 gateway:
-  enabled: false
+  # null = derive from GATEWAY_SYSTEM_TYPE (enabled when it contains "gateway-api-default"); set true/false to override.
+  enabled: null
   annotations: {}
   labels: {}
-  parentRefs: []
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: "{{ .Values.GATEWAY_SYSTEM_NAME }}"
+      namespace: "{{ .Values.GATEWAY_SYSTEM_NAMESPACE }}"
+      # Uncomment if using gateway.redirectRoute (HTTP-to-HTTPS redirect)
+      # so this route only targets the Envoy Gateway's HTTPS listener.
+      # port: 443
   hostnames: []
-  rules: []
+  rules:
+    - path:
+        type: PathPrefix
+        value: /
+      backendRefs:
+        - port: 8888
   redirectRoute:
     enabled: false
-    parentRefs: []
+    # Targets the Envoy Gateway's HTTP listener.
+    parentRefs:
+      - group: gateway.networking.k8s.io
+        kind: Gateway
+        name: "{{ .Values.GATEWAY_SYSTEM_NAME }}"
+        namespace: "{{ .Values.GATEWAY_SYSTEM_NAMESPACE }}"
+        port: 80
   backendTLSPolicy:
       enabled: false
       hostname: ''

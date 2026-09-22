@@ -677,9 +677,9 @@
       "type": "object",
       "properties": {
         "create": {
-          "description": "Whether to create the ingress resource.",
-          "type": "boolean",
-          "default": true
+          "description": "Whether to create the ingress resource. Null derives it from GATEWAY_SYSTEM_TYPE containing \"legacy-ingress\".",
+          "type": ["boolean", "null"],
+          "default": null
         },
         "type": {
           "description": "The type of ingress controller to use.",
@@ -1072,9 +1072,9 @@
       "type": "object",
       "properties": {
         "enabled": {
-          "description": "Whether the gateway is enabled.",
-          "type": "boolean",
-          "default": false
+          "description": "Whether the gateway is enabled. Null derives it from GATEWAY_SYSTEM_TYPE containing \"gateway-api-default\".",
+          "type": ["boolean", "null"],
+          "default": null
         },
         "annotations": {
           "description": "Annotations for the gateway.",
@@ -1093,9 +1093,16 @@
           }
         },
         "parentRefs": {
-          "description": "References to parent resources.",
+          "description": "References to parent resources. Defaults to a single ref built from GATEWAY_SYSTEM_NAME / GATEWAY_SYSTEM_NAMESPACE.",
           "type": "array",
-          "default": [],
+          "default": [
+            {
+              "group": "gateway.networking.k8s.io",
+              "kind": "Gateway",
+              "name": "{{ .Values.GATEWAY_SYSTEM_NAME }}",
+              "namespace": "{{ .Values.GATEWAY_SYSTEM_NAMESPACE }}"
+            }
+          ],
           "items": {
             "type": "object"
           }
@@ -1111,7 +1118,19 @@
         "rules": {
           "description": "Rules for the gateway.",
           "type": "array",
-          "default": [],
+          "default": [
+            {
+              "path": {
+                "type": "PathPrefix",
+                "value": "/"
+              },
+              "backendRefs": [
+                {
+                  "port": 8888
+                }
+              ]
+            }
+          ],
           "items": {
             "type": "object"
           }
@@ -1126,9 +1145,17 @@
               "default": false
             },
             "parentRefs": {
-              "description": "References to parent resources for the redirect route.",
+              "description": "References to parent resources for the redirect route. Defaults to a single ref built from GATEWAY_SYSTEM_NAME / GATEWAY_SYSTEM_NAMESPACE.",
               "type": "array",
-              "default": [],
+              "default": [
+                {
+                  "group": "gateway.networking.k8s.io",
+                  "kind": "Gateway",
+                  "name": "{{ .Values.GATEWAY_SYSTEM_NAME }}",
+                  "namespace": "{{ .Values.GATEWAY_SYSTEM_NAMESPACE }}",
+                  "port": 80
+                }
+              ],
               "items": {
                 "type": "object"
               }
@@ -1176,7 +1203,22 @@
     },
     "PAAS_PLATFORM": {
       "type": "string",
-      "description": "The PaaS platform where Hive Metastore is being deployed to."
+      "description": "The PaaS platform where Hue is being deployed to."
+    },
+    "GATEWAY_SYSTEM_TYPE": {
+      "description": "The mode of Gateway applications must use during installation: \"legacy-ingress\", \"gateway-api-default\", or \"legacy-ingress, gateway-api-default\" for both.",
+      "type": "string",
+      "default": "legacy-ingress"
+    },
+    "GATEWAY_SYSTEM_NAME": {
+      "description": "The name of the Gateway API Gateway controller, used as spec.parentRefs.name on HTTPRoute resources.",
+      "type": "string",
+      "default": "default-external-gateway"
+    },
+    "GATEWAY_SYSTEM_NAMESPACE": {
+      "description": "The namespace of the Gateway API Gateway controller, used as spec.parentRefs.namespace on HTTPRoute resources.",
+      "type": "string",
+      "default": "gateway-system"
     }
   }
 }

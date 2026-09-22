@@ -194,6 +194,31 @@ Hue PG User Password
 {{- end -}}
 
 {{/*
+Whether to render the legacy Ingress resource. Uses .Values.ingress.create when explicitly set
+(true/false); otherwise falls back to whether GATEWAY_SYSTEM_TYPE contains "legacy-ingress".
+*/}}
+{{- define "hue.ingressEnabled" -}}
+{{- if eq .Values.ingress.create nil -}}
+{{- contains "legacy-ingress" .Values.GATEWAY_SYSTEM_TYPE -}}
+{{- else -}}
+{{- .Values.ingress.create -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Whether to render the Gateway API HTTPRoute resources. Uses .Values.gateway.enabled when
+explicitly set (true/false); otherwise falls back to whether GATEWAY_SYSTEM_TYPE contains
+"gateway-api-default".
+*/}}
+{{- define "hue.gatewayEnabled" -}}
+{{- if eq .Values.gateway.enabled nil -}}
+{{- contains "gateway-api-default" .Values.GATEWAY_SYSTEM_TYPE -}}
+{{- else -}}
+{{- .Values.gateway.enabled -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Hue Pod SecurityContext values
 */}}
 {{- define "hue.podSecurityContext" -}}
