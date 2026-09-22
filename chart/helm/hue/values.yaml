@@ -360,7 +360,12 @@ gateway:
       # so this route only targets the Envoy Gateway's HTTPS listener.
       # port: 443
   hostnames: []
-  rules: []
+  rules:
+    - path:
+        type: PathPrefix
+        value: /
+      backendRefs:
+        - port: 8888
   redirectRoute:
     enabled: false
     # Targets the Envoy Gateway's HTTP listener.

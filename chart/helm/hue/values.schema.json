@@ -1118,7 +1118,19 @@
         "rules": {
           "description": "Rules for the gateway.",
           "type": "array",
-          "default": [],
+          "default": [
+            {
+              "path": {
+                "type": "PathPrefix",
+                "value": "/"
+              },
+              "backendRefs": [
+                {
+                  "port": 8888
+                }
+              ]
+            }
+          ],
           "items": {
             "type": "object"
           }
