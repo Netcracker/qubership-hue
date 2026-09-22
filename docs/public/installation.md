@@ -911,10 +911,10 @@ It is possible to deploy the following three objects:
 
 ### Automatic Switching Between Ingress and HTTPRoute
 
-The Qubership platform provides the `GATEWAY_SYSTEM_TYPE`, `GATEWAY_SYSTEM_NAME`, and `GATEWAY_SYSTEM_NAMESPACE` parameters, which describe the shared Gateway available in the cluster. When `ingress.create` and `gateway.enabled` are left at their default value of `null`, the chart derives them from `GATEWAY_SYSTEM_TYPE`:
+The Qubership platform provides the `GATEWAY_SYSTEM_TYPE`, `GATEWAY_SYSTEM_NAME`, and `GATEWAY_SYSTEM_NAMESPACE` parameters, which describe the shared Gateway available in the cluster. When `ingress.create` and `gateway.enabled` are left at their default value of `null`, the chart derives them independently from `GATEWAY_SYSTEM_TYPE`:
 * If `GATEWAY_SYSTEM_TYPE` contains `legacy-ingress`, the Ingress is created.
 * If `GATEWAY_SYSTEM_TYPE` contains `gateway-api-default`, the HTTPRoute is created.
-* If `GATEWAY_SYSTEM_TYPE` contains both values (for example, `"legacy-ingress, gateway-api-default"`), the HTTPRoute takes priority and the Ingress is skipped.
+* If `GATEWAY_SYSTEM_TYPE` contains both values (for example, `"legacy-ingress, gateway-api-default"`), both the Ingress and the HTTPRoute are created.
 
 Set `ingress.create` and/or `gateway.enabled` explicitly to `true` or `false` to override this behavior regardless of `GATEWAY_SYSTEM_TYPE`.
 
@@ -933,7 +933,7 @@ Following configuration parameters are available:
 |gateway.labels|`object`|`{}`|Custom labels for HTTPRoute|
 |gateway.parentRefs|`array`|see below|parentRefs for HTTPRoute. Defaults to a single ref built from `GATEWAY_SYSTEM_NAME`/`GATEWAY_SYSTEM_NAMESPACE`|
 |gateway.hostnames|`array`|`[]`|hostnames for HTTPRoute|
-|gateway.rules|`array`|`[]`|Rules for HTTPRoute. When `rules[].matches` is not set, it defaults to `path.type=PathPrefix` and `path.value=/`. `backendRefs` in the rule will point to Hue server service, but the weight can be configured if needed.|
+|gateway.rules|`array`|see below|Rules for HTTPRoute. When `rules[].matches` is not set, it defaults to `path.type=PathPrefix` and `path.value=/`. `backendRefs` in the rule will point to Hue server service, but the weight can be configured if needed.|
 |gateway.redirectRoute.enabled|`boolean`|`false`|Specifies if redirect HTTPRoute for Hue server is deployed|
 |gateway.redirectRoute.parentRefs|`array`|see below|parentRefs for redirect HTTPRoute. Defaults to a single ref built from `GATEWAY_SYSTEM_NAME`/`GATEWAY_SYSTEM_NAMESPACE`, targeting port `80`|
 |gateway.backendTLSPolicy.enabled|`boolean`|`false`|Specifies if the backendTLSPolicy should be deployed|
@@ -967,15 +967,24 @@ gateway:
         port: 80
 ```
 
+Default `gateway.rules`:
+```yaml
+gateway:
+  rules:
+    - path:
+        type: PathPrefix
+        value: /
+      backendRefs:
+        - port: 8888
+```
+
 The configuration examples are given below:
 
-Zero-config (default): with `GATEWAY_SYSTEM_TYPE` set to `gateway-api-default` by the platform, no `gateway`/`ingress` values need to be set — the HTTPRoute is created automatically and attached to the shared Gateway named by `GATEWAY_SYSTEM_NAME`/`GATEWAY_SYSTEM_NAMESPACE`:
+Zero-config (default): with `GATEWAY_SYSTEM_TYPE` set to `gateway-api-default` by the platform, only `hostnames` needs to be set — the HTTPRoute is created automatically, attached to the shared Gateway named by `GATEWAY_SYSTEM_NAME`/`GATEWAY_SYSTEM_NAMESPACE`, and routes `/` to the Hue service using the default `gateway.rules` shown above:
 ```yaml
 gateway:
   hostnames:
     - hue-gateway.your.k8s.hostname
-  rules:
-    - path: {}
 ```
 
 The following examples show explicit configuration, overriding the automatic defaults above:

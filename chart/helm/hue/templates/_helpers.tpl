@@ -195,17 +195,11 @@ Hue PG User Password
 
 {{/*
 Whether to render the legacy Ingress resource. Uses .Values.ingress.create when explicitly set
-(true/false); otherwise falls back to whether GATEWAY_SYSTEM_TYPE contains "legacy-ingress" -
-unless .Values.gateway.enabled is also unset and the HTTPRoute would be created, in which case
-the Ingress is skipped regardless of GATEWAY_SYSTEM_TYPE.
+(true/false); otherwise falls back to whether GATEWAY_SYSTEM_TYPE contains "legacy-ingress".
 */}}
 {{- define "hue.ingressEnabled" -}}
 {{- if eq .Values.ingress.create nil -}}
-{{- if and (eq .Values.gateway.enabled nil) (eq (include "hue.gatewayEnabled" .) "true") -}}
-{{- false -}}
-{{- else -}}
 {{- contains "legacy-ingress" .Values.GATEWAY_SYSTEM_TYPE -}}
-{{- end -}}
 {{- else -}}
 {{- .Values.ingress.create -}}
 {{- end -}}
