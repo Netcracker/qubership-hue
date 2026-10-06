@@ -368,6 +368,10 @@ gateway:
         - port: 8888
   redirectRoute:
     enabled: false
+    rules:
+      - path:
+          type: PathPrefix
+          value: /
     # Targets the Envoy Gateway's HTTP listener.
     parentRefs:
       - group: gateway.networking.k8s.io

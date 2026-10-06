@@ -135,11 +135,20 @@ spec:
     {{- tpl (toYaml .) $Global  | nindent 4 }}
   {{- end }}
   rules:
-    - filters:
+    {{- range .Values.gateway.redirectRoute.rules }}
+    - matches:
+        {{- if .matches }}
+        {{- toYaml .matches | nindent 8 }}
+        {{- else }}
+        - path:
+            type: {{ .path.type | default "PathPrefix" }}
+            value: {{ .path.value | default "/" }}
+        {{- end }}    
+      filters:
         - type: RequestRedirect
           requestRedirect:
             scheme: https
             statusCode: 301
+    {{- end }}      
 {{- end }}
 {{- end -}}
-

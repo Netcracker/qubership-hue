@@ -678,7 +678,10 @@
       "properties": {
         "create": {
           "description": "Whether to create the ingress resource. Null derives it from GATEWAY_SYSTEM_TYPE containing \"legacy-ingress\".",
-          "type": ["boolean", "null"],
+          "type": [
+            "boolean",
+            "null"
+          ],
           "default": null
         },
         "type": {
@@ -866,7 +869,6 @@
               "memory": "600Mi"
             }
           }
-
         },
         "service": {
           "description": "Service configuration for Trino.",
@@ -939,7 +941,6 @@
       "description": "JVM configuration for Trino.",
       "type": "string",
       "default": "see the values.yaml file"
-
     },
     "jvm": {
       "description": "JVM configuration for the Trino container.",
@@ -1073,7 +1074,10 @@
       "properties": {
         "enabled": {
           "description": "Whether the gateway is enabled. Null derives it from GATEWAY_SYSTEM_TYPE containing \"gateway-api-default\".",
-          "type": ["boolean", "null"],
+          "type": [
+            "boolean",
+            "null"
+          ],
           "default": null
         },
         "annotations": {
@@ -1143,6 +1147,26 @@
               "description": "Whether the redirect route is enabled.",
               "type": "boolean",
               "default": false
+            },
+            "rules": {
+              "description": "Rules for the gateway.",
+              "type": "array",
+              "default": [
+                {
+                  "path": {
+                    "type": "PathPrefix",
+                    "value": "/"
+                  },
+                  "backendRefs": [
+                    {
+                      "port": 8888
+                    }
+                  ]
+                }
+              ],
+              "items": {
+                "type": "object"
+              }
             },
             "parentRefs": {
               "description": "References to parent resources for the redirect route. Defaults to a single ref built from GATEWAY_SYSTEM_NAME / GATEWAY_SYSTEM_NAMESPACE.",
