@@ -926,7 +926,7 @@ Following configuration parameters are available:
 |ingress.create|`boolean`|`null`|Specifies if Ingress for Hue server is deployed. `null` derives it from `GATEWAY_SYSTEM_TYPE`; set to `true`/`false` to override|
 |gateway.enabled|`boolean`|`null`|Specifies if HTTPRoute for Hue server is deployed. `null` derives it from `GATEWAY_SYSTEM_TYPE`; set to `true`/`false` to override|
 |gateway.annotations|`object`|`{}`|Annotations for HTTPRoute and related objects|
-|gateway.labels|`object`|see below|Labels for HTTPRoute. Defaults to the `deployment.netcracker.com/ingress-type` and `deployment.netcracker.com/ingress-audience-type` values, which must match the Ingress labels (DEVOPS-012)|
+|gateway.labels|`object`|see below|Labels for HTTPRoute. Defaults to the `deployment.netcracker.com/ingress-type`, `deployment.netcracker.com/ingress-audience-type` and `app.kubernetes.io/component: ingress`|
 |gateway.parentRefs|`array`|see below|parentRefs for HTTPRoute. Defaults to a single ref built from `GATEWAY_SYSTEM_NAME`/`GATEWAY_SYSTEM_NAMESPACE`|
 |gateway.hostnames|`array`|`[]`|hostnames for HTTPRoute|
 |gateway.rules|`array`|see below|Rules for HTTPRoute. When `rules[].matches` is not set, it defaults to `path.type=PathPrefix` and `path.value=/`. `backendRefs` in the rule will point to Hue server service, but the weight can be configured if needed.|
