@@ -6,7 +6,6 @@ List of ports used by Qubership-hue deployment schema are as follows:
 
 | Port | Service | Description                                                                            |
 |------|---------|----------------------------------------------------------------------------------------|
-| 8005 | Hue     | Port for the Hue API.                                                                  |
 | 8888 | Hue     | Hue service port.                                                                      |
 | 8080 | Trino   | Trino service port. It is available only if Trino is deployed as part of Qubership-hue deployment schema. |
 

@@ -12,12 +12,6 @@ image:
    registry: "ghcr.io/netcracker/qubership-hue"
    tag: "main"
    pullPolicy: "IfNotPresent"
-
-
-api:
-  enabled: false
-  domain: "api."
-
 hue:
   priorityClassName: ~
   replicas: 1
@@ -350,7 +344,10 @@ gateway:
   # null = derive from GATEWAY_SYSTEM_TYPE (enabled when it contains "gateway-api-default"); set true/false to override.
   enabled: null
   annotations: {}
-  labels: {}
+  labels:
+    deployment.netcracker.com/ingress-type: public-network
+    deployment.netcracker.com/ingress-audience-type: ops-user
+    app.kubernetes.io/component: ingress
   parentRefs:
     - group: gateway.networking.k8s.io
       kind: Gateway

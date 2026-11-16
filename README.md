@@ -28,9 +28,6 @@ image:
    registry: "ghcr.io/netcracker/qubership-hue"
    tag: "main"
    pullPolicy: "IfNotPresent"
-api:
-  enabled: false
-  domain: "api."
 hue:
   priorityClassName: ~
   replicas: 1
@@ -317,37 +314,6 @@ extraVolumeMounts: []
 
 ---
 
-### `deployment-hue-api.yaml`
-
-```yaml
-metadata:
-  # Qubership custom change: custom labels for Qubership release support
-  name: {{ .Chart.Name }}-hue-api
-  labels:
-    app: {{ .Chart.Name }}
-    component: hue
-    release: {{ .Release.Name }}
-spec:
-  
-  selector:
-    matchLabels:
-      # Qubership custom change: custom labels for Qubership release support
-      app: {{ .Chart.Name }}
-      component: hue
-      release: {{ .Release.Name }}
-  template:
-    metadata:
-      labels:
-        # Qubership custom change: custom labels for Qubership release support
-        app: {{ .Chart.Name }}
-        component: hue
-        release: {{ .Release.Name }}
-    spec:
-      containers:
-        imagePullPolicy: {{ .Values.hue.imagePullPolicy }}    
-```
----
-
 ### `deployment-hue.yaml`
 
 ```yaml
@@ -565,35 +531,6 @@ spec:
         {{- end }}
       serviceAccountName: ""
 
-```
----
-
-### `service-hue-api.yaml`
-```yaml
-metadata:
-  # Qubership custom change: custom annotations for Qubership release support
-  {{- if .Values.hue.service.annotations }}
-  annotations:
-    {{- toYaml .Values.hue.service.annotations | nindent 4 }}
-  {{- end }}
-  labels:
-    # Qubership custom change: custom labels for Qubership release support
-    app: {{ .Chart.Name }}
-    component: hue
-    release: {{ .Release.Name }}
-spec:
-            
-  ports:
-  - name: hue-api
-    port: 8005
-    #Qubership custom change: using ingress instead of Nodeport
-    targetPort: 8005
-  selector:
-    pod: hue-api
-    # Qubership custom change: Qubership release support
-    app: {{ .Chart.Name }}
-    component: hue
-    release: {{ .Release.Name }}
 ```
 ---
 

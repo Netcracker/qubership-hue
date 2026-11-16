@@ -472,22 +472,6 @@
         "tag"
       ]
     },
-    "api": {
-      "description": "api configuration.",
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "description": "Whether to enable the API.",
-          "type": "boolean",
-          "default": false
-        },
-        "domain": {
-          "description": "The domain for the API.",
-          "type": "string",
-          "default": "api."
-        }
-      }
-    },
     "hue": {
       "description": "Hue configuration.",
       "type": "object",

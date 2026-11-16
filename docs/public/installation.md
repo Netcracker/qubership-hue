@@ -182,10 +182,6 @@ image:
    tag: "main"
    pullPolicy: "IfNotPresent"
 
-api:
-  enabled: false
-  domain: api.hue.dashboard.host.k8s.com
-
 hue:
   replicas: 1
   delayStart: 60
@@ -930,12 +926,12 @@ Following configuration parameters are available:
 |ingress.create|`boolean`|`null`|Specifies if Ingress for Hue server is deployed. `null` derives it from `GATEWAY_SYSTEM_TYPE`; set to `true`/`false` to override|
 |gateway.enabled|`boolean`|`null`|Specifies if HTTPRoute for Hue server is deployed. `null` derives it from `GATEWAY_SYSTEM_TYPE`; set to `true`/`false` to override|
 |gateway.annotations|`object`|`{}`|Annotations for HTTPRoute and related objects|
-|gateway.labels|`object`|`{}`|Custom labels for HTTPRoute|
-|gateway.parentRefs|`array`|see below|parentRefs for HTTPRoute. Defaults to a single ref built from `GATEWAY_SYSTEM_NAME`/`GATEWAY_SYSTEM_NAMESPACE`|
+|gateway.labels|`object`|see values.yaml|Defaults to labels required for Qubership Release|
+|gateway.parentRefs|`array`|see values.yaml|parentRefs for HTTPRoute. Defaults to a single ref built from `GATEWAY_SYSTEM_NAME`/`GATEWAY_SYSTEM_NAMESPACE`|
 |gateway.hostnames|`array`|`[]`|hostnames for HTTPRoute|
-|gateway.rules|`array`|see below|Rules for HTTPRoute. When `rules[].matches` is not set, it defaults to `path.type=PathPrefix` and `path.value=/`. `backendRefs` in the rule will point to Hue server service, but the weight can be configured if needed.|
+|gateway.rules|`array`|see values.yaml|Rules for HTTPRoute. When `rules[].matches` is not set, it defaults to `path.type=PathPrefix` and `path.value=/`. `backendRefs` in the rule will point to Hue server service, but the weight can be configured if needed.|
 |gateway.redirectRoute.enabled|`boolean`|`false`|Specifies if redirect HTTPRoute for Hue server is deployed|
-|gateway.redirectRoute.parentRefs|`array`|see below|parentRefs for redirect HTTPRoute. Defaults to a single ref built from `GATEWAY_SYSTEM_NAME`/`GATEWAY_SYSTEM_NAMESPACE`, targeting port `80`|
+|gateway.redirectRoute.parentRefs|`array`|see values.yaml|parentRefs for redirect HTTPRoute. Defaults to a single ref built from `GATEWAY_SYSTEM_NAME`/`GATEWAY_SYSTEM_NAMESPACE`, targeting port `80`|
 |gateway.backendTLSPolicy.enabled|`boolean`|`false`|Specifies if the backendTLSPolicy should be deployed|
 |gateway.backendTLSPolicy.hostname|`string`|`''`|Hostname for backendTLSPolicy|
 |gateway.backendTLSPolicy.caCertificateRefs|`array`|`[]`|caCertificateRefs for backendTLSPolicy|
