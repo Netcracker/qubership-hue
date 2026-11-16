@@ -93,7 +93,7 @@ Trino deployment only labels for Qubership release
 app.kubernetes.io/instance: {{ cat .Release.Name "-" .Release.Namespace | nospace | trunc 63 | trimSuffix "-" }}
 app.kubernetes.io/component: {{ default "trino" .Values.trinoComponentLabel }}
 app.kubernetes.io/version: {{ splitList ":" ( include "hue.image" . ) | last }}
-app.kubernetes.io/technology: java
+app.kubernetes.io/technology: java-others
 {{- end }}
 
 
