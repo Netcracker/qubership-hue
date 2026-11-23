@@ -35,6 +35,7 @@ For troubleshouting it might be useful to carefully check installation parameter
 5) Update the chart-version in the pipeline .github/workflows/helm-charts-release.yaml when the chart is upgraded.
 6) Check that hue can be deployed and can connect to all dependent services.
 7) Update documentation if needed.
+8) Update the pinned versions in the QA skill [qa-hue SKILL.md](/agent-packages/qa-hue/.apm/skills/qa-hue/SKILL.md): the "The component" paragraph repeats the `gethue/hue` base image tag and `appVersion`, and the "Data-source variants" section names the embedded Trino version from [release-images.yaml](/chart/helm/hue/release-images.yaml). Grep the skill for the old version to be sure nothing else drifted.
 
 ## Useful links:
 

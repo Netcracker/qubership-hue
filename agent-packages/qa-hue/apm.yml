@@ -1,0 +1,11 @@
+name: qa-hue
+version: 1.0.0
+description: QA guidance for the Qubership Hue Helm deployment — verification when no automated tests exist, database creation and migration, OIDC/LDAP/Kerberos authentication, embedded Trino and read-only filesystem constraints.
+targets:
+- claude
+- copilot
+- cursor
+dependencies:
+  apm: []
+  mcp: []
+includes: auto
